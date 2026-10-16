@@ -1,0 +1,265 @@
+
+x-titanos:
+  name: Cloudflare Tunnel
+  main: cloudflared
+  category: networking
+
+  description:
+    de: >-
+      Sicheren Cloudflare Tunnel für lokale Dienste
+      bereitstellen. Ermöglicht den Zugriff über
+      eigene Domains ohne Portfreigaben am Router.
+      Inklusive automatischer Wiederverbindung,
+      Verschlüsselung und erweiterten Einstellungen.
+    en: >-
+      Create a secure Cloudflare Tunnel for local
+      services. Access applications through custom
+      domains without router port forwarding.
+      Includes automatic reconnection, encryption
+      and advanced configuration.
+
+  tips:
+    de: >-
+      Zuerst im Cloudflare Zero Trust Dashboard einen
+      Tunnel vom Typ cloudflared erstellen.
+      Anschließend den Tunnel-Token kopieren und
+      bei der Installation eintragen.
+      Der Token wird von Cloudflare bereitgestellt
+      und darf nicht automatisch generiert werden.
+      Domains und Zieladressen werden im Cloudflare
+      Dashboard unter den Tunnel-Routen eingerichtet.
+      Es werden keine eingehenden Ports benötigt.
+      Der Tunnel baut ausschließlich ausgehende
+      Verbindungen zu Cloudflare auf.
+      Andere Docker-Dienste müssen über eine
+      erreichbare IP-Adresse oder ein gemeinsames
+      Docker-Netzwerk angesprochen werden.
+      Öffentliche Anwendungen sollten zusätzlich
+      durch Cloudflare Access geschützt werden.
+    en: >-
+      First create a cloudflared tunnel in the
+      Cloudflare Zero Trust dashboard.
+      Copy the tunnel token and enter it during
+      installation. The token is provided by
+      Cloudflare and must not be generated.
+      Configure domains and origin services in
+      the Cloudflare dashboard.
+      No inbound ports are required.
+      The tunnel uses outbound connections only.
+      Other Docker services must be reachable
+      through an IP address or shared Docker network.
+      Protect public applications with Cloudflare Access.
+
+  # ============================================
+  # KONFIGURIERBARE VARIABLEN
+  # ============================================
+
+  variables:
+
+    # ------------------------------------------
+    # AUTHENTIFIZIERUNG
+    # ------------------------------------------
+
+    TUNNEL_TOKEN:
+      label:
+        de: Cloudflare Tunnel Token
+        en: Cloudflare Tunnel Token
+      secret: true
+      required: true
+
+    # ------------------------------------------
+    # VERBINDUNG
+    # ------------------------------------------
+
+    TUNNEL_TRANSPORT_PROTOCOL:
+      label:
+        de: Verbindungsprotokoll (auto/quic/http2)
+        en: Connection protocol (auto/quic/http2)
+
+    TUNNEL_EDGE_IP_VERSION:
+      label:
+        de: IP-Version (4/6/auto)
+        en: IP version (4/6/auto)
+
+    TUNNEL_RETRIES:
+      label:
+        de: Verbindungsversuche
+        en: Connection retries
+
+    TUNNEL_GRACE_PERIOD:
+      label:
+        de: Wartezeit beim Beenden
+        en: Shutdown grace period
+
+    TUNNEL_POST_QUANTUM:
+      label:
+        de: Post-Quantum-Verschlüsselung erzwingen
+        en: Enforce post-quantum encryption
+
+    # ------------------------------------------
+    # PROTOKOLLIERUNG
+    # ------------------------------------------
+
+    TUNNEL_LOGLEVEL:
+      label:
+        de: Protokollstufe (info/warn/error/debug)
+        en: Log level (info/warn/error/debug)
+
+    TUNNEL_LOG_OUTPUT:
+      label:
+        de: Protokollformat (default/json)
+        en: Log format (default/json)
+
+    # ------------------------------------------
+    # MONITORING
+    # ------------------------------------------
+
+    TUNNEL_METRICS:
+      label:
+        de: Interner Metrik-Endpunkt
+        en: Internal metrics endpoint
+
+    # ------------------------------------------
+    # UPDATES
+    # ------------------------------------------
+
+    NO_AUTOUPDATE:
+      label:
+        de: Automatische Updates deaktivieren
+        en: Disable automatic updates
+
+  # ============================================
+  # SPEICHER
+  # ============================================
+
+  # Token-basierte Tunnel benötigen keine
+  # persistenten lokalen Konfigurationsdateien.
+
+  paths: {}
+
+  # ============================================
+  # PORTS
+  # ============================================
+
+  # Keine Portfreigaben erforderlich.
+  # Der Tunnel baut ausgehende Verbindungen auf.
+
+  ports: {}
+
+
+# ==============================================
+# SERVICES
+# ==============================================
+
+services:
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+
+    # ==========================================
+    # STARTBEFEHL
+    # ==========================================
+
+    command:
+      - tunnel
+      - --no-autoupdate
+      - run
+
+    # ==========================================
+    # UMGEBUNGSVARIABLEN
+    # ==========================================
+
+    environment:
+
+      # ----------------------------------------
+      # Authentifizierung
+      # ----------------------------------------
+
+      # Muss von TitanOS oder über .env gesetzt
+      # werden. Niemals automatisch generieren.
+      TUNNEL_TOKEN: "${TUNNEL_TOKEN:?Cloudflare Tunnel Token erforderlich}"
+
+      # ----------------------------------------
+      # Verbindung
+      # ----------------------------------------
+
+      # auto = QUIC mit HTTP/2-Fallback
+      TUNNEL_TRANSPORT_PROTOCOL: "auto"
+
+      # 4 = IPv4
+      # 6 = IPv6
+      # auto = automatische Auswahl
+      TUNNEL_EDGE_IP_VERSION: "4"
+
+      # Wiederholungsversuche bei Fehlern
+      TUNNEL_RETRIES: "5"
+
+      # Wartezeit bei Container-Stopp
+      TUNNEL_GRACE_PERIOD: "30s"
+
+      # true erzwingt Post-Quantum bei QUIC
+      # und deaktiviert den Non-PQ-Fallback.
+      TUNNEL_POST_QUANTUM: "false"
+
+      # ----------------------------------------
+      # Protokollierung
+      # ----------------------------------------
+
+      # debug / info / warn / error / fatal
+      TUNNEL_LOGLEVEL: "info"
+
+      # default / json
+      TUNNEL_LOG_OUTPUT: "default"
+
+      # ----------------------------------------
+      # Monitoring
+      # ----------------------------------------
+
+      # Nur innerhalb des Containers erreichbar
+      TUNNEL_METRICS: "127.0.0.1:2000"
+
+      # ----------------------------------------
+      # Updates
+      # ----------------------------------------
+
+      # Updates erfolgen über Docker-Images.
+      NO_AUTOUPDATE: "true"
+
+    # ==========================================
+    # HOST-ERREICHBARKEIT
+    # ==========================================
+
+    # Ermöglicht den Zugriff auf Dienste,
+    # die über den Docker-Host erreichbar sind.
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    # ==========================================
+    # SICHERHEIT
+    # ==========================================
+
+    security_opt:
+      - no-new-privileges:true
+
+    cap_drop:
+      - ALL
+
+    # ==========================================
+    # BEENDEN
+    # ==========================================
+
+    stop_grace_period: 40s
+
+    # ==========================================
+    # KEINE EINGEHENDEN PORTS
+    # ==========================================
+
+    # ports: nicht erforderlich
+
+    # ==========================================
+    # KEINE PERSISTENTEN VOLUMES
+    # ==========================================
+
+    # volumes: nicht erforderlich
