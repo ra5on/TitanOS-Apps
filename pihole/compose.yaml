@@ -1,0 +1,237 @@
+
+x-titanos:
+  name: Pi-hole
+  main: pihole
+  category: networking
+
+  description:
+    de: >-
+      Netzwerkweiter DNS-Werbeblocker mit
+      integriertem DNS-Server, Blocklisten,
+      detaillierten Statistiken, DNS-Cache,
+      lokalen DNS-Einträgen und Web-Dashboard.
+    en: >-
+      Network-wide DNS ad blocker with
+      integrated DNS server, blocklists,
+      detailed statistics, DNS cache,
+      local DNS records and web dashboard.
+
+  tips:
+    de: >-
+      Beim Installieren ein sicheres Passwort
+      für die Weboberfläche vergeben.
+      Das Dashboard ist über Port 8081 unter
+      /admin erreichbar.
+      Der DNS-Server verwendet TCP und UDP
+      auf Port 53.
+      Als Upstream-DNS sind Cloudflare und
+      Quad9 voreingestellt.
+      Nach der Installation die IP-Adresse
+      des TitanOS-Servers als DNS-Server im
+      Router oder auf den Geräten eintragen.
+      Einstellungen, Blocklisten und
+      Statistiken bleiben dauerhaft erhalten.
+      DHCP ist standardmäßig deaktiviert.
+      Der Docker-Bridge-Modus wird verwendet.
+      Port 53 muss auf dem Host frei sein.
+      Die DNS- und Webports nicht öffentlich
+      ins Internet weiterleiten.
+    en: >-
+      Set a secure administrator password
+      during installation.
+      The dashboard is available on port
+      8081 under /admin.
+      DNS uses TCP and UDP port 53.
+      Cloudflare and Quad9 are configured
+      as default upstream DNS servers.
+      Configure the TitanOS server IP as
+      DNS in your router or devices.
+      Settings, blocklists and statistics
+      remain persistent.
+      DHCP is disabled by default.
+      Docker bridge networking is used.
+      Host port 53 must be available.
+      Do not expose DNS or dashboard ports
+      directly to the Internet.
+
+  # ============================================
+  # TITANOS VARIABLEN
+  # ============================================
+
+  variables:
+
+    # ------------------------------------------
+    # SYSTEM
+    # ------------------------------------------
+
+    TZ:
+      label:
+        de: Zeitzone
+        en: Timezone
+
+    # ------------------------------------------
+    # ADMINISTRATOR
+    # ------------------------------------------
+
+    FTLCONF_webserver_api_password:
+      label:
+        de: Administrator-Passwort
+        en: Administrator password
+      secret: true
+      required: true
+
+    # ------------------------------------------
+    # DNS
+    # ------------------------------------------
+
+    FTLCONF_dns_listeningMode:
+      label:
+        de: DNS-Zugriffsmodus
+        en: DNS listening mode
+
+    FTLCONF_dns_upstreams:
+      label:
+        de: Upstream-DNS-Server
+        en: Upstream DNS servers
+
+  # ============================================
+  # PERSISTENTE DATEN
+  # ============================================
+
+  paths:
+
+    /etc/pihole:
+      label:
+        de: Konfiguration, Blocklisten und Datenbank
+        en: Configuration, blocklists and database
+
+  # ============================================
+  # PORTS
+  # ============================================
+
+  ports:
+
+    "80":
+      label: Pi-hole Dashboard
+      webui: true
+
+    "53":
+      label: DNS TCP/UDP
+      webui: false
+
+
+# ==============================================
+# SERVICES
+# ==============================================
+
+services:
+
+  pihole:
+    image: pihole/pihole:latest
+    restart: unless-stopped
+
+    # ==========================================
+    # UMGEBUNGSVARIABLEN
+    # ==========================================
+
+    environment:
+
+      # ----------------------------------------
+      # SYSTEM
+      # ----------------------------------------
+
+      TZ: "Europe/Berlin"
+
+      # ----------------------------------------
+      # ADMINISTRATOR
+      # ----------------------------------------
+
+      # TitanOS fragt das Passwort ab und
+      # trägt es vor dem Containerstart ein.
+      FTLCONF_webserver_api_password: ""
+
+      # ----------------------------------------
+      # DNS-SERVER
+      # ----------------------------------------
+
+      # ALL ist für Docker-Bridge erforderlich.
+      # Den Port nicht ins Internet freigeben.
+      FTLCONF_dns_listeningMode: "ALL"
+
+      # Standard-Upstream-DNS-Server
+      # Mehrere Server mit ; trennen.
+      #
+      # Cloudflare: 1.1.1.1
+      # Quad9:      9.9.9.9
+      FTLCONF_dns_upstreams: "1.1.1.1;9.9.9.9"
+
+      # ========================================
+      # WEITERE OPTIONALE EINSTELLUNGEN
+      # ========================================
+
+      # Nicht gesetzte Optionen bleiben
+      # über das Pi-hole-Dashboard änderbar.
+      #
+      # Beispiele für spätere Erweiterungen:
+      #
+      # FTLCONF_dns_dnssec: "false"
+      # FTLCONF_dns_queryLogging: "true"
+      # FTLCONF_dns_cache_size: "10000"
+      # FTLCONF_dns_rateLimit_count: "1000"
+      # FTLCONF_dns_rateLimit_interval: "60"
+
+    # ==========================================
+    # NETZWERK
+    # ==========================================
+
+    ports:
+
+      # DNS TCP
+      - "53:53/tcp"
+
+      # DNS UDP
+      - "53:53/udp"
+
+      # Web-Dashboard
+      # Host-Port 8081 -> Container-Port 80
+      - "8081:80/tcp"
+
+    # ==========================================
+    # PERSISTENTE DATEN
+    # ==========================================
+
+    volumes:
+
+      # Datenbank, Konfiguration,
+      # Blocklisten und Statistiken
+      - ./etc-pihole:/etc/pihole
+
+    # ==========================================
+    # SICHERHEIT
+    # ==========================================
+
+    # DHCP bleibt deaktiviert.
+    # NET_ADMIN wird für normalen
+    # DNS-Betrieb nicht benötigt.
+    #
+    # cap_add:
+    #   - NET_ADMIN
+    #
+    # Nur für spezielle Funktionen wie DHCP
+    # und mit passender Netzkonfiguration.
+
+    # ==========================================
+    # BEENDEN
+    # ==========================================
+
+    stop_grace_period: 30s
+
+    # ==========================================
+    # PROTOKOLLIERUNG
+    # ==========================================
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
