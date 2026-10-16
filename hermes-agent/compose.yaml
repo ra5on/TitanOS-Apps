@@ -1,0 +1,448 @@
+
+x-titanos:
+  name: Hermes Agent
+  main: hermes
+  category: productivity
+
+  description:
+    de: >-
+      Autonomer KI-Agent von Nous Research mit
+      Web-Dashboard, persistentem Gedächtnis,
+      Skills, Tools, Automatisierungen und
+      Unterstützung für lokale sowie externe
+      KI-Modelle.
+    en: >-
+      Autonomous AI agent by Nous Research.
+      Includes web dashboard, persistent memory,
+      skills, tools, automations and support
+      for local and cloud AI models.
+
+  tips:
+    de: >-
+      Beim ersten Start Hermes über das
+      Terminal mit hermes setup einrichten.
+      Das Web-Dashboard ist auf Port 9119
+      erreichbar und durch Benutzername und
+      Passwort geschützt.
+      Die Agent-API verwendet Port 8642 und
+      benötigt einen eigenen API-Schlüssel.
+      Für Ollama einen Custom Endpoint mit
+      der URL http://host.docker.internal:11434/v1
+      einrichten, sofern Ollama auf dem
+      Docker-Host erreichbar ist.
+      Skills, Erinnerungen, Konfigurationen
+      und Gesprächsverläufe bleiben auf dem
+      Daten-Volume erhalten.
+      Für die Modellausführung ist im
+      Hermes-Container keine GPU erforderlich.
+      Keine Docker-Socket-Freigabe voreingestellt.
+      Dashboard und API nicht ohne zusätzliche
+      Absicherung öffentlich erreichbar machen.
+    en: >-
+      Run hermes setup in the container terminal
+      to complete the initial configuration.
+      The dashboard runs on port 9119 and
+      requires username and password.
+      The agent API uses port 8642 and
+      requires a separate API key.
+      Local Ollama can be configured as a
+      custom endpoint.
+      Skills, memories, configuration and
+      conversations are stored persistently.
+      No GPU or Docker socket access is required
+      for the default installation.
+      Do not expose the dashboard or API publicly
+      without additional protection.
+
+  # ============================================
+  # KONFIGURIERBARE VARIABLEN
+  # ============================================
+
+  variables:
+
+    # ------------------------------------------
+    # DASHBOARD
+    # ------------------------------------------
+
+    HERMES_DASHBOARD_BASIC_AUTH_USERNAME:
+      label:
+        de: Dashboard-Benutzername
+        en: Dashboard username
+      required: true
+
+    HERMES_DASHBOARD_BASIC_AUTH_PASSWORD:
+      label:
+        de: Dashboard-Passwort
+        en: Dashboard password
+      secret: true
+      required: true
+
+    HERMES_DASHBOARD_BASIC_AUTH_SECRET:
+      label:
+        de: Sitzungsschlüssel
+        en: Session signing secret
+      secret: generate
+      required: true
+
+    HERMES_DASHBOARD_BASIC_AUTH_TTL_SECONDS:
+      label:
+        de: Sitzungsdauer in Sekunden
+        en: Session duration in seconds
+
+    # ------------------------------------------
+    # AGENT API
+    # ------------------------------------------
+
+    API_SERVER_KEY:
+      label:
+        de: Agent API-Schlüssel
+        en: Agent API key
+      secret: generate
+      required: true
+
+    API_SERVER_CORS_ORIGINS:
+      label:
+        de: Erlaubte API-Web-Ursprünge
+        en: Allowed API origins
+
+    API_SERVER_MODEL_NAME:
+      label:
+        de: API-Modellname
+        en: API model name
+
+    # ------------------------------------------
+    # SYSTEM
+    # ------------------------------------------
+
+    HERMES_UID:
+      label:
+        de: Benutzer-ID
+        en: User ID
+
+    HERMES_GID:
+      label:
+        de: Gruppen-ID
+        en: Group ID
+
+    HERMES_TIMEZONE:
+      label:
+        de: Zeitzone
+        en: Timezone
+
+    # ------------------------------------------
+    # MODELLANBIETER
+    # ------------------------------------------
+
+    OPENROUTER_API_KEY:
+      label:
+        de: OpenRouter API-Schlüssel
+        en: OpenRouter API key
+      secret: true
+
+    OPENAI_API_KEY:
+      label:
+        de: OpenAI API-Schlüssel
+        en: OpenAI API key
+      secret: true
+
+    ANTHROPIC_API_KEY:
+      label:
+        de: Anthropic API-Schlüssel
+        en: Anthropic API key
+      secret: true
+
+    GOOGLE_API_KEY:
+      label:
+        de: Google Gemini API-Schlüssel
+        en: Google Gemini API key
+      secret: true
+
+    DEEPSEEK_API_KEY:
+      label:
+        de: DeepSeek API-Schlüssel
+        en: DeepSeek API key
+      secret: true
+
+    OLLAMA_API_KEY:
+      label:
+        de: Ollama Cloud API-Schlüssel
+        en: Ollama Cloud API key
+      secret: true
+
+    # ------------------------------------------
+    # MESSENGER
+    # ------------------------------------------
+
+    TELEGRAM_BOT_TOKEN:
+      label:
+        de: Telegram Bot-Token
+        en: Telegram bot token
+      secret: true
+
+    TELEGRAM_ALLOWED_USERS:
+      label:
+        de: Erlaubte Telegram-Benutzer-IDs
+        en: Allowed Telegram user IDs
+
+    DISCORD_BOT_TOKEN:
+      label:
+        de: Discord Bot-Token
+        en: Discord bot token
+      secret: true
+
+    DISCORD_ALLOWED_USERS:
+      label:
+        de: Erlaubte Discord-Benutzer-IDs
+        en: Allowed Discord user IDs
+
+    SLACK_BOT_TOKEN:
+      label:
+        de: Slack Bot-Token
+        en: Slack bot token
+      secret: true
+
+    SLACK_APP_TOKEN:
+      label:
+        de: Slack App-Token
+        en: Slack app token
+      secret: true
+
+    # ------------------------------------------
+    # WEB-SUCHE UND TOOLS
+    # ------------------------------------------
+
+    TAVILY_API_KEY:
+      label:
+        de: Tavily Such-API
+        en: Tavily search API
+      secret: true
+
+    BRAVE_SEARCH_API_KEY:
+      label:
+        de: Brave Search API
+        en: Brave Search API
+      secret: true
+
+    FIRECRAWL_API_KEY:
+      label:
+        de: Firecrawl API
+        en: Firecrawl API
+      secret: true
+
+    EXA_API_KEY:
+      label:
+        de: Exa Such-API
+        en: Exa search API
+      secret: true
+
+    SEARXNG_URL:
+      label:
+        de: SearXNG Serveradresse
+        en: SearXNG server URL
+
+    # ------------------------------------------
+    # TERMINAL
+    # ------------------------------------------
+
+    TERMINAL_ENV:
+      label:
+        de: Terminal-Backend
+        en: Terminal backend
+
+    TERMINAL_TIMEOUT:
+      label:
+        de: Befehlszeitlimit in Sekunden
+        en: Command timeout in seconds
+
+  # ============================================
+  # PERSISTENTE DATEN
+  # ============================================
+
+  paths:
+    /opt/data:
+      label:
+        de: Konfiguration, Skills, Erinnerungen und Chats
+        en: Configuration, skills, memories and chats
+
+  # ============================================
+  # PORTS
+  # ============================================
+
+  ports:
+    "9119":
+      label: Hermes Dashboard
+      webui: true
+
+    "8642":
+      label: Hermes Agent API
+      webui: false
+
+
+# ==============================================
+# SERVICES
+# ==============================================
+
+services:
+
+  hermes:
+    image: nousresearch/hermes-agent:latest
+    restart: unless-stopped
+
+    # ==========================================
+    # STARTBEFEHL
+    # ==========================================
+
+    command:
+      - gateway
+      - run
+
+    # ==========================================
+    # UMGEBUNGSVARIABLEN
+    # ==========================================
+
+    environment:
+
+      # ----------------------------------------
+      # System
+      # ----------------------------------------
+
+      TZ: Europe/Berlin
+      HERMES_HOME: /opt/data
+      HERMES_TIMEZONE: ${HERMES_TIMEZONE:-Europe/Berlin}
+
+      HERMES_UID: ${HERMES_UID:-10000}
+      HERMES_GID: ${HERMES_GID:-10000}
+
+      # ----------------------------------------
+      # Web-Dashboard
+      # ----------------------------------------
+
+      HERMES_DASHBOARD: "1"
+      HERMES_DASHBOARD_HOST: "0.0.0.0"
+      HERMES_DASHBOARD_PORT: "9119"
+
+      # Benutzeranmeldung
+      HERMES_DASHBOARD_BASIC_AUTH_USERNAME: ${HERMES_DASHBOARD_BASIC_AUTH_USERNAME:-admin}
+      HERMES_DASHBOARD_BASIC_AUTH_PASSWORD: ${HERMES_DASHBOARD_BASIC_AUTH_PASSWORD:?Dashboard-Passwort erforderlich}
+      HERMES_DASHBOARD_BASIC_AUTH_SECRET: ${HERMES_DASHBOARD_BASIC_AUTH_SECRET:?Sitzungsschluessel erforderlich}
+
+      # Standard: 24 Stunden
+      HERMES_DASHBOARD_BASIC_AUTH_TTL_SECONDS: ${HERMES_DASHBOARD_BASIC_AUTH_TTL_SECONDS:-86400}
+
+      # ----------------------------------------
+      # OpenAI-kompatible Agent API
+      # ----------------------------------------
+
+      API_SERVER_ENABLED: "true"
+      API_SERVER_HOST: "0.0.0.0"
+      API_SERVER_PORT: "8642"
+
+      API_SERVER_KEY: ${API_SERVER_KEY:?Agent-API-Schluessel erforderlich}
+
+      # CORS bleibt standardmäßig eingeschränkt.
+      API_SERVER_CORS_ORIGINS: ${API_SERVER_CORS_ORIGINS:-}
+
+      API_SERVER_MODEL_NAME: ${API_SERVER_MODEL_NAME:-hermes-agent}
+
+      # ----------------------------------------
+      # Terminal
+      # ----------------------------------------
+
+      # local führt Befehle innerhalb des
+      # Hermes-Containers aus.
+      TERMINAL_ENV: ${TERMINAL_ENV:-local}
+
+      # Zeitlimit für Terminalbefehle
+      TERMINAL_TIMEOUT: ${TERMINAL_TIMEOUT:-180}
+
+      # ----------------------------------------
+      # Optionale Modellanbieter
+      # ----------------------------------------
+
+      # Für diese Anbieter die Variablen nur
+      # setzen, wenn entsprechende Schlüssel
+      # vorhanden sind. Die Modellwahl erfolgt
+      # über hermes model oder config.yaml.
+      #
+      # OPENROUTER_API_KEY:
+      # OPENAI_API_KEY:
+      # ANTHROPIC_API_KEY:
+      # GOOGLE_API_KEY:
+      # DEEPSEEK_API_KEY:
+      # OLLAMA_API_KEY:
+
+      # ----------------------------------------
+      # Messenger
+      # ----------------------------------------
+
+      # TELEGRAM_BOT_TOKEN:
+      # TELEGRAM_ALLOWED_USERS:
+      # DISCORD_BOT_TOKEN:
+      # DISCORD_ALLOWED_USERS:
+      # SLACK_BOT_TOKEN:
+      # SLACK_APP_TOKEN:
+
+      # ----------------------------------------
+      # Suche und Web-Tools
+      # ----------------------------------------
+
+      # TAVILY_API_KEY:
+      # BRAVE_SEARCH_API_KEY:
+      # FIRECRAWL_API_KEY:
+      # EXA_API_KEY:
+      # SEARXNG_URL:
+
+    # ==========================================
+    # PORTFREIGABEN
+    # ==========================================
+
+    ports:
+      # Web-Dashboard mit Passwortanmeldung
+      - "9119:9119"
+
+      # Agent API nur auf dem Docker-Host
+      - "127.0.0.1:8642:8642"
+
+    # ==========================================
+    # PERSISTENTE DATEN
+    # ==========================================
+
+    volumes:
+      - ./hermes:/opt/data
+
+    # ==========================================
+    # NETZWERK
+    # ==========================================
+
+    # Zugriff auf andere Dienste des Docker-Hosts
+    # z. B. Ollama oder vLLM.
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    # ==========================================
+    # SICHERHEIT
+    # ==========================================
+
+    security_opt:
+      - no-new-privileges:true
+
+    # Kein privilegierter Container.
+    # Kein Docker-Socket-Mount.
+    # Keine direkte Host-Dateisystemfreigabe.
+
+    # ==========================================
+    # BEENDEN
+    # ==========================================
+
+    stop_grace_period: 30s
+
+    # ==========================================
+    # LOGS
+    # ==========================================
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
