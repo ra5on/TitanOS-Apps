@@ -9,59 +9,62 @@ x-titanos:
       Autonomer KI-Agent von Nous Research mit
       Web-Dashboard, persistentem Gedächtnis,
       Skills, Tools, Automatisierungen und
-      Unterstützung für lokale sowie externe
+      Unterstützung für lokale und externe
       KI-Modelle.
     en: >-
-      Autonomous AI agent by Nous Research.
-      Includes web dashboard, persistent memory,
+      Autonomous AI agent by Nous Research
+      with web dashboard, persistent memory,
       skills, tools, automations and support
       for local and cloud AI models.
 
   tips:
     de: >-
-      Beim ersten Start Hermes über das
-      Terminal mit hermes setup einrichten.
-      Das Web-Dashboard ist auf Port 9119
-      erreichbar und durch Benutzername und
-      Passwort geschützt.
-      Die Agent-API verwendet Port 8642 und
-      benötigt einen eigenen API-Schlüssel.
-      Für Ollama einen Custom Endpoint mit
-      der URL http://host.docker.internal:11434/v1
-      einrichten, sofern Ollama auf dem
+      Beim Installieren einen Benutzernamen und
+      ein sicheres Passwort festlegen.
+      TitanOS generiert den Sitzungsschlüssel
+      und API-Schlüssel automatisch.
+      Das Dashboard ist über Port 9119 erreichbar.
+      Die Agent-API auf Port 8642 ist nur
+      vom Docker-Host erreichbar.
+      KI-Modelle und externe Dienste können
+      anschließend über das Hermes-Dashboard
+      oder hermes setup eingerichtet werden.
+      Für lokales Ollama den Custom Endpoint
+      http://host.docker.internal:11434/v1
+      verwenden, sofern Ollama über den
       Docker-Host erreichbar ist.
-      Skills, Erinnerungen, Konfigurationen
-      und Gesprächsverläufe bleiben auf dem
-      Daten-Volume erhalten.
-      Für die Modellausführung ist im
-      Hermes-Container keine GPU erforderlich.
-      Keine Docker-Socket-Freigabe voreingestellt.
-      Dashboard und API nicht ohne zusätzliche
-      Absicherung öffentlich erreichbar machen.
+      Sämtliche Agent-Daten, Konfigurationen,
+      Erinnerungen, Skills und Gespräche
+      bleiben dauerhaft gespeichert.
+      Es wird keine GPU benötigt, solange
+      die Modelle extern oder in Ollama laufen.
+      Das Dashboard nur in vertrauenswürdigen
+      Netzwerken oder über VPN betreiben.
     en: >-
-      Run hermes setup in the container terminal
-      to complete the initial configuration.
-      The dashboard runs on port 9119 and
-      requires username and password.
-      The agent API uses port 8642 and
-      requires a separate API key.
-      Local Ollama can be configured as a
-      custom endpoint.
-      Skills, memories, configuration and
-      conversations are stored persistently.
-      No GPU or Docker socket access is required
-      for the default installation.
-      Do not expose the dashboard or API publicly
-      without additional protection.
+      Set a username and secure password during
+      installation. TitanOS generates the session
+      signing key and API key automatically.
+      The dashboard is available on port 9119.
+      The agent API on port 8642 is only
+      accessible from the Docker host.
+      Configure models and external providers
+      through the Hermes dashboard or setup.
+      Local Ollama can be configured through
+      a custom OpenAI-compatible endpoint.
+      All configurations, skills, memories,
+      sessions and conversations are persistent.
+      No GPU is required for remote inference.
+      Only expose the dashboard on trusted
+      networks or behind a VPN.
 
   # ============================================
-  # KONFIGURIERBARE VARIABLEN
+  # TITANOS VARIABLEN
   # ============================================
 
   variables:
 
     # ------------------------------------------
-    # DASHBOARD
+    # DASHBOARD AUTHENTIFIZIERUNG
     # ------------------------------------------
 
     HERMES_DASHBOARD_BASIC_AUTH_USERNAME:
@@ -84,11 +87,6 @@ x-titanos:
       secret: generate
       required: true
 
-    HERMES_DASHBOARD_BASIC_AUTH_TTL_SECONDS:
-      label:
-        de: Sitzungsdauer in Sekunden
-        en: Session duration in seconds
-
     # ------------------------------------------
     # AGENT API
     # ------------------------------------------
@@ -100,6 +98,15 @@ x-titanos:
       secret: generate
       required: true
 
+    # ------------------------------------------
+    # ERWEITERTE EINSTELLUNGEN
+    # ------------------------------------------
+
+    HERMES_DASHBOARD_BASIC_AUTH_TTL_SECONDS:
+      label:
+        de: Anmeldesitzung in Sekunden
+        en: Login session lifetime in seconds
+
     API_SERVER_CORS_ORIGINS:
       label:
         de: Erlaubte API-Web-Ursprünge
@@ -107,152 +114,18 @@ x-titanos:
 
     API_SERVER_MODEL_NAME:
       label:
-        de: API-Modellname
-        en: API model name
-
-    # ------------------------------------------
-    # SYSTEM
-    # ------------------------------------------
-
-    HERMES_UID:
-      label:
-        de: Benutzer-ID
-        en: User ID
-
-    HERMES_GID:
-      label:
-        de: Gruppen-ID
-        en: Group ID
-
-    HERMES_TIMEZONE:
-      label:
-        de: Zeitzone
-        en: Timezone
-
-    # ------------------------------------------
-    # MODELLANBIETER
-    # ------------------------------------------
-
-    OPENROUTER_API_KEY:
-      label:
-        de: OpenRouter API-Schlüssel
-        en: OpenRouter API key
-      secret: true
-
-    OPENAI_API_KEY:
-      label:
-        de: OpenAI API-Schlüssel
-        en: OpenAI API key
-      secret: true
-
-    ANTHROPIC_API_KEY:
-      label:
-        de: Anthropic API-Schlüssel
-        en: Anthropic API key
-      secret: true
-
-    GOOGLE_API_KEY:
-      label:
-        de: Google Gemini API-Schlüssel
-        en: Google Gemini API key
-      secret: true
-
-    DEEPSEEK_API_KEY:
-      label:
-        de: DeepSeek API-Schlüssel
-        en: DeepSeek API key
-      secret: true
-
-    OLLAMA_API_KEY:
-      label:
-        de: Ollama Cloud API-Schlüssel
-        en: Ollama Cloud API key
-      secret: true
-
-    # ------------------------------------------
-    # MESSENGER
-    # ------------------------------------------
-
-    TELEGRAM_BOT_TOKEN:
-      label:
-        de: Telegram Bot-Token
-        en: Telegram bot token
-      secret: true
-
-    TELEGRAM_ALLOWED_USERS:
-      label:
-        de: Erlaubte Telegram-Benutzer-IDs
-        en: Allowed Telegram user IDs
-
-    DISCORD_BOT_TOKEN:
-      label:
-        de: Discord Bot-Token
-        en: Discord bot token
-      secret: true
-
-    DISCORD_ALLOWED_USERS:
-      label:
-        de: Erlaubte Discord-Benutzer-IDs
-        en: Allowed Discord user IDs
-
-    SLACK_BOT_TOKEN:
-      label:
-        de: Slack Bot-Token
-        en: Slack bot token
-      secret: true
-
-    SLACK_APP_TOKEN:
-      label:
-        de: Slack App-Token
-        en: Slack app token
-      secret: true
-
-    # ------------------------------------------
-    # WEB-SUCHE UND TOOLS
-    # ------------------------------------------
-
-    TAVILY_API_KEY:
-      label:
-        de: Tavily Such-API
-        en: Tavily search API
-      secret: true
-
-    BRAVE_SEARCH_API_KEY:
-      label:
-        de: Brave Search API
-        en: Brave Search API
-      secret: true
-
-    FIRECRAWL_API_KEY:
-      label:
-        de: Firecrawl API
-        en: Firecrawl API
-      secret: true
-
-    EXA_API_KEY:
-      label:
-        de: Exa Such-API
-        en: Exa search API
-      secret: true
-
-    SEARXNG_URL:
-      label:
-        de: SearXNG Serveradresse
-        en: SearXNG server URL
-
-    # ------------------------------------------
-    # TERMINAL
-    # ------------------------------------------
+        de: Angezeigter API-Modellname
+        en: Advertised API model name
 
     TERMINAL_ENV:
       label:
-        de: Terminal-Backend
-        en: Terminal backend
+        de: Terminal-Backend (local/docker/ssh)
+        en: Terminal backend (local/docker/ssh)
 
     TERMINAL_TIMEOUT:
       label:
-        de: Befehlszeitlimit in Sekunden
-        en: Command timeout in seconds
+        de: Terminal-Zeitlimit in Sekunden
+        en: Terminal timeout in seconds
 
   # ============================================
   # PERSISTENTE DATEN
@@ -303,104 +176,80 @@ services:
     environment:
 
       # ----------------------------------------
-      # System
+      # SYSTEM
       # ----------------------------------------
 
-      TZ: Europe/Berlin
-      HERMES_HOME: /opt/data
-      HERMES_TIMEZONE: ${HERMES_TIMEZONE:-Europe/Berlin}
-
-      HERMES_UID: ${HERMES_UID:-10000}
-      HERMES_GID: ${HERMES_GID:-10000}
+      TZ: "Europe/Berlin"
 
       # ----------------------------------------
-      # Web-Dashboard
+      # WEB-DASHBOARD
       # ----------------------------------------
 
+      # Dashboard aktivieren
       HERMES_DASHBOARD: "1"
+
+      # Im Container auf allen Interfaces lauschen
       HERMES_DASHBOARD_HOST: "0.0.0.0"
       HERMES_DASHBOARD_PORT: "9119"
 
-      # Benutzeranmeldung
-      HERMES_DASHBOARD_BASIC_AUTH_USERNAME: ${HERMES_DASHBOARD_BASIC_AUTH_USERNAME:-admin}
-      HERMES_DASHBOARD_BASIC_AUTH_PASSWORD: ${HERMES_DASHBOARD_BASIC_AUTH_PASSWORD:?Dashboard-Passwort erforderlich}
-      HERMES_DASHBOARD_BASIC_AUTH_SECRET: ${HERMES_DASHBOARD_BASIC_AUTH_SECRET:?Sitzungsschluessel erforderlich}
-
-      # Standard: 24 Stunden
-      HERMES_DASHBOARD_BASIC_AUTH_TTL_SECONDS: ${HERMES_DASHBOARD_BASIC_AUTH_TTL_SECONDS:-86400}
-
       # ----------------------------------------
-      # OpenAI-kompatible Agent API
+      # DASHBOARD BENUTZERANMELDUNG
       # ----------------------------------------
 
+      # Wird bei der Installation abgefragt
+      HERMES_DASHBOARD_BASIC_AUTH_USERNAME: ""
+
+      # Wird bei der Installation abgefragt
+      HERMES_DASHBOARD_BASIC_AUTH_PASSWORD: ""
+
+      # Wird von TitanOS automatisch generiert
+      HERMES_DASHBOARD_BASIC_AUTH_SECRET: ""
+
+      # 24 Stunden Anmeldesitzung
+      HERMES_DASHBOARD_BASIC_AUTH_TTL_SECONDS: "86400"
+
+      # ----------------------------------------
+      # AGENT API
+      # ----------------------------------------
+
+      # OpenAI-kompatible API aktivieren
       API_SERVER_ENABLED: "true"
+
+      # Auf allen Container-Interfaces lauschen
       API_SERVER_HOST: "0.0.0.0"
       API_SERVER_PORT: "8642"
 
-      API_SERVER_KEY: ${API_SERVER_KEY:?Agent-API-Schluessel erforderlich}
+      # Wird von TitanOS automatisch generiert
+      API_SERVER_KEY: ""
 
-      # CORS bleibt standardmäßig eingeschränkt.
-      API_SERVER_CORS_ORIGINS: ${API_SERVER_CORS_ORIGINS:-}
+      # Keine zusätzlichen Browser-Ursprünge
+      API_SERVER_CORS_ORIGINS: ""
 
-      API_SERVER_MODEL_NAME: ${API_SERVER_MODEL_NAME:-hermes-agent}
-
-      # ----------------------------------------
-      # Terminal
-      # ----------------------------------------
-
-      # local führt Befehle innerhalb des
-      # Hermes-Containers aus.
-      TERMINAL_ENV: ${TERMINAL_ENV:-local}
-
-      # Zeitlimit für Terminalbefehle
-      TERMINAL_TIMEOUT: ${TERMINAL_TIMEOUT:-180}
+      # Angezeigter Modellname
+      API_SERVER_MODEL_NAME: "hermes-agent"
 
       # ----------------------------------------
-      # Optionale Modellanbieter
+      # TERMINAL
       # ----------------------------------------
 
-      # Für diese Anbieter die Variablen nur
-      # setzen, wenn entsprechende Schlüssel
-      # vorhanden sind. Die Modellwahl erfolgt
-      # über hermes model oder config.yaml.
-      #
-      # OPENROUTER_API_KEY:
-      # OPENAI_API_KEY:
-      # ANTHROPIC_API_KEY:
-      # GOOGLE_API_KEY:
-      # DEEPSEEK_API_KEY:
-      # OLLAMA_API_KEY:
+      # local = Befehle im Hermes-Container
+      # docker = zusätzlicher Sandbox-Container
+      # ssh = entfernter SSH-Server
+      TERMINAL_ENV: "local"
 
-      # ----------------------------------------
-      # Messenger
-      # ----------------------------------------
-
-      # TELEGRAM_BOT_TOKEN:
-      # TELEGRAM_ALLOWED_USERS:
-      # DISCORD_BOT_TOKEN:
-      # DISCORD_ALLOWED_USERS:
-      # SLACK_BOT_TOKEN:
-      # SLACK_APP_TOKEN:
-
-      # ----------------------------------------
-      # Suche und Web-Tools
-      # ----------------------------------------
-
-      # TAVILY_API_KEY:
-      # BRAVE_SEARCH_API_KEY:
-      # FIRECRAWL_API_KEY:
-      # EXA_API_KEY:
-      # SEARXNG_URL:
+      # Maximale Befehlsdauer in Sekunden
+      TERMINAL_TIMEOUT: "180"
 
     # ==========================================
     # PORTFREIGABEN
     # ==========================================
 
     ports:
-      # Web-Dashboard mit Passwortanmeldung
+
+      # Dashboard im lokalen Netzwerk
       - "9119:9119"
 
-      # Agent API nur auf dem Docker-Host
+      # API nur auf dem Docker-Host
       - "127.0.0.1:8642:8642"
 
     # ==========================================
@@ -414,8 +263,8 @@ services:
     # NETZWERK
     # ==========================================
 
-    # Zugriff auf andere Dienste des Docker-Hosts
-    # z. B. Ollama oder vLLM.
+    # Erlaubt die Verbindung zu Ollama,
+    # vLLM und anderen Diensten des Hosts.
 
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -424,12 +273,21 @@ services:
     # SICHERHEIT
     # ==========================================
 
+    # Kein privilegierter Container.
+    # Kein Docker-Socket eingebunden.
+    # Keine Host-Dateisystemfreigabe außer
+    # dem persistenten Hermes-Datenverzeichnis.
+
     security_opt:
       - no-new-privileges:true
 
-    # Kein privilegierter Container.
-    # Kein Docker-Socket-Mount.
-    # Keine direkte Host-Dateisystemfreigabe.
+    # ==========================================
+    # RESSOURCEN
+    # ==========================================
+
+    # Bei Browser-Automatisierungen sind
+    # mindestens 2 GB RAM sinnvoll.
+    # Hier keine feste Speicherbegrenzung.
 
     # ==========================================
     # BEENDEN
@@ -438,7 +296,7 @@ services:
     stop_grace_period: 30s
 
     # ==========================================
-    # LOGS
+    # PROTOKOLLIERUNG
     # ==========================================
 
     logging:
