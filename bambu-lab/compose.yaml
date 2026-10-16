@@ -1,0 +1,319 @@
+
+x-titanos:
+  name: Bambu Studio
+  main: bambustudio
+  category: productivity
+
+  description:
+    de: >-
+      Bambu Studio als browserbasierte Anwendung
+      für Bambu Lab 3D-Drucker.
+      3D-Modelle vorbereiten, slicen und drucken.
+      Mit Benutzeranmeldung, Versionsauswahl,
+      dauerhaftem Speicher und optionaler
+      GPU-Beschleunigung.
+    en: >-
+      Browser-based Bambu Studio for
+      Bambu Lab 3D printers.
+      Prepare, slice and print 3D models.
+      Includes authentication, version selection,
+      persistent storage and optional
+      GPU acceleration.
+
+  tips:
+    de: >-
+      Beim Installieren Benutzername und Passwort
+      für die Weboberfläche vergeben.
+      Bambu Studio ist über HTTPS auf Port
+      3001 erreichbar.
+      Beim ersten Aufruf muss gegebenenfalls
+      das selbstsignierte Zertifikat bestätigt
+      werden. Anschließend Bambu Studio
+      einrichten und den Drucker verbinden.
+      Die Verbindung zu Bambu Lab Druckern
+      kann über das Bambu-Konto oder LAN-Modus
+      erfolgen. Die automatische Druckersuche
+      kann im Docker-Bridge-Netz eingeschränkt
+      sein. Gegebenenfalls die Drucker-IP
+      manuell eintragen.
+      Einstellungen, Druckprofile und Dateien
+      bleiben dauerhaft erhalten.
+      GPU-Beschleunigung ist optional.
+      Die Anwendung nicht ohne zusätzliche
+      Sicherheitsmaßnahmen öffentlich freigeben.
+    en: >-
+      Set a username and password during
+      installation.
+      Bambu Studio is accessible via HTTPS
+      on port 3001.
+      Accept the self-signed certificate
+      warning if prompted.
+      Configure Bambu Studio and connect
+      your printer through your Bambu account
+      or LAN mode.
+      Automatic printer discovery may be
+      limited by Docker bridge networking.
+      Manual printer IP configuration may
+      be required.
+      Settings, print profiles and files
+      are stored persistently.
+      GPU acceleration is optional.
+      Do not expose the application publicly
+      without additional security.
+
+  # ============================================
+  # TITANOS VARIABLEN
+  # ============================================
+
+  variables:
+
+    # ------------------------------------------
+    # VERSION
+    # ------------------------------------------
+
+    BAMBU_STUDIO_VERSION:
+      label:
+        de: Bambu Studio Docker-Version
+        en: Bambu Studio Docker version
+      required: true
+
+    # ------------------------------------------
+    # BENUTZERANMELDUNG
+    # ------------------------------------------
+
+    CUSTOM_USER:
+      label:
+        de: Weboberfläche Benutzername
+        en: Web interface username
+      required: true
+
+    PASSWORD:
+      label:
+        de: Weboberfläche Passwort
+        en: Web interface password
+      secret: true
+      required: true
+
+    # ------------------------------------------
+    # SYSTEM
+    # ------------------------------------------
+
+    PUID:
+      label:
+        de: Benutzer-ID
+        en: User ID
+
+    PGID:
+      label:
+        de: Gruppen-ID
+        en: Group ID
+
+    TZ:
+      label:
+        de: Zeitzone
+        en: Timezone
+
+    LC_ALL:
+      label:
+        de: Sprache der Anwendung
+        en: Application language
+
+    # ------------------------------------------
+    # DARSTELLUNG
+    # ------------------------------------------
+
+    DARK_MODE:
+      label:
+        de: Dunkles Design aktivieren
+        en: Enable dark mode
+
+    TITLE:
+      label:
+        de: Titel der Weboberfläche
+        en: Web interface title
+
+    # ------------------------------------------
+    # PERFORMANCE
+    # ------------------------------------------
+
+    AUTO_GPU:
+      label:
+        de: Automatische GPU-Nutzung
+        en: Automatic GPU usage
+
+    # ------------------------------------------
+    # SICHERHEIT
+    # ------------------------------------------
+
+    SELKIES_ENABLE_SHARING:
+      label:
+        de: Sitzungsfreigabe erlauben
+        en: Allow session sharing
+
+  # ============================================
+  # PERSISTENTE DATEN
+  # ============================================
+
+  paths:
+
+    /config:
+      label:
+        de: Konfiguration, Projekte und Druckprofile
+        en: Configuration, projects and print profiles
+
+  # ============================================
+  # PORTS
+  # ============================================
+
+  ports:
+
+    "3001":
+      label: Bambu Studio HTTPS
+      webui: true
+
+
+# ==============================================
+# SERVICES
+# ==============================================
+
+services:
+
+  bambustudio:
+    image: "lscr.io/linuxserver/bambustudio:${BAMBU_STUDIO_VERSION:-latest}"
+    restart: unless-stopped
+
+    # ==========================================
+    # SYSTEM
+    # ==========================================
+
+    environment:
+
+      # ----------------------------------------
+      # VERSION - TITANOS AUSWAHL
+      # ----------------------------------------
+
+      # TitanOS muss diesen Wert auch für die
+      # Image-Version übernehmen.
+      BAMBU_STUDIO_VERSION: "latest"
+
+      # ----------------------------------------
+      # BENUTZER UND BERECHTIGUNGEN
+      # ----------------------------------------
+
+      PUID: "1000"
+      PGID: "1000"
+
+      # ----------------------------------------
+      # SPRACHE UND ZEIT
+      # ----------------------------------------
+
+      TZ: "Europe/Berlin"
+      LC_ALL: "de_DE.UTF-8"
+
+      # ----------------------------------------
+      # WEBANMELDUNG
+      # ----------------------------------------
+
+      # Wird von TitanOS abgefragt
+      CUSTOM_USER: ""
+
+      # Wird von TitanOS abgefragt
+      PASSWORD: ""
+
+      # ----------------------------------------
+      # OBERFLÄCHE
+      # ----------------------------------------
+
+      TITLE: "Bambu Studio"
+
+      # Dunkles Design
+      DARK_MODE: "true"
+
+      # ----------------------------------------
+      # GPU
+      # ----------------------------------------
+
+      # Ohne Gerätefreigabe CPU-Betrieb
+      AUTO_GPU: "false"
+
+      # ----------------------------------------
+      # SICHERHEIT
+      # ----------------------------------------
+
+      # Sitzungsfreigabe deaktivieren
+      SELKIES_ENABLE_SHARING: "false"
+
+      # ----------------------------------------
+      # OPTIONALE ERWEITERUNGEN
+      # ----------------------------------------
+
+      # Wayland standardmäßig verwenden
+      PIXELFLUX_WAYLAND: "true"
+
+      # Gamepad-Unterstützung deaktivieren
+      NO_GAMEPAD: "true"
+
+    # ==========================================
+    # PORTFREIGABEN
+    # ==========================================
+
+    ports:
+
+      # Browserzugriff über HTTPS
+      - "3001:3001"
+
+    # ==========================================
+    # PERSISTENTE DATEN
+    # ==========================================
+
+    volumes:
+
+      # Konfiguration, Projekte, Druckprofile
+      - ./config:/config
+
+    # ==========================================
+    # GEMEINSAMER SPEICHER
+    # ==========================================
+
+    # Wichtig für grafische Anwendungen
+    shm_size: "1gb"
+
+    # ==========================================
+    # OPTIONALE GPU-BESCHLEUNIGUNG
+    # ==========================================
+
+    # Für Intel/AMD mit /dev/dri:
+    #
+    # devices:
+    #   - /dev/dri:/dev/dri
+    #
+    # Zusätzlich:
+    # AUTO_GPU: "true"
+    #
+    # NVIDIA benötigt eine separate
+    # Docker-GPU-Konfiguration und geeignete
+    # NVIDIA-Treiber auf dem Host.
+
+    # ==========================================
+    # SICHERHEIT
+    # ==========================================
+
+    # Kein privilegierter Container
+    # Kein Docker-Socket-Mount
+    # Keine zusätzlichen Host-Verzeichnisse
+
+    # ==========================================
+    # BEENDEN
+    # ==========================================
+
+    stop_grace_period: 30s
+
+    # ==========================================
+    # PROTOKOLLIERUNG
+    # ==========================================
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
