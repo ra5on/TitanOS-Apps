@@ -178,7 +178,7 @@ services:
 
       # Muss von TitanOS oder über .env gesetzt
       # werden. Niemals automatisch generieren.
-      TUNNEL_TOKEN: "${TUNNEL_TOKEN:?Cloudflare Tunnel Token erforderlich}"
+      TUNNEL_TOKEN: ""
 
       # ----------------------------------------
       # Verbindung
