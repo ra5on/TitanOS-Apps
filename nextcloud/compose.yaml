@@ -1,0 +1,312 @@
+
+x-titanos:
+  name: Nextcloud + MariaDB
+  main: nextcloud
+  category: productivity
+
+  description:
+    de: >-
+      Private Cloud mit Dateisynchronisierung,
+      Benutzerverwaltung, Kalender und Kontakten.
+      Nextcloud und MariaDB werden automatisch
+      eingerichtet. Beide Versionen sind
+      unabhängig konfigurierbar.
+    en: >-
+      Private cloud with file synchronization,
+      user management, calendars and contacts.
+      Automatic Nextcloud and MariaDB setup
+      with independently selectable versions.
+
+  tips:
+    de: >-
+      Nextcloud- und MariaDB-Version auswählen.
+      Administrator-Benutzername und Passwort
+      vergeben sowie die Server-IP oder Domain
+      eintragen. Datenbankpasswörter werden von
+      TitanOS automatisch generiert und beiden
+      Diensten korrekt zugewiesen.
+      Die Installation erfolgt ohne zusätzlichen
+      Nextcloud-Installationsassistenten.
+      Nextcloud ist über Port 8080 erreichbar.
+      Der Cron-Dienst wird automatisch gestartet.
+      Bei bestehenden Installationen keine
+      älteren Versionen auswählen.
+      Vor Versionswechseln Backups erstellen.
+    en: >-
+      Select the Nextcloud and MariaDB versions.
+      Enter administrator credentials and
+      the server IP or domain.
+      Database passwords are generated and
+      shared automatically by TitanOS.
+      No additional installation wizard is needed.
+      Nextcloud runs on port 8080.
+      A cron service is included.
+      Never downgrade existing installations.
+      Back up data before upgrading.
+
+  # ============================================
+  # TITANOS VARIABLEN
+  # ============================================
+
+  variables:
+
+    # ------------------------------------------
+    # VERSIONEN
+    # ------------------------------------------
+
+    NEXTCLOUD_VERSION:
+      label:
+        de: Nextcloud-Version (z.B. 35.0.1-apache)
+        en: Nextcloud version (e.g. 35.0.1-apache)
+
+    MARIADB_VERSION:
+      label:
+        de: MariaDB-Version (z.B. 11.8)
+        en: MariaDB version (e.g. 11.8)
+
+    # ------------------------------------------
+    # NEXTCLOUD ADMINISTRATOR
+    # ------------------------------------------
+
+    NEXTCLOUD_ADMIN_USER:
+      label:
+        de: Administrator-Benutzername
+        en: Administrator username
+      required: true
+
+    NEXTCLOUD_ADMIN_PASSWORD:
+      label:
+        de: Administrator-Passwort
+        en: Administrator password
+      secret: true
+      required: true
+
+    # ------------------------------------------
+    # SERVER
+    # ------------------------------------------
+
+    NEXTCLOUD_TRUSTED_DOMAINS:
+      label:
+        de: Server-IP oder Domain
+        en: Server IP or domain
+      required: true
+
+    # ------------------------------------------
+    # DATENBANK
+    # ------------------------------------------
+
+    MYSQL_PASSWORD:
+      label:
+        de: Datenbankpasswort
+        en: Database password
+      secret: generate
+      required: true
+
+    MARIADB_ROOT_PASSWORD:
+      label:
+        de: MariaDB Root-Passwort
+        en: MariaDB root password
+      secret: generate
+      required: true
+
+    # ------------------------------------------
+    # PHP
+    # ------------------------------------------
+
+    PHP_MEMORY_LIMIT:
+      label:
+        de: PHP-Arbeitsspeicherlimit
+        en: PHP memory limit
+
+    PHP_UPLOAD_LIMIT:
+      label:
+        de: Maximale Uploadgröße
+        en: Maximum upload size
+
+  # ============================================
+  # DATENSPEICHER
+  # ============================================
+
+  paths:
+
+    /var/www/html:
+      label:
+        de: Nextcloud Dateien und Konfiguration
+        en: Nextcloud files and configuration
+
+    /var/lib/mysql:
+      label:
+        de: MariaDB Datenbank
+        en: MariaDB database
+
+  # ============================================
+  # PORTS
+  # ============================================
+
+  ports:
+
+    "80":
+      label: Nextcloud Weboberfläche
+      webui: true
+
+
+# ==============================================
+# SERVICES
+# ==============================================
+
+services:
+
+  # ============================================
+  # MARIADB
+  # ============================================
+
+  mariadb:
+    image: "mariadb:${MARIADB_VERSION:-11.8}"
+    restart: unless-stopped
+
+    environment:
+
+      TZ: "Europe/Berlin"
+
+      # Automatische Datenbankerstellung
+      MYSQL_DATABASE: "nextcloud"
+      MYSQL_USER: "nextcloud"
+
+      # Gemeinsames generiertes Passwort
+      MYSQL_PASSWORD: ""
+
+      # Separates generiertes Root-Passwort
+      MARIADB_ROOT_PASSWORD: ""
+
+    command:
+      - --transaction-isolation=READ-COMMITTED
+      - --binlog-format=ROW
+
+    volumes:
+      - ./mariadb:/var/lib/mysql
+
+    healthcheck:
+      test:
+        - CMD
+        - healthcheck.sh
+        - --connect
+        - --innodb_initialized
+      interval: 10s
+      timeout: 5s
+      start_period: 60s
+      retries: 10
+
+    stop_grace_period: 60s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ============================================
+  # NEXTCLOUD
+  # ============================================
+
+  nextcloud:
+    image: "nextcloud:${NEXTCLOUD_VERSION:-35.0.1-apache}"
+    restart: unless-stopped
+
+    environment:
+
+      # ----------------------------------------
+      # SYSTEM
+      # ----------------------------------------
+
+      TZ: "Europe/Berlin"
+
+      # ----------------------------------------
+      # ADMINISTRATOR
+      # ----------------------------------------
+
+      NEXTCLOUD_ADMIN_USER: ""
+      NEXTCLOUD_ADMIN_PASSWORD: ""
+
+      # ----------------------------------------
+      # DATENBANK
+      # ----------------------------------------
+
+      MYSQL_HOST: "mariadb"
+      MYSQL_DATABASE: "nextcloud"
+      MYSQL_USER: "nextcloud"
+
+      # Dasselbe Passwort wie in MariaDB
+      MYSQL_PASSWORD: ""
+
+      # ----------------------------------------
+      # DOMAIN / IP
+      # ----------------------------------------
+
+      NEXTCLOUD_TRUSTED_DOMAINS: ""
+
+      # ----------------------------------------
+      # PHP
+      # ----------------------------------------
+
+      PHP_MEMORY_LIMIT: "512M"
+      PHP_UPLOAD_LIMIT: "2G"
+
+      # ----------------------------------------
+      # APACHE
+      # ----------------------------------------
+
+      APACHE_BODY_LIMIT: "0"
+
+      # ----------------------------------------
+      # NEXTCLOUD
+      # ----------------------------------------
+
+      NEXTCLOUD_INIT_HTACCESS: "true"
+
+    ports:
+      - "8080:80"
+
+    volumes:
+      - ./nextcloud:/var/www/html
+
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
+    stop_grace_period: 30s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ============================================
+  # NEXTCLOUD CRON
+  # ============================================
+
+  nextcloud-cron:
+    image: "nextcloud:${NEXTCLOUD_VERSION:-35.0.1-apache}"
+    restart: unless-stopped
+
+    entrypoint: /cron.sh
+
+    environment:
+      TZ: "Europe/Berlin"
+
+    volumes:
+      - ./nextcloud:/var/www/html
+
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      nextcloud:
+        condition: service_started
+
+    stop_grace_period: 30s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
