@@ -1,0 +1,165 @@
+
+x-titanos:
+  name: AdGuard Home
+  main: adguard
+  category: networking
+
+  description:
+    de: >-
+      Netzwerkweiter Werbe- und Trackingblocker
+      mit eigenem DNS-Server, Filterlisten,
+      Statistiken, Kinderschutz und moderner
+      Weboberfläche.
+    en: >-
+      Network-wide ad and tracker blocking
+      with integrated DNS server, filter lists,
+      statistics, parental controls and
+      modern web interface.
+
+  tips:
+    de: >-
+      Beim ersten Start die Weboberfläche
+      auf Port 3000 öffnen.
+      Im Einrichtungsassistenten für die
+      Admin-Weboberfläche Port 3000 und
+      für den DNS-Server Port 53 auswählen.
+      Anschließend Benutzername und Passwort
+      direkt in AdGuard Home erstellen.
+      Die Weboberfläche bleibt dadurch dauerhaft
+      über Port 3000 erreichbar.
+      Nach der Einrichtung die IP-Adresse
+      des TitanOS-Servers als DNS-Server im
+      Router oder auf den Endgeräten eintragen.
+      Filterlisten, Statistiken und Benutzer
+      bleiben dauerhaft gespeichert.
+      DHCP ist standardmäßig deaktiviert.
+      Keine Router-Portfreigaben ins Internet
+      erstellen. Port 53 muss frei sein.
+    en: >-
+      Open port 3000 for the initial setup.
+      Select port 3000 for the admin interface
+      and port 53 for DNS during installation.
+      Create the administrator credentials
+      inside the AdGuard Home setup wizard.
+      The dashboard will remain available
+      on port 3000.
+      Configure the TitanOS server IP as the
+      DNS server in your router or devices.
+      Settings, filter lists and statistics
+      remain persistent.
+      DHCP is disabled by default.
+      Do not expose ports to the Internet.
+      Port 53 must be available.
+
+  # ============================================
+  # TITANOS VARIABLEN
+  # ============================================
+
+  variables:
+
+    TZ:
+      label:
+        de: Zeitzone
+        en: Timezone
+
+  # ============================================
+  # PERSISTENTE DATEN
+  # ============================================
+
+  paths:
+
+    /opt/adguardhome/work:
+      label:
+        de: Datenbank, Statistiken und Arbeitsdaten
+        en: Database, statistics and working data
+
+    /opt/adguardhome/conf:
+      label:
+        de: Konfiguration, Filter und Benutzer
+        en: Configuration, filters and users
+
+  # ============================================
+  # PORTS
+  # ============================================
+
+  ports:
+
+    "3000":
+      label: AdGuard Home Dashboard
+      webui: true
+
+    "53":
+      label: DNS TCP/UDP
+      webui: false
+
+
+# ==============================================
+# SERVICES
+# ==============================================
+
+services:
+
+  adguard:
+    image: adguard/adguardhome:latest
+    restart: unless-stopped
+
+    # ==========================================
+    # UMGEBUNGSVARIABLEN
+    # ==========================================
+
+    environment:
+
+      # Systemzeit
+      TZ: "Europe/Berlin"
+
+    # ==========================================
+    # NETZWERK
+    # ==========================================
+
+    ports:
+
+      # DNS über TCP und UDP
+      - "53:53/tcp"
+      - "53:53/udp"
+
+      # Ersteinrichtung und Dashboard
+      - "3000:3000/tcp"
+
+    # ==========================================
+    # DATENSPEICHER
+    # ==========================================
+
+    volumes:
+
+      # Statistiken, Datenbank und Arbeitsdaten
+      - ./work:/opt/adguardhome/work
+
+      # Anwendungskonfiguration
+      - ./conf:/opt/adguardhome/conf
+
+    # ==========================================
+    # SICHERHEIT
+    # ==========================================
+
+    security_opt:
+      - no-new-privileges:true
+
+    # Kein privilegierter Container.
+    # DHCP und verschlüsselte DNS-Listener
+    # sind hier nicht zusätzlich freigegeben.
+
+    # ==========================================
+    # BEENDEN
+    # ==========================================
+
+    stop_grace_period: 30s
+
+    # ==========================================
+    # PROTOKOLLIERUNG
+    # ==========================================
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
