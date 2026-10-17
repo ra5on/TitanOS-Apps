@@ -1,6 +1,6 @@
 
 x-titanos:
-  icon: "https://raw.githubusercontent.com/bambulab/BambuStudio/master/resources/images/bbl-3dp-logo.svg"
+  icon: "https://raw.githubusercontent.com/bambulab/BambuStudio/master/resources/images/BambuStudio_128px.png"
   name: Bambu Studio
   main: bambustudio
   category: productivity

@@ -3,7 +3,7 @@ x-titanos:
   icon: "https://raw.githubusercontent.com/AdguardTeam/AdGuardHome/master/client/public/assets/apple-touch-icon-180x180.png"
   name: AdGuard Home
   main: adguard
-  category: networking
+  category: network
 
   description:
     de: >-
