@@ -1,5 +1,6 @@
 
 x-titanos:
+  icon: "https://raw.githubusercontent.com/blakeblackshear/frigate/dev/web/images/branding/apple-touch-icon.png"
   name: Frigate NVR
   main: frigate
   category: security
@@ -114,6 +115,8 @@ x-titanos:
 
 services:
   frigate:
+    labels:
+      titanos.webui: "https://[host]:8971"
     image: "ghcr.io/blakeblackshear/frigate:${FRIGATE_IMAGE_TAG:-latest}"
     restart: unless-stopped
     stop_grace_period: 30s

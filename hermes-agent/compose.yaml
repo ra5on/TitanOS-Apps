@@ -1,5 +1,6 @@
 
 x-titanos:
+  icon: "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/apps/bootstrap-installer/src-tauri/icons/128x128.png"
   name: Hermes Agent
   main: hermes
   category: productivity
@@ -158,6 +159,8 @@ x-titanos:
 services:
 
   hermes:
+    labels:
+      titanos.webui: "http://[host]:9119"
     image: nousresearch/hermes-agent:latest
     restart: unless-stopped
 
