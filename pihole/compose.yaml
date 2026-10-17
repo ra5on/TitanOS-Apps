@@ -3,7 +3,7 @@ x-titanos:
   icon: "https://raw.githubusercontent.com/pi-hole/web/master/img/favicons/android-chrome-192x192.png"
   name: Pi-hole
   main: pihole
-  category: networking
+  category: network
 
   description:
     de: >-

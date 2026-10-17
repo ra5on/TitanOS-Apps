@@ -3,7 +3,7 @@ x-titanos:
   icon: "https://raw.githubusercontent.com/cloudflare/cloudflare-docs/production/public/favicon.png"
   name: Cloudflare Tunnel
   main: cloudflared
-  category: networking
+  category: network
 
   description:
     de: >-
