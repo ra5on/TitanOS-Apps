@@ -1,0 +1,449 @@
+
+x-titanos:
+  name: Node-RED
+  main: node-red
+  category: productivity
+
+  description:
+    de: >-
+      Visuelle Automatisierungsplattform zur
+      Verbindung von APIs, IoT-Geräten,
+      Smart-Home-Systemen und Webdiensten.
+      Mit grafischem Flow-Editor, Benutzeranmeldung,
+      persistenten Daten und Versionsauswahl.
+    en: >-
+      Visual automation platform for connecting
+      APIs, IoT devices, smart home systems
+      and web services. Includes graphical
+      flow editor, authentication, persistent
+      storage and version selection.
+
+  tips:
+    de: >-
+      Bei der Installation Node-RED-Version,
+      Benutzernamen und Passwort festlegen.
+      TitanOS generiert den Verschlüsselungsschlüssel
+      für gespeicherte Zugangsdaten automatisch.
+      Die Benutzeranmeldung wird beim ersten
+      Start selbstständig eingerichtet.
+      Das Dashboard ist auf Port 1880 erreichbar.
+      Flows, installierte Nodes, Projekte und
+      Konfigurationen bleiben dauerhaft gespeichert.
+      Bei der ersten Installation muss das
+      Datenverzeichnis leer und für UID 1000
+      beschreibbar sein.
+      Bestehende settings.js-Dateien werden aus
+      Sicherheitsgründen nicht überschrieben.
+      Die Anwendung nur in vertrauenswürdigen
+      Netzwerken oder über HTTPS mit zusätzlichem
+      Zugriffsschutz bereitstellen.
+    en: >-
+      Select the Node-RED version, username
+      and password during installation.
+      TitanOS generates the credential
+      encryption secret automatically.
+      Editor authentication is configured
+      on first startup.
+      The dashboard runs on port 1880.
+      Flows, installed nodes, projects and
+      configuration remain persistent.
+      The initial data directory must be empty
+      and writable by UID 1000.
+      Existing settings.js files are not
+      overwritten for security reasons.
+      Only expose the app on trusted networks
+      or behind HTTPS and additional access control.
+
+  # ============================================
+  # TITANOS VARIABLEN
+  # ============================================
+
+  variables:
+
+    # ------------------------------------------
+    # VERSION
+    # ------------------------------------------
+
+    NODE_RED_IMAGE_TAG:
+      label:
+        de: Node-RED Docker-Version
+        en: Node-RED Docker version
+      required: true
+
+    # ------------------------------------------
+    # BENUTZERANMELDUNG
+    # ------------------------------------------
+
+    NODE_RED_USERNAME:
+      label:
+        de: Administrator-Benutzername
+        en: Administrator username
+      required: true
+
+    NODE_RED_PASSWORD:
+      label:
+        de: Administrator-Passwort
+        en: Administrator password
+      secret: true
+      required: true
+
+    # ------------------------------------------
+    # VERSCHLÜSSELUNG
+    # ------------------------------------------
+
+    NODE_RED_CREDENTIAL_SECRET:
+      label:
+        de: Verschlüsselungsschlüssel
+        en: Credential encryption secret
+      secret: generate
+      required: true
+
+    # ------------------------------------------
+    # SYSTEM
+    # ------------------------------------------
+
+    TZ:
+      label:
+        de: Zeitzone
+        en: Timezone
+
+    NODE_RED_LANG:
+      label:
+        de: Sprache der Oberfläche
+        en: Interface language
+
+    # ------------------------------------------
+    # FLOWS UND PROJEKTE
+    # ------------------------------------------
+
+    FLOWS:
+      label:
+        de: Name der Flow-Datei
+        en: Flow file name
+
+    NODE_RED_ENABLE_PROJECTS:
+      label:
+        de: Git-Projekte aktivieren
+        en: Enable Git projects
+
+    NODE_RED_ENABLE_SAFE_MODE:
+      label:
+        de: Abgesicherten Start aktivieren
+        en: Enable safe mode
+
+    NODE_RED_PERSIST_CONTEXT:
+      label:
+        de: Flow-Kontext dauerhaft speichern
+        en: Persist flow context
+
+    # ------------------------------------------
+    # PERFORMANCE
+    # ------------------------------------------
+
+    NODE_OPTIONS:
+      label:
+        de: Node.js Startoptionen
+        en: Node.js runtime options
+
+    # ------------------------------------------
+    # PROTOKOLLIERUNG
+    # ------------------------------------------
+
+    NODE_RED_LOG_LEVEL:
+      label:
+        de: Protokollstufe
+        en: Logging level
+
+  # ============================================
+  # PERSISTENTE DATEN
+  # ============================================
+
+  paths:
+    /data:
+      label:
+        de: Flows, Projekte, Nodes und Konfiguration
+        en: Flows, projects, nodes and configuration
+
+  # ============================================
+  # PORTS
+  # ============================================
+
+  ports:
+    "1880":
+      label: Node-RED Dashboard
+      webui: true
+
+
+# ==============================================
+# SERVICES
+# ==============================================
+
+services:
+
+  node-red:
+    image: "nodered/node-red:${NODE_RED_IMAGE_TAG:latest}"
+    restart: unless-stopped
+
+    # ==========================================
+    # UMGEBUNGSVARIABLEN
+    # ==========================================
+
+    environment:
+
+      # ----------------------------------------
+      # VERSION
+      # ----------------------------------------
+
+      # Sichtbarer Wert für den TitanOS-Installer.
+      # TitanOS muss diesen zusätzlich an Compose
+      # zur Image-Auswahl übergeben.
+      NODE_RED_IMAGE_TAG: "latest"
+
+      # ----------------------------------------
+      # SYSTEM
+      # ----------------------------------------
+
+      TZ: "Europe/Berlin"
+
+      # Unterstützt beispielsweise:
+      # de, en-US, zh-CN, ja
+      NODE_RED_LANG: "de"
+
+      # ----------------------------------------
+      # BENUTZERANMELDUNG
+      # ----------------------------------------
+
+      # Benutzername aus TitanOS
+      NODE_RED_USERNAME: ""
+
+      # Passwort aus TitanOS
+      NODE_RED_PASSWORD: ""
+
+      # Von TitanOS generierter Schlüssel
+      NODE_RED_CREDENTIAL_SECRET: ""
+
+      # ----------------------------------------
+      # FLOWS
+      # ----------------------------------------
+
+      # Standard-Flow-Datei
+      FLOWS: "flows.json"
+
+      # ----------------------------------------
+      # PROJEKTE
+      # ----------------------------------------
+
+      # Git-basierte Node-RED-Projekte
+      NODE_RED_ENABLE_PROJECTS: "false"
+
+      # ----------------------------------------
+      # SICHERER START
+      # ----------------------------------------
+
+      # true = Flows zunächst nicht ausführen
+      NODE_RED_ENABLE_SAFE_MODE: "false"
+
+      # ----------------------------------------
+      # KONTEXTSPEICHER
+      # ----------------------------------------
+
+      # true = Kontext auf Festplatte speichern
+      NODE_RED_PERSIST_CONTEXT: "true"
+
+      # ----------------------------------------
+      # PERFORMANCE
+      # ----------------------------------------
+
+      # Node.js Heap maximal 512 MB
+      NODE_OPTIONS: "--max-old-space-size=512"
+
+      # ----------------------------------------
+      # PROTOKOLLIERUNG
+      # ----------------------------------------
+
+      NODE_RED_LOG_LEVEL: "info"
+
+    # ==========================================
+    # AUTOMATISCHE ERSTEINRICHTUNG
+    # ==========================================
+
+    # Node-RED bietet keine nativen
+    # Benutzername/Passwort-Umgebungsvariablen.
+    #
+    # Deshalb erzeugt dieser Startvorgang
+    # eine settings.js mit adminAuth.
+    #
+    # Das Passwort wird mit bcrypt gehasht.
+    # Keine Speicherung im Klartext in /data.
+    #
+    # Die Flows werden anschließend regulär
+    # über Node-RED gestartet.
+
+    entrypoint:
+      - /bin/sh
+      - -ec
+
+    command:
+      - |
+        node <<'NODE'
+        const fs = require('fs');
+        const bcrypt = require(
+          require.resolve('bcryptjs', {
+            paths: ['/usr/src/node-red/node_modules/node-red']
+          })
+        );
+
+        const username = (process.env.NODE_RED_USERNAME || '').trim();
+        const password = process.env.NODE_RED_PASSWORD || '';
+        const secret = process.env.NODE_RED_CREDENTIAL_SECRET || '';
+
+        if (!username || !password || !secret) {
+          console.error(
+            'TitanOS: Benutzername, Passwort und ' +
+            'Verschluesselungsschluessel sind erforderlich.'
+          );
+          process.exit(1);
+        }
+
+        const settingsFile = '/data/settings.js';
+        const authFile = '/data/.titanos-admin-auth.json';
+
+        const auth = {
+          type: 'credentials',
+          users: [{
+            username,
+            password: bcrypt.hashSync(password, 10),
+            permissions: '*'
+          }]
+        };
+
+        fs.writeFileSync(
+          authFile + '.tmp',
+          JSON.stringify(auth, null, 2),
+          { mode: 0o600 }
+        );
+        fs.renameSync(authFile + '.tmp', authFile);
+
+        const marker = 'TITANOS_BOOTSTRAP_V1';
+
+        if (!fs.existsSync(settingsFile)) {
+          const settings = `
+        // TITANOS_BOOTSTRAP_V1
+        // Automatisch erzeugte Node-RED-Konfiguration.
+        const defaults = require(
+          '/usr/src/node-red/node_modules/node-red/settings.js'
+        );
+
+        module.exports = {
+          ...defaults,
+
+          lang: process.env.NODE_RED_LANG || 'de',
+
+          credentialSecret:
+            process.env.NODE_RED_CREDENTIAL_SECRET,
+
+          adminAuth:
+            require('/data/.titanos-admin-auth.json'),
+
+          editorTheme: {
+            ...defaults.editorTheme,
+            projects: {
+              ...(defaults.editorTheme || {}).projects,
+              enabled:
+                process.env.NODE_RED_ENABLE_PROJECTS === 'true'
+            }
+          },
+
+          contextStorage:
+            process.env.NODE_RED_PERSIST_CONTEXT === 'true'
+              ? {
+                  default: {
+                    module: 'localfilesystem'
+                  }
+                }
+              : defaults.contextStorage,
+
+          logging: {
+            ...defaults.logging,
+            console: {
+              ...(defaults.logging || {}).console,
+              level: process.env.NODE_RED_LOG_LEVEL || 'info'
+            }
+          }
+        };
+        `;
+
+          fs.writeFileSync(settingsFile, settings, {
+            mode: 0o600
+          });
+
+          console.log(
+            'TitanOS: Node-RED wurde eingerichtet.'
+          );
+        } else {
+          const existing = fs.readFileSync(settingsFile, 'utf8');
+
+          if (!existing.includes(marker)) {
+            console.error(
+              'TitanOS: Bestehende settings.js erkannt. ' +
+              'Automatische Anmeldung nicht aktiviert. ' +
+              'Bitte bestehende Konfiguration pruefen.'
+            );
+            process.exit(1);
+          }
+
+          console.log(
+            'TitanOS: Bestehende Konfiguration wird verwendet.'
+          );
+        }
+        NODE
+
+        if [ "$$NODE_RED_ENABLE_SAFE_MODE" = "true" ]; then
+          exec node node_modules/node-red/red.js \
+            --userDir /data --safe "$$FLOWS"
+        else
+          exec node node_modules/node-red/red.js \
+            --userDir /data "$$FLOWS"
+        fi
+
+    # ==========================================
+    # PORTFREIGABE
+    # ==========================================
+
+    ports:
+      - "1880:1880"
+
+    # ==========================================
+    # PERSISTENTER SPEICHER
+    # ==========================================
+
+    volumes:
+      - ./data:/data
+
+    # ==========================================
+    # SICHERHEIT
+    # ==========================================
+
+    security_opt:
+      - no-new-privileges:true
+
+    # Kein privilegierter Container.
+    # Kein Docker-Socket eingebunden.
+    # Keine direkten Host-Verzeichnisse
+    # außer dem persistenten Datenordner.
+
+    # ==========================================
+    # BEENDEN
+    # ==========================================
+
+    stop_grace_period: 30s
+
+    # ==========================================
+    # LOGS
+    # ==========================================
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
