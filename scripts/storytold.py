@@ -134,7 +134,7 @@ if __name__=='__main__':
   for app in APPS:
    try:
     record=latest(app);saved=ROOT/app/'release.json'
-    if not saved.exists() or json.loads(saved.read_text())!=record:matrix.append({'app':app,'record':json.dumps(record)})
+    if os.environ.get('GITHUB_EVENT_NAME') in ('pull_request', 'push', 'workflow_dispatch') or not saved.exists() or json.loads(saved.read_text())!=record:matrix.append({'app':app,'record':json.dumps(record)})
    except Exception as error: print(f'{app}: {error}',file=__import__('sys').stderr);raise
   print(json.dumps({'include':matrix}))
  else:
