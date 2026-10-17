@@ -58,6 +58,11 @@ jobs:
           npm install --prefix /tmp/browser playwright
           /tmp/browser/node_modules/.bin/playwright install --with-deps chromium
           PLAYWRIGHT_PATH=/tmp/browser/node_modules/playwright/index.mjs node scripts/web-smoke.mjs http://127.0.0.1:8099 "$APP"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: browser-${{ matrix.app }}
+          path: '*-smoke.png'
       - name: Publish checked images
         if: github.event_name != 'pull_request'
         env:
