@@ -4,6 +4,7 @@
 # health dependencies and explicit service addresses. See adjacent LICENSE.
 # https://github.com/immich-app/immich/releases/tag/v3.3.3
 x-titanos:
+  icon: "https://raw.githubusercontent.com/immich-app/immich/main/design/immich-logo.svg"
   name: Immich
   main: immich-server
   category: photos
@@ -33,6 +34,8 @@ x-titanos:
       webui: true
 services:
   immich-server:
+    labels:
+      titanos.webui: "http://[host]:2283"
     image: ghcr.io/immich-app/immich-server:v3.3.3
     restart: unless-stopped
     environment:

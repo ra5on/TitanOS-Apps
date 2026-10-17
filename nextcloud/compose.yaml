@@ -1,5 +1,6 @@
 
 x-titanos:
+  icon: "https://raw.githubusercontent.com/nextcloud/server/master/core/img/favicon-touch.png"
   name: Nextcloud + MariaDB
   main: nextcloud
   category: productivity
@@ -254,6 +255,8 @@ services:
   # ============================================
 
   nextcloud:
+    labels:
+      titanos.webui: "http://[host]:8080"
     image: "nextcloud:${NEXTCLOUD_VERSION:-35.0.2-apache}"
     restart: unless-stopped
 

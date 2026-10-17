@@ -1,5 +1,6 @@
 
 x-titanos:
+  icon: "https://raw.githubusercontent.com/pi-hole/web/master/img/favicons/android-chrome-192x192.png"
   name: Pi-hole
   main: pihole
   category: networking
@@ -127,6 +128,8 @@ x-titanos:
 services:
 
   pihole:
+    labels:
+      titanos.webui: "http://[host]:8081/admin/"
     image: pihole/pihole:latest
     restart: unless-stopped
 

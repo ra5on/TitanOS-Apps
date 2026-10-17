@@ -1,0 +1,108 @@
+name: Storytold web images
+on:
+  schedule:
+    - cron: '23 */6 * * *'
+  workflow_dispatch:
+  pull_request:
+    paths: ['scripts/**', 'packaging/**', '.github/workflows/storytold.yml']
+  push:
+    branches: [main]
+    paths: ['scripts/storytold.py', 'scripts/web-smoke.mjs', 'packaging/**', '.github/workflows/storytold.yml']
+permissions:
+  contents: read
+concurrency:
+  group: storytold-images
+  cancel-in-progress: false
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.discover.outputs.matrix }}
+      changed: ${{ steps.discover.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: discover
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          matrix=$(python3 scripts/storytold.py discover)
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          echo "changed=$(echo "$matrix" | jq '.include | length > 0')" >> "$GITHUB_OUTPUT"
+  build:
+    needs: discover
+    if: needs.discover.outputs.changed == 'true'
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.discover.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Fetch verified web release and original notices
+        env:
+          GH_TOKEN: ${{ github.token }}
+          APP: ${{ matrix.app }}
+          RECORD: ${{ matrix.record }}
+        run: python3 scripts/storytold.py prepare --app "$APP" --record "$RECORD"
+      - name: Build and test
+        env:
+          APP: ${{ matrix.app }}
+        run: |
+          docker build --label "org.opencontainers.image.source=https://github.com/ra5on/TitanOS-Apps" -t "test-$APP" image-context
+          docker run -d --name web-test --read-only --tmpfs /tmp:rw,size=32m,mode=1777 --cap-drop ALL --security-opt no-new-privileges:true -p 127.0.0.1:8099:8080 "test-$APP"
+          npm install --prefix /tmp/browser playwright
+          /tmp/browser/node_modules/.bin/playwright install --with-deps chromium
+          PLAYWRIGHT_PATH=/tmp/browser/node_modules/playwright/index.mjs node scripts/web-smoke.mjs http://127.0.0.1:8099 "$APP"
+      - name: Publish checked images
+        if: github.event_name != 'pull_request'
+        env:
+          APP: ${{ matrix.app }}
+          RECORD: ${{ matrix.record }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(echo "$RECORD" | jq -r .tag)
+          echo "$GH_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          image="ghcr.io/ra5on/titanos-$APP"
+          docker tag "test-$APP" "$image:$version"
+          docker tag "test-$APP" "$image:latest"
+          docker push "$image:$version"
+          docker push "$image:latest"
+          python3 scripts/storytold.py catalog --app "$APP" --record "$RECORD"
+      - uses: actions/upload-artifact@v7
+        if: github.event_name != 'pull_request'
+        with:
+          name: catalog-${{ matrix.app }}
+          path: ${{ matrix.app }}/
+  catalog:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: catalog-*
+          path: /tmp/catalog
+      - name: Update only successfully tested catalog entries
+        run: |
+          for dir in /tmp/catalog/catalog-*; do
+            app=${dir##*/catalog-}
+            mkdir -p "$app"
+            cp "$dir/compose.yaml" "$dir/release.json" "$app/"
+          done
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- '*craft/compose.yaml' '*craft/release.json'
+          git diff --cached --quiet && exit 0
+          git commit -m 'Update checked Storytold web releases'
+          git pull --rebase origin main
+          git push origin HEAD:main

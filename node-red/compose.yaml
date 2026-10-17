@@ -1,5 +1,6 @@
 
 x-titanos:
+  icon: "https://raw.githubusercontent.com/node-red/node-red/main/packages/node_modules/@node-red/editor-client/src/images/node-red-icon.svg"
   name: Node-RED
   main: node-red
   category: productivity
@@ -181,7 +182,9 @@ x-titanos:
 services:
 
   node-red:
-    image: "nodered/node-red:${NODE_RED_IMAGE_TAG:latest}"
+    labels:
+      titanos.webui: "http://[host]:1880"
+    image: "nodered/node-red:${NODE_RED_IMAGE_TAG:-latest}"
     restart: unless-stopped
 
     # ==========================================

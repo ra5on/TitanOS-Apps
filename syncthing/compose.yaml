@@ -1,4 +1,5 @@
 x-titanos:
+  icon: "https://raw.githubusercontent.com/syncthing/syncthing/main/assets/logo-128.png"
   name: Syncthing
   category: backup
   description:
@@ -23,6 +24,8 @@ x-titanos:
 
 services:
   syncthing:
+    labels:
+      titanos.webui: "http://[host]:8384"
     image: syncthing/syncthing:latest
     restart: unless-stopped
     environment:

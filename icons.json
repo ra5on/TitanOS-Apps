@@ -1,0 +1,15 @@
+{
+  "adguard": "https://raw.githubusercontent.com/AdguardTeam/AdGuardHome/master/client/public/assets/apple-touch-icon-180x180.png",
+  "bambu-lab": "https://raw.githubusercontent.com/bambulab/BambuStudio/master/resources/images/bbl-3dp-logo.svg",
+  "frigate": "https://raw.githubusercontent.com/blakeblackshear/frigate/dev/web/images/branding/apple-touch-icon.png",
+  "hermes-agent": "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/apps/bootstrap-installer/src-tauri/icons/128x128.png",
+  "immich": "https://raw.githubusercontent.com/immich-app/immich/main/design/immich-logo.svg",
+  "nextcloud": "https://raw.githubusercontent.com/nextcloud/server/master/core/img/favicon-touch.png",
+  "node-red": "https://raw.githubusercontent.com/node-red/node-red/main/packages/node_modules/@node-red/editor-client/src/images/node-red-icon.svg",
+  "ollama": "https://raw.githubusercontent.com/ollama/ollama/main/docs/ollama-logo.svg",
+  "pihole": "https://raw.githubusercontent.com/pi-hole/web/master/img/favicons/android-chrome-192x192.png",
+  "syncthing": "https://raw.githubusercontent.com/syncthing/syncthing/main/assets/logo-128.png",
+  "uptime-kuma": "https://raw.githubusercontent.com/louislam/uptime-kuma/master/public/icon.svg",
+  "vaultwarden": "https://raw.githubusercontent.com/dani-garcia/vaultwarden/main/resources/vaultwarden-icon.svg",
+  "cloudflare-tunnel": "https://raw.githubusercontent.com/cloudflare/cloudflare-docs/production/public/favicon.png"
+}

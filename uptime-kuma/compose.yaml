@@ -1,4 +1,5 @@
 x-titanos:
+  icon: "https://raw.githubusercontent.com/louislam/uptime-kuma/master/public/icon.svg"
   name: Uptime Kuma
   category: network
   description:
@@ -14,6 +15,8 @@ x-titanos:
 
 services:
   uptime-kuma:
+    labels:
+      titanos.webui: "http://[host]:3001"
     image: louislam/uptime-kuma:latest
     restart: unless-stopped
     environment:
