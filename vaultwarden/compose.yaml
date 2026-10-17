@@ -1,4 +1,5 @@
 x-titanos:
+  icon: "https://raw.githubusercontent.com/dani-garcia/vaultwarden/main/resources/vaultwarden-icon.svg"
   name: Vaultwarden
   category: security
   description:
@@ -32,6 +33,8 @@ x-titanos:
 
 services:
   vaultwarden:
+    labels:
+      titanos.webui: "http://[host]:8222"
     image: vaultwarden/server:latest
     restart: unless-stopped
     environment:
