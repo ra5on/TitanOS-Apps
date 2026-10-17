@@ -14,8 +14,8 @@ try {
  page.on('response', r => { if (r.status() >= 400 && !/favicon|fonts\/manifest/.test(r.url())) failed.push(`${r.status()} ${r.url()}`); });
  await page.goto(`${url}/${suffix}`, {waitUntil:'networkidle', timeout:120000});
  await page.waitForSelector('canvas', {state:'visible', timeout:120000});
- await page.waitForFunction(() => !!window.wasmBindings, { }, {timeout:120000});
- await page.locator('[id$="_loading"]').waitFor({state:'hidden', timeout:120000});
+ await page.waitForFunction(app => app === 'filmcraft' ? !!window.filmcraftLoad?.readyMs : app === 'effectcraft' ? !!window.effectcraftLoad?.readyMs : app === 'lightcraft' ? !!window.lightcraft?.command : !!window.wasmBindings, app, {timeout:120000});
+ await page.locator('#loading, [id$="_loading"]').waitFor({state:'hidden', timeout:120000});
  await page.waitForTimeout(5000);
  assert.equal(errors.length, 0, errors.join('\n'));
  assert.equal(failed.length, 0, failed.join('\n'));
