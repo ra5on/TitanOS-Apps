@@ -1,0 +1,230 @@
+
+x-titanos:
+  name: Frigate NVR
+  main: frigate
+  category: security
+
+  description:
+    de: >-
+      Lokale Videoüberwachung mit KI-Objekterkennung,
+      Kamera-Livestreams, Aufzeichnungen und Ereignissen.
+      Frigate bietet eine geschützte Weboberfläche,
+      einen Kamera-Einrichtungsassistenten und optional
+      Hardwarebeschleunigung für Intel, AMD, NVIDIA und Coral.
+    en: >-
+      Local video surveillance with AI object detection,
+      camera live streams, recordings and events.
+      Includes authenticated web UI, camera setup wizard
+      and optional Intel, AMD, NVIDIA and Coral acceleration.
+
+  tips:
+    de: >-
+      Nach dem Start https://SERVER-IP:8971 öffnen.
+      Frigate legt den Benutzer admin mit zufälligem Passwort
+      an. Das erste Passwort steht im Container-Log und
+      sollte direkt im Dashboard geändert werden.
+      Kameras anschließend im Assistenten hinzufügen.
+      Die Konfiguration und Aufzeichnungen bleiben erhalten.
+      Port 5000 (API ohne Anmeldung) ist nicht freigegeben.
+      Für NVIDIA das TensorRT-Image und eine Docker-GPU-
+      Freigabe konfigurieren; für Intel/AMD bei Bedarf
+      /dev/dri durchreichen. Keine direkten Internetfreigaben.
+      Bei Versionswechseln die Konfiguration vorher sichern.
+    en: >-
+      Open https://SERVER-IP:8971 after starting.
+      Frigate creates an admin account and random password;
+      find the first password in container logs and change it.
+      Add cameras through the setup wizard.
+      Configuration and recordings persist.
+      Port 5000 (unauthenticated API) is not exposed.
+      NVIDIA requires a TensorRT image and Docker GPU access;
+      Intel/AMD may require /dev/dri passthrough.
+      Do not expose the app directly to the internet.
+      Back up the config before upgrading.
+
+  variables:
+    FRIGATE_IMAGE_TAG:
+      label:
+        de: Frigate-Version und Image-Variante
+        en: Frigate version and image variant
+      required: true
+
+    TZ:
+      label:
+        de: Zeitzone
+        en: Timezone
+
+    FRIGATE_RTSP_USER:
+      label:
+        de: RTSP-Benutzername (optional)
+        en: RTSP username (optional)
+
+    FRIGATE_RTSP_PASSWORD:
+      label:
+        de: RTSP-Passwort (optional)
+        en: RTSP password (optional)
+      secret: true
+
+    FRIGATE_MQTT_HOST:
+      label:
+        de: MQTT-Server (optional)
+        en: MQTT server (optional)
+
+    FRIGATE_MQTT_USER:
+      label:
+        de: MQTT-Benutzername (optional)
+        en: MQTT username (optional)
+
+    FRIGATE_MQTT_PASSWORD:
+      label:
+        de: MQTT-Passwort (optional)
+        en: MQTT password (optional)
+      secret: true
+
+    PLUS_API_KEY:
+      label:
+        de: Frigate+ API-Schlüssel (optional)
+        en: Frigate+ API key (optional)
+      secret: true
+
+  paths:
+    /config:
+      label:
+        de: Einstellungen, Benutzer und Ereignisdatenbank
+        en: Settings, users and event database
+
+    /media/frigate:
+      label:
+        de: Kameraaufzeichnungen, Clips und Schnappschüsse
+        en: Recordings, clips and snapshots
+
+  ports:
+    "8971":
+      label: Frigate Dashboard (HTTPS)
+      webui: true
+
+    "8554":
+      label: RTSP-Restream (TCP)
+      webui: false
+
+    "8555":
+      label: WebRTC (TCP und UDP)
+      webui: false
+
+
+services:
+  frigate:
+    image: "ghcr.io/blakeblackshear/frigate:${FRIGATE_IMAGE_TAG:-latest}"
+    restart: unless-stopped
+    stop_grace_period: 30s
+
+    environment:
+      TZ: "Europe/Berlin"
+
+      # Versionsfeld für TitanOS.
+      # Image-Auswahl benötigt zusätzlich
+      # Compose-Variablen oder Image-Ersetzung.
+      FRIGATE_IMAGE_TAG: "latest"
+
+      # Optionale Kamera-Zugangsdaten
+      FRIGATE_RTSP_USER: ""
+      FRIGATE_RTSP_PASSWORD: ""
+
+      # Optionale MQTT-Zugangsdaten
+      FRIGATE_MQTT_HOST: ""
+      FRIGATE_MQTT_USER: ""
+      FRIGATE_MQTT_PASSWORD: ""
+
+      # Optionaler Frigate+ Zugang
+      PLUS_API_KEY: ""
+
+    ports:
+      # Geschütztes HTTPS-Dashboard
+      - "8971:8971/tcp"
+
+      # RTSP-Restreaming
+      - "8554:8554/tcp"
+
+      # WebRTC für Live-Kameras
+      - "8555:8555/tcp"
+      - "8555:8555/udp"
+
+      # API ohne Authentifizierung
+      # bewusst NICHT freigeben.
+      # - "5000:5000/tcp"
+
+      # Go2RTC-Admin-Oberfläche
+      # ebenfalls nicht freigeben.
+      # - "1984:1984/tcp"
+
+    # Shared Memory für Kamerastreams
+    shm_size: "512mb"
+
+    volumes:
+      # Konfiguration und Datenbank
+      - ./config:/config
+
+      # Aufzeichnungen und Medien
+      - ./media:/media/frigate
+
+      # Temporärer Aufnahme-Cache (1 GB RAM)
+      - type: tmpfs
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+
+    # ==========================================
+    # OPTIONAL: INTEL / AMD
+    # ==========================================
+
+    # devices:
+    #   - /dev/dri/renderD128:/dev/dri/renderD128
+    #
+    # Anschließend FFmpeg-Beschleunigung
+    # in Frigate konfigurieren:
+    # preset-vaapi
+
+    # ==========================================
+    # OPTIONAL: NVIDIA / TENSORRT
+    # ==========================================
+
+    # Frigate-Image auf 0.18.2-tensorrt ändern
+    # und die GPU-Freigabe aktivieren.
+    #
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+    #
+    # Für NVIDIA-Videodekodierung:
+    # FFmpeg-Preset preset-nvidia verwenden.
+
+    # ==========================================
+    # OPTIONAL: GOOGLE CORAL USB
+    # ==========================================
+
+    # devices:
+    #   - /dev/bus/usb:/dev/bus/usb
+
+    # ==========================================
+    # SICHERHEIT
+    # ==========================================
+
+    security_opt:
+      - no-new-privileges:true
+
+    cap_drop:
+      - ALL
+
+    # ==========================================
+    # PROTOKOLLIERUNG
+    # ==========================================
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
