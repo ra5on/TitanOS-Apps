@@ -1,6 +1,6 @@
 {
   "adguard": "https://raw.githubusercontent.com/AdguardTeam/AdGuardHome/master/client/public/assets/apple-touch-icon-180x180.png",
-  "bambu-lab": "https://raw.githubusercontent.com/bambulab/BambuStudio/master/resources/images/bbl-3dp-logo.svg",
+  "bambu-lab": "https://raw.githubusercontent.com/bambulab/BambuStudio/master/resources/images/BambuStudio_128px.png",
   "frigate": "https://raw.githubusercontent.com/blakeblackshear/frigate/dev/web/images/branding/apple-touch-icon.png",
   "hermes-agent": "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/apps/bootstrap-installer/src-tauri/icons/128x128.png",
   "immich": "https://raw.githubusercontent.com/immich-app/immich/main/design/immich-logo.svg",
