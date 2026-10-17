@@ -1,0 +1,46 @@
+# Automatically updated only after the image passes its checks.
+x-titanos:
+  name: PhotoCraft
+  main: photocraft
+  category: photos
+  icon: "https://raw.githubusercontent.com/storytold/photocraft/v0.9.0/assets/app-icon/hicolor/128x128/apps/ai.storyteller.photocraft.png"
+  description:
+    de: "Bilder bearbeiten im Browser. Verarbeitung auf deinem Endgerät."
+    en: "Edit images in your browser. Processing runs on your device."
+  tips:
+    de: >-
+      Web-Version von Storytold; Funktionsumfang kann von der Desktop-Version abweichen.
+      Dateien über Öffnen/Exportieren im Browser bearbeiten. NAS-Freigaben am PC einbinden,
+      um sie im Dateidialog auszuwählen. Ein Docker-Pfad allein ermöglicht keinen direkten
+      Zugriff auf NAS-Dokumente. Es wird kein Dokumentenordner eingebunden.
+      Für WebGPU, Zwischenablage und weitere Browserfunktionen HTTPS über einen
+      Reverse-Proxy verwenden; die öffentliche URL kann in TitanOS eingetragen werden.
+      Vor dem Schließen exportieren; die Speicherung hängt von App und Browser ab.
+    en: >-
+      Storytold web version; features may differ from the desktop application.
+      Open/export files using your browser. Mount an NAS share on your computer to
+      select it in the file picker. A Docker path alone does not give browser apps
+      access to NAS documents. No document directory is mounted.
+      Use an HTTPS reverse proxy for WebGPU, clipboard and other browser features;
+      enter its public URL in TitanOS. Export before closing; persistence depends
+      on the application and browser.
+  ports:
+    "8080":
+      label: Web UI
+      webui: true
+services:
+  photocraft:
+    image: ghcr.io/ra5on/titanos-photocraft:latest
+    restart: unless-stopped
+    labels:
+      titanos.webui: "http://[host]:8090"
+    ports:
+      - "8090:8080"
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
