@@ -13,6 +13,11 @@ APPS = {
  'designcraft': ('DesignCraft', 'productivity', 'Seiten und Layouts gestalten', 'Design pages and layouts'),
  'effectcraft': ('EffectCraft', 'media', 'Animationen und Effekte gestalten', 'Create motion graphics and effects'),
  'figcraft': ('FigCraft', 'productivity', 'Oberflächen und Prototypen gestalten', 'Design interfaces and prototypes'),
+ 'wordcraft': ('WordCraft', 'productivity', 'Textdokumente bearbeiten', 'Edit text documents'),
+ 'gridcraft': ('GridCraft', 'productivity', 'Tabellen bearbeiten', 'Edit spreadsheets'),
+ 'deckcraft': ('DeckCraft', 'productivity', 'Präsentationen gestalten', 'Create presentations'),
+ 'cadcraft': ('CADCraft', 'productivity', 'Technische Zeichnungen erstellen', 'Create technical drawings'),
+ 'soundcraft': ('SoundCraft', 'media', 'Audio aufnehmen und bearbeiten', 'Record and edit audio'),
 }
 
 def api(path):
@@ -20,6 +25,10 @@ def api(path):
 
 def latest(app):
  release = api(f'repos/storytold/{app}/releases/latest')
+ # DeckCraft 0.8.0 panics at std::process::id in WASM, including ?blank.
+ # Keep the tested 0.7.0 only while 0.8.0 is latest; later releases are tested normally.
+ if app == 'deckcraft' and release['tag_name'] == 'v0.8.0':
+  release = api(f'repos/storytold/{app}/releases/tags/v0.7.0')
  tag = release['tag_name']
  if release['draft'] or release['prerelease'] or not re.fullmatch(r'v?\d+\.\d+\.\d+', tag):
   raise ValueError(f'Not a stable release: {tag}')
@@ -56,6 +65,23 @@ def unpack(data, destination):
    target.write_bytes(archive.read(e))
  if not list(destination.rglob('*.wasm')): raise ValueError('Missing WebAssembly')
 
+def supplement_web_assets(app, record, site):
+ # Upstream 0.9.1 requests this external font but omits it from its web ZIP.
+ # The commit is craft-fonts-ref in lightcraft/v0.9.1/.github/workflows/release.yml.
+ if app != 'lightcraft' or record['tag'] != 'v0.9.1': return
+ base='https://raw.githubusercontent.com/storytold/craft-fonts/3d9ab3a132ed0eff457e424226a435a901da30d3/fonts/noto-sans-cjk-sc/'
+ assets=[
+  ('NotoSansCJKsc-Regular.otf','lightcraft_zh_hans.otf',16437364,'2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b'),
+  ('OFL.txt','licenses/OFL-NotoSansCJKsc.txt',4301,'6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2'),
+ ]
+ sources=[]
+ for name,target,size,digest in assets:
+  data=download(base+name, size)
+  if len(data)!=size or hashlib.sha256(data).hexdigest()!=digest: raise ValueError('Supplemental font checksum/size mismatch')
+  (site/target).write_bytes(data)
+  sources.append({'url':base+name,'sha256':digest,'size':size,'file':target})
+ (site/'licenses'/'FONT-SOURCES.json').write_text(json.dumps(sources,indent=2)+'\n')
+
 def prepare(app, record, destination):
  data=download(record['url'])
  if len(data)!=record['size'] or hashlib.sha256(data).hexdigest()!=record['sha256']:
@@ -70,6 +96,7 @@ def prepare(app, record, destination):
  for name in notices:
   (licenses/name).write_bytes(download(f'https://raw.githubusercontent.com/storytold/{app}/{record["tag"]}/{name}', 2*1024*1024))
  (licenses/'SOURCE.json').write_text(json.dumps({'repository':f'https://github.com/storytold/{app}',**record},indent=2)+'\n')
+ supplement_web_assets(app,record,destination/'site')
  shutil.copy(ROOT/'packaging/Dockerfile',destination/'Dockerfile')
  shutil.copy(ROOT/'packaging/nginx.conf',destination/'nginx.conf')
 
