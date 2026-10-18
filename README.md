@@ -12,7 +12,7 @@ mit deutsch- und englischsprachigen Beschreibungen, Eingabefeldern und Hinweisen
 ## Installation in TitanOS
 
 1. Ein Daten-Volume einrichten und unter **Docker** als Speicherort auswählen.
-2. Unter **Apps** eine Anwendung aus der Quelle **Offiziell** öffnen.
+2. Unter **Apps** eine Anwendung aus der Quelle **TitanOS-Apps** (in älteren Versionen **Offiziell**) öffnen.
 3. Die Hinweise der Vorlage lesen und Speicherpfade, Ports und Zugangsdaten
    im Installationsformular festlegen. Hardwarebeschleunigung nur bei Bedarf auswählen.
 4. Installieren und die Anwendung anschließend unter **Docker** verwalten.
@@ -31,12 +31,15 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | --- | --- |
 | [AdGuard Home](adguard/compose.yaml) | DNS-Server mit Werbe- und Trackingfilter |
 | [Bambu Studio](bambu-lab/compose.yaml) | 3D-Modelle im Browser vorbereiten und slicen |
+| [CADCraft](cadcraft/compose.yaml) | Technische Zeichnungen und CAD-Entwürfe erstellen |
 | [Cloudflare Tunnel](cloudflare-tunnel/compose.yaml) | Dienste über eigene Domains erreichbar machen |
+| [DeckCraft](deckcraft/compose.yaml) | Präsentationen erstellen und bearbeiten |
 | [DesignCraft](designcraft/compose.yaml) | Seiten und Layouts gestalten |
 | [EffectCraft](effectcraft/compose.yaml) | Animationen und Effekte gestalten |
 | [FigCraft](figcraft/compose.yaml) | Oberflächen und Prototypen entwerfen |
 | [FilmCraft](filmcraft/compose.yaml) | Videos bearbeiten |
 | [Frigate NVR](frigate/compose.yaml) | Videoüberwachung mit Objekterkennung |
+| [GridCraft](gridcraft/compose.yaml) | Tabellen und Berechnungen bearbeiten |
 | [Hermes Agent](hermes-agent/compose.yaml) | KI-Agent mit Web-Dashboard |
 | [Immich](immich/compose.yaml) | Fotos und Videos verwalten und sichern |
 | [LightCraft](lightcraft/compose.yaml) | Fotos entwickeln |
@@ -46,10 +49,12 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [PdfCraft](pdfcraft/compose.yaml) | PDFs bearbeiten |
 | [PhotoCraft](photocraft/compose.yaml) | Bilder bearbeiten |
 | [Pi-hole](pihole/compose.yaml) | DNS-Werbeblocker mit Dashboard |
+| [SoundCraft](soundcraft/compose.yaml) | Audio aufnehmen und bearbeiten |
 | [Syncthing](syncthing/compose.yaml) | Ordner zwischen Geräten synchronisieren |
 | [Uptime Kuma](uptime-kuma/compose.yaml) | Erreichbarkeit von Diensten überwachen |
 | [Vaultwarden](vaultwarden/compose.yaml) | Passwortmanager für Bitwarden-Clients |
 | [VectorCraft](vectorcraft/compose.yaml) | Vektorgrafiken bearbeiten |
+| [WordCraft](wordcraft/compose.yaml) | Textdokumente erstellen und bearbeiten |
 
 ## Speicherpfade und Dokumente
 
@@ -90,7 +95,7 @@ Web-UI-Knopf, weil diese Vorlagen keine lokale Benutzeroberfläche bereitstellen
 ## Storytold / Craft-Apps
 
 Der Workflow [Storytold web images](.github/workflows/storytold.yml) prüft alle sechs Stunden sowie manuell neue
-stabile Releases der acht konfigurierten Craft-Apps. Er lädt die offiziellen
+stabile Releases der 13 konfigurierten Craft-Apps. Er lädt die offiziellen
 Web-ZIPs, prüft Größe und SHA-256 aus GitHubs Release-Metadaten und übernimmt die
 Original-Lizenztexte und Quellverweise der exakten Version. Anschließend baut
 er ein schlankes, nicht privilegiertes NGINX-Image und prüft HTTP, fehlende
@@ -99,6 +104,16 @@ versionierte Images und `latest` nach GHCR übertragen und Katalogeinträge
 aktualisiert. Scheitern Prüfungen, wird die betroffene neue Version nicht
 veröffentlicht. Alte versionierte Images bleiben für Rückwechsel verfügbar.
 Die Vorlagen beziehen ihre Images aus der GitHub Container Registry (GHCR).
+
+DeckCraft verwendet vorerst die geprüfte Version 0.7.0, weil das offizielle
+Web-Paket 0.8.0 beim Start abstürzt. Spätere Versionen werden wieder automatisch
+geprüft. Bei LightCraft 0.9.1 ergänzt die Paketierung eine im offiziellen ZIP
+fehlende Schrift mit Original-Lizenz und festen Prüfsummen. Einzelheiten stehen
+in [den dokumentierten Upstream-Ausnahmen](docs/CRAFT-UPSTREAM.md).
+
+AniCraft hat derzeit kein veröffentlichtes Release. Die eigentliche ArtCraft-App
+bietet in ihrem aktuellen Release Windows- und macOS-Pakete, aber kein Web-Paket.
+Sie sind deshalb nicht als lauffähige Web-Container im Katalog aufgeführt.
 
 Diese Browser-Apps verarbeiten Dokumente auf dem Endgerät. Sie sind keine
 serverseitigen Desktop-Sitzungen. NAS-Freigaben am PC einbinden und im normalen
