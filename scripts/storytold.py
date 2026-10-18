@@ -13,6 +13,11 @@ APPS = {
  'designcraft': ('DesignCraft', 'productivity', 'Seiten und Layouts gestalten', 'Design pages and layouts'),
  'effectcraft': ('EffectCraft', 'media', 'Animationen und Effekte gestalten', 'Create motion graphics and effects'),
  'figcraft': ('FigCraft', 'productivity', 'Oberflächen und Prototypen gestalten', 'Design interfaces and prototypes'),
+ 'wordcraft': ('WordCraft', 'productivity', 'Textdokumente bearbeiten', 'Edit text documents'),
+ 'gridcraft': ('GridCraft', 'productivity', 'Tabellen bearbeiten', 'Edit spreadsheets'),
+ 'deckcraft': ('DeckCraft', 'productivity', 'Präsentationen gestalten', 'Create presentations'),
+ 'cadcraft': ('CADCraft', 'productivity', 'Technische Zeichnungen erstellen', 'Create technical drawings'),
+ 'soundcraft': ('SoundCraft', 'media', 'Audio aufnehmen und bearbeiten', 'Record and edit audio'),
 }
 
 def api(path):

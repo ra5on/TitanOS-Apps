@@ -17,4 +17,9 @@ class Archives(unittest.TestCase):
  def test_missing_wasm(self):
   with tempfile.TemporaryDirectory() as d:
    with self.assertRaises(ValueError):module.unpack(self.archive({'index.html':'test'}),Path(d))
+class Catalog(unittest.TestCase):
+ def test_existing_ports_remain_stable(self):
+  self.assertEqual(list(module.APPS)[:8], ['photocraft','pdfcraft','filmcraft','vectorcraft','lightcraft','designcraft','effectcraft','figcraft'])
+ def test_all_released_craft_web_apps_are_discovered(self):
+  self.assertEqual(set(module.APPS), {'photocraft','pdfcraft','filmcraft','vectorcraft','lightcraft','designcraft','effectcraft','figcraft','wordcraft','gridcraft','deckcraft','cadcraft','soundcraft'})
 if __name__=='__main__':unittest.main()
