@@ -3,7 +3,7 @@ x-titanos:
   name: FigCraft
   main: figcraft
   category: productivity
-  icon: "https://raw.githubusercontent.com/storytold/figcraft/v0.6.0/assets/app-icon/hicolor/128x128/apps/ai.storyteller.figcraft.png"
+  icon: "https://raw.githubusercontent.com/storytold/figcraft/v0.7.0/assets/app-icon/hicolor/128x128/apps/ai.storyteller.figcraft.png"
   description:
     de: "Oberflächen und Prototypen gestalten im Browser. Verarbeitung auf deinem Endgerät."
     en: "Design interfaces and prototypes in your browser. Processing runs on your device."
