@@ -1,16 +1,17 @@
+# Automatically updated only after the image passes its checks.
 x-titanos:
   name: SolidCraft
   main: solidcraft
   category: productivity
-  icon: "https://raw.githubusercontent.com/tangency-labs/solidcraft/main/assets/icons/app/linux/exports/hicolor/128x128/apps/ai.storyteller.solidcraft.png"
+  icon: "https://raw.githubusercontent.com/tangency-labs/solidcraft/v0.16.2/assets/icons/app/linux/exports/hicolor/128x128/apps/ai.storyteller.solidcraft.png"
   description:
-    de: "3D-CAD-Modelle im Browser erstellen und bearbeiten. Verarbeitung auf deinem Endgerät."
+    de: "3D-CAD-Modelle erstellen und bearbeiten im Browser. Verarbeitung auf deinem Endgerät."
     en: "Create and edit 3D CAD models in your browser. Processing runs on your device."
   tips:
     de: >-
-      Offizielles SolidCraft-Web-Image. Entwürfe werden im Speicher des jeweiligen
-      Browsers abgelegt, nicht auf dem NAS. Beim Zugriff von einem anderen Gerät
-      ist HTTPS über einen Reverse-Proxy zum Speichern erforderlich; die öffentliche
+      Web-Version von SolidCraft (Tangency Labs). Entwürfe werden im Speicher des
+      jeweiligen Browsers abgelegt, nicht auf dem NAS. Beim Zugriff von einem anderen
+      Gerät ist HTTPS über einen Reverse-Proxy zum Speichern erforderlich; die öffentliche
       URL kann in TitanOS eingetragen werden. Der lokale HTTP-Link allein reicht
       dafür nicht aus. Wichtige Entwürfe zusätzlich als Datei exportieren, bevor
       Browserdaten gelöscht oder Browser, Gerät oder Webadresse gewechselt werden.
@@ -18,8 +19,8 @@ x-titanos:
       Kein Dokumentenordner und keine NAS-GPU-Durchreichung erforderlich.
       Anleitung: https://docs.solidcraft.io/guide/getting-started.html
     en: >-
-      Official SolidCraft web image. Designs are stored in each visitor's browser,
-      not on the NAS. Access from another device requires an HTTPS reverse proxy
+      SolidCraft web version (Tangency Labs). Designs are stored in each visitor's
+      browser, not on the NAS. Access from another device requires an HTTPS reverse proxy
       to save designs; enter its public URL in TitanOS. The local HTTP link alone
       is not sufficient. Export important designs to files before clearing browser
       data or changing browsers, devices or the web address. Mount NAS shares on
@@ -32,7 +33,7 @@ x-titanos:
       webui: true
 services:
   solidcraft:
-    image: ghcr.io/tangency-labs/solidcraft-web:latest
+    image: ghcr.io/ra5on/titanos-solidcraft:latest
     restart: unless-stopped
     labels:
       titanos.webui: "http://[host]:8103"
@@ -40,7 +41,7 @@ services:
       - "8103:8080"
     read_only: true
     tmpfs:
-      - /tmp
+      - /tmp:size=32m,mode=1777
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
     logging:
