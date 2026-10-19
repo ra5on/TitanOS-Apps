@@ -49,6 +49,7 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [PdfCraft](pdfcraft/compose.yaml) | PDFs bearbeiten |
 | [PhotoCraft](photocraft/compose.yaml) | Bilder bearbeiten |
 | [Pi-hole](pihole/compose.yaml) | DNS-Werbeblocker mit Dashboard |
+| [SolidCraft](solidcraft/compose.yaml) | 3D-CAD-Modelle im Browser erstellen und bearbeiten |
 | [SoundCraft](soundcraft/compose.yaml) | Audio aufnehmen und bearbeiten |
 | [Syncthing](syncthing/compose.yaml) | Ordner zwischen Geräten synchronisieren |
 | [Uptime Kuma](uptime-kuma/compose.yaml) | Erreichbarkeit von Diensten überwachen |
@@ -91,6 +92,15 @@ Vaultwarden benötigt für den Web-Tresor einen sicheren Browserkontext: HTTPS a
 Reverse-Proxy einrichten und die entsprechende öffentliche URL hinterlegen.
 Sein interner Container-Port bleibt HTTP. Ollama und cloudflared erhalten keinen
 Web-UI-Knopf, weil diese Vorlagen keine lokale Benutzeroberfläche bereitstellen.
+
+SolidCraft verwendet das offizielle Image `ghcr.io/tangency-labs/solidcraft-web:latest`
+mit wählbarem Host-Port (Standard `8103`). Entwürfe bleiben im jeweiligen Browser,
+nicht auf dem NAS. Zum Speichern beim Zugriff von anderen Geräten HTTPS über einen
+Reverse-Proxy einrichten und dessen URL in TitanOS hinterlegen. Wichtige Entwürfe
+zusätzlich als Datei exportieren; NAS-Backups sichern den Browserspeicher nicht.
+Das Image wird vom SolidCraft-Projekt bereitgestellt und nicht durch unseren
+Storytold-Build-Workflow gebaut. Siehe die
+[offizielle Docker-Anleitung](https://docs.solidcraft.io/guide/getting-started.html#self-hosting-with-docker).
 
 ## Storytold / Craft-Apps
 
