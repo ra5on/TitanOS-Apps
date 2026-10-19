@@ -18,13 +18,39 @@ APPS = {
  'deckcraft': ('DeckCraft', 'productivity', 'Präsentationen gestalten', 'Create presentations'),
  'cadcraft': ('CADCraft', 'productivity', 'Technische Zeichnungen erstellen', 'Create technical drawings'),
  'soundcraft': ('SoundCraft', 'media', 'Audio aufnehmen und bearbeiten', 'Record and edit audio'),
+ 'solidcraft': ('SolidCraft', 'productivity', '3D-CAD-Modelle erstellen und bearbeiten', 'Create and edit 3D CAD models'),
 }
+# Apps that are not published by storytold. Their GHCR images are not public,
+# so they are built here from the release's web archive like the others.
+OWNERS = {'solidcraft': 'tangency-labs'}
+ICONS = {'solidcraft': 'assets/icons/app/linux/exports/hicolor/128x128/apps/ai.storyteller.solidcraft.png'}
+TIPS = {'solidcraft': ('''
+      Web-Version von SolidCraft (Tangency Labs). Entwürfe werden im Speicher des
+      jeweiligen Browsers abgelegt, nicht auf dem NAS. Beim Zugriff von einem anderen
+      Gerät ist HTTPS über einen Reverse-Proxy zum Speichern erforderlich; die öffentliche
+      URL kann in TitanOS eingetragen werden. Der lokale HTTP-Link allein reicht
+      dafür nicht aus. Wichtige Entwürfe zusätzlich als Datei exportieren, bevor
+      Browserdaten gelöscht oder Browser, Gerät oder Webadresse gewechselt werden.
+      NAS-Freigaben am PC einbinden und beim Öffnen/Exportieren im Dateidialog wählen.
+      Kein Dokumentenordner und keine NAS-GPU-Durchreichung erforderlich.
+      Anleitung: https://docs.solidcraft.io/guide/getting-started.html''', '''
+      SolidCraft web version (Tangency Labs). Designs are stored in each visitor's
+      browser, not on the NAS. Access from another device requires an HTTPS reverse proxy
+      to save designs; enter its public URL in TitanOS. The local HTTP link alone
+      is not sufficient. Export important designs to files before clearing browser
+      data or changing browsers, devices or the web address. Mount NAS shares on
+      your computer and select them in the file picker when opening/exporting.
+      No document directory or NAS GPU passthrough is required.
+      Guide: https://docs.solidcraft.io/guide/getting-started.html''')}
+
+def owner(app):
+ return OWNERS.get(app, 'storytold')
 
 def api(path):
  return json.loads(subprocess.check_output(['gh', 'api', path], text=True))
 
 def latest(app):
- release = api(f'repos/storytold/{app}/releases/latest')
+ release = api(f'repos/{owner(app)}/{app}/releases/latest')
  # DeckCraft 0.8.0 panics at std::process::id in WASM, including ?blank.
  # Keep the tested 0.7.0 only while 0.8.0 is latest; later releases are tested normally.
  if app == 'deckcraft' and release['tag_name'] == 'v0.8.0':
@@ -37,7 +63,7 @@ def latest(app):
  asset = assets[0]
  digest = asset.get('digest') or ''
  if not re.fullmatch(r'sha256:[a-f0-9]{64}', digest): raise ValueError('Missing upstream asset SHA-256')
- if not asset['browser_download_url'].startswith(f'https://github.com/storytold/{app}/releases/download/'):
+ if not asset['browser_download_url'].startswith(f'https://github.com/{owner(app)}/{app}/releases/download/'):
   raise ValueError('Unexpected asset origin')
  return {'tag':tag, 'url':asset['browser_download_url'], 'sha256':digest[7:], 'size':asset['size']}
 
@@ -90,12 +116,12 @@ def prepare(app, record, destination):
  unpack(data,destination/'site')
  licenses=destination/'site'/'licenses';licenses.mkdir(parents=True,exist_ok=True)
  # Original notices from the exact release, not from the moving default branch.
- tree=api(f'repos/storytold/{app}/git/trees/{record["tag"]}')
+ tree=api(f'repos/{owner(app)}/{app}/git/trees/{record["tag"]}')
  notices=[e['path'] for e in tree['tree'] if e['type']=='blob' and re.match(r'^(LICENSE|NOTICE|ATTRIBUTION)([.-]|$)',e['path'],re.I)]
  if not any(p.startswith('LICENSE') for p in notices): raise ValueError('Missing license')
  for name in notices:
-  (licenses/name).write_bytes(download(f'https://raw.githubusercontent.com/storytold/{app}/{record["tag"]}/{name}', 2*1024*1024))
- (licenses/'SOURCE.json').write_text(json.dumps({'repository':f'https://github.com/storytold/{app}',**record},indent=2)+'\n')
+  (licenses/name).write_bytes(download(f'https://raw.githubusercontent.com/{owner(app)}/{app}/{record["tag"]}/{name}', 2*1024*1024))
+ (licenses/'SOURCE.json').write_text(json.dumps({'repository':f'https://github.com/{owner(app)}/{app}',**record},indent=2)+'\n')
  supplement_web_assets(app,record,destination/'site')
  shutil.copy(ROOT/'packaging/Dockerfile',destination/'Dockerfile')
  shutil.copy(ROOT/'packaging/nginx.conf',destination/'nginx.conf')
@@ -103,7 +129,23 @@ def prepare(app, record, destination):
 def catalog(app,record):
  title,category,de,en=APPS[app];folder=ROOT/app;folder.mkdir(exist_ok=True)
  port=8090+list(APPS).index(app)
- icon=f'https://raw.githubusercontent.com/storytold/{app}/{record["tag"]}/assets/app-icon/hicolor/128x128/apps/ai.storyteller.{app}.png'
+ icon_path=ICONS.get(app, f'assets/app-icon/hicolor/128x128/apps/ai.storyteller.{app}.png')
+ icon=f'https://raw.githubusercontent.com/{owner(app)}/{app}/{record["tag"]}/{icon_path}'
+ tips_de,tips_en=TIPS.get(app,('''
+      Web-Version von Storytold; Funktionsumfang kann von der Desktop-Version abweichen.
+      Dateien über Öffnen/Exportieren im Browser bearbeiten. NAS-Freigaben am PC einbinden,
+      um sie im Dateidialog auszuwählen. Ein Docker-Pfad allein ermöglicht keinen direkten
+      Zugriff auf NAS-Dokumente. Es wird kein Dokumentenordner eingebunden.
+      Für WebGPU, Zwischenablage und weitere Browserfunktionen HTTPS über einen
+      Reverse-Proxy verwenden; die öffentliche URL kann in TitanOS eingetragen werden.
+      Vor dem Schließen exportieren; die Speicherung hängt von App und Browser ab.''','''
+      Storytold web version; features may differ from the desktop application.
+      Open/export files using your browser. Mount an NAS share on your computer to
+      select it in the file picker. A Docker path alone does not give browser apps
+      access to NAS documents. No document directory is mounted.
+      Use an HTTPS reverse proxy for WebGPU, clipboard and other browser features;
+      enter its public URL in TitanOS. Export before closing; persistence depends
+      on the application and browser.'''))
  compose=f'''# Automatically updated only after the image passes its checks.
 x-titanos:
   name: {title}
@@ -114,22 +156,8 @@ x-titanos:
     de: "{de} im Browser. Verarbeitung auf deinem Endgerät."
     en: "{en} in your browser. Processing runs on your device."
   tips:
-    de: >-
-      Web-Version von Storytold; Funktionsumfang kann von der Desktop-Version abweichen.
-      Dateien über Öffnen/Exportieren im Browser bearbeiten. NAS-Freigaben am PC einbinden,
-      um sie im Dateidialog auszuwählen. Ein Docker-Pfad allein ermöglicht keinen direkten
-      Zugriff auf NAS-Dokumente. Es wird kein Dokumentenordner eingebunden.
-      Für WebGPU, Zwischenablage und weitere Browserfunktionen HTTPS über einen
-      Reverse-Proxy verwenden; die öffentliche URL kann in TitanOS eingetragen werden.
-      Vor dem Schließen exportieren; die Speicherung hängt von App und Browser ab.
-    en: >-
-      Storytold web version; features may differ from the desktop application.
-      Open/export files using your browser. Mount an NAS share on your computer to
-      select it in the file picker. A Docker path alone does not give browser apps
-      access to NAS documents. No document directory is mounted.
-      Use an HTTPS reverse proxy for WebGPU, clipboard and other browser features;
-      enter its public URL in TitanOS. Export before closing; persistence depends
-      on the application and browser.
+    de: >-{tips_de}
+    en: >-{tips_en}
   ports:
     "8080":
       label: Web UI
