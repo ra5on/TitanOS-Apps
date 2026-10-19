@@ -93,19 +93,19 @@ Reverse-Proxy einrichten und die entsprechende öffentliche URL hinterlegen.
 Sein interner Container-Port bleibt HTTP. Ollama und cloudflared erhalten keinen
 Web-UI-Knopf, weil diese Vorlagen keine lokale Benutzeroberfläche bereitstellen.
 
-SolidCraft verwendet das offizielle Image `ghcr.io/tangency-labs/solidcraft-web:latest`
-mit wählbarem Host-Port (Standard `8103`). Entwürfe bleiben im jeweiligen Browser,
+SolidCraft (Tangency Labs) wird wie die Craft-Apps aus dem offiziellen Web-ZIP
+des jeweiligen Releases gebaut und als `ghcr.io/ra5on/titanos-solidcraft`
+veröffentlicht, weil das Image des Projekts auf GHCR nicht öffentlich abrufbar ist.
+Standard-Port ist `8103`. Entwürfe bleiben im jeweiligen Browser,
 nicht auf dem NAS. Zum Speichern beim Zugriff von anderen Geräten HTTPS über einen
 Reverse-Proxy einrichten und dessen URL in TitanOS hinterlegen. Wichtige Entwürfe
 zusätzlich als Datei exportieren; NAS-Backups sichern den Browserspeicher nicht.
-Das Image wird vom SolidCraft-Projekt bereitgestellt und nicht durch unseren
-Storytold-Build-Workflow gebaut. Siehe die
-[offizielle Docker-Anleitung](https://docs.solidcraft.io/guide/getting-started.html#self-hosting-with-docker).
+Siehe die [Anleitung von SolidCraft](https://docs.solidcraft.io/guide/getting-started.html).
 
 ## Storytold / Craft-Apps
 
 Der Workflow [Storytold web images](.github/workflows/storytold.yml) prüft alle sechs Stunden sowie manuell neue
-stabile Releases der 13 konfigurierten Craft-Apps. Er lädt die offiziellen
+stabile Releases der 14 konfigurierten Craft-Apps (13 von Storytold, dazu SolidCraft). Er lädt die offiziellen
 Web-ZIPs, prüft Größe und SHA-256 aus GitHubs Release-Metadaten und übernimmt die
 Original-Lizenztexte und Quellverweise der exakten Version. Anschließend baut
 er ein schlankes, nicht privilegiertes NGINX-Image und prüft HTTP, fehlende
