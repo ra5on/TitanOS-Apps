@@ -11,5 +11,6 @@
   "syncthing": "https://raw.githubusercontent.com/syncthing/syncthing/main/assets/logo-128.png",
   "uptime-kuma": "https://raw.githubusercontent.com/louislam/uptime-kuma/master/public/icon.svg",
   "vaultwarden": "https://raw.githubusercontent.com/dani-garcia/vaultwarden/main/resources/vaultwarden-icon.svg",
-  "cloudflare-tunnel": "https://raw.githubusercontent.com/cloudflare/cloudflare-docs/production/public/favicon.png"
+  "cloudflare-tunnel": "https://raw.githubusercontent.com/cloudflare/cloudflare-docs/production/public/favicon.png",
+  "solidcraft": "https://raw.githubusercontent.com/tangency-labs/solidcraft/main/assets/icons/app/linux/exports/hicolor/128x128/apps/ai.storyteller.solidcraft.png"
 }
