@@ -18,17 +18,21 @@ APPS = {
  'deckcraft': ('DeckCraft', 'productivity', 'Präsentationen gestalten', 'Create presentations'),
  'cadcraft': ('CADCraft', 'productivity', 'Technische Zeichnungen erstellen', 'Create technical drawings'),
  'soundcraft': ('SoundCraft', 'media', 'Audio aufnehmen und bearbeiten', 'Record and edit audio'),
+ 'solidcraft': ('SolidCraft', 'productivity', '3D-CAD-Modelle erstellen und bearbeiten', 'Create and edit 3D CAD models'),
 }
 
 def api(path):
  return json.loads(subprocess.check_output(['gh', 'api', path], text=True))
 
+def repository(app):
+ return 'tangency-labs/solidcraft' if app == 'solidcraft' else f'storytold/{app}'
+
 def latest(app):
- release = api(f'repos/storytold/{app}/releases/latest')
+ release = api(f'repos/{repository(app)}/releases/latest')
  # DeckCraft 0.8.0 panics at std::process::id in WASM, including ?blank.
  # Keep the tested 0.7.0 only while 0.8.0 is latest; later releases are tested normally.
  if app == 'deckcraft' and release['tag_name'] == 'v0.8.0':
-  release = api(f'repos/storytold/{app}/releases/tags/v0.7.0')
+  release = api(f'repos/{repository(app)}/releases/tags/v0.7.0')
  tag = release['tag_name']
  if release['draft'] or release['prerelease'] or not re.fullmatch(r'v?\d+\.\d+\.\d+', tag):
   raise ValueError(f'Not a stable release: {tag}')
@@ -37,7 +41,7 @@ def latest(app):
  asset = assets[0]
  digest = asset.get('digest') or ''
  if not re.fullmatch(r'sha256:[a-f0-9]{64}', digest): raise ValueError('Missing upstream asset SHA-256')
- if not asset['browser_download_url'].startswith(f'https://github.com/storytold/{app}/releases/download/'):
+ if not asset['browser_download_url'].startswith(f'https://github.com/{repository(app)}/releases/download/'):
   raise ValueError('Unexpected asset origin')
  return {'tag':tag, 'url':asset['browser_download_url'], 'sha256':digest[7:], 'size':asset['size']}
 
@@ -90,20 +94,29 @@ def prepare(app, record, destination):
  unpack(data,destination/'site')
  licenses=destination/'site'/'licenses';licenses.mkdir(parents=True,exist_ok=True)
  # Original notices from the exact release, not from the moving default branch.
- tree=api(f'repos/storytold/{app}/git/trees/{record["tag"]}')
- notices=[e['path'] for e in tree['tree'] if e['type']=='blob' and re.match(r'^(LICENSE|NOTICE|ATTRIBUTION)([.-]|$)',e['path'],re.I)]
+ tree=api(f'repos/{repository(app)}/git/trees/{record["tag"]}')
+ notices=[e['path'] for e in tree['tree'] if e['type']=='blob' and re.match(r'^(LICENSE|NOTICE|ATTRIBUTION|THIRD-PARTY-LICENSES)([.-]|$)',e['path'],re.I)]
  if not any(p.startswith('LICENSE') for p in notices): raise ValueError('Missing license')
  for name in notices:
-  (licenses/name).write_bytes(download(f'https://raw.githubusercontent.com/storytold/{app}/{record["tag"]}/{name}', 2*1024*1024))
- (licenses/'SOURCE.json').write_text(json.dumps({'repository':f'https://github.com/storytold/{app}',**record},indent=2)+'\n')
+  (licenses/name).write_bytes(download(f'https://raw.githubusercontent.com/{repository(app)}/{record["tag"]}/{name}', 2*1024*1024))
+ (licenses/'SOURCE.json').write_text(json.dumps({'repository':f'https://github.com/{repository(app)}',**record},indent=2)+'\n')
  supplement_web_assets(app,record,destination/'site')
  shutil.copy(ROOT/'packaging/Dockerfile',destination/'Dockerfile')
  shutil.copy(ROOT/'packaging/nginx.conf',destination/'nginx.conf')
 
 def catalog(app,record):
  title,category,de,en=APPS[app];folder=ROOT/app;folder.mkdir(exist_ok=True)
+ if app == 'solidcraft':
+  # Preserve SolidCraft's explicit browser-storage/HTTPS guidance and existing port.
+  path=folder/'compose.yaml'
+  compose=path.read_text().replace('ghcr.io/tangency-labs/solidcraft-web:latest', 'ghcr.io/ra5on/titanos-solidcraft:latest')
+  compose=compose.replace('Offizielles SolidCraft-Web-Image.', 'TitanOS-Image aus dem offiziellen SolidCraft-Web-Release.')
+  compose=compose.replace('Official SolidCraft web image.', 'TitanOS image built from the official SolidCraft web release.')
+  path.write_text(compose)
+  (folder/'release.json').write_text(json.dumps(record,indent=2)+'\n')
+  return
  port=8090+list(APPS).index(app)
- icon=f'https://raw.githubusercontent.com/storytold/{app}/{record["tag"]}/assets/app-icon/hicolor/128x128/apps/ai.storyteller.{app}.png'
+ icon=f'https://raw.githubusercontent.com/{repository(app)}/{record["tag"]}/assets/app-icon/hicolor/128x128/apps/ai.storyteller.{app}.png'
  compose=f'''# Automatically updated only after the image passes its checks.
 x-titanos:
   name: {title}

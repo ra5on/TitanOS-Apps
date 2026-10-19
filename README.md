@@ -93,19 +93,19 @@ Reverse-Proxy einrichten und die entsprechende öffentliche URL hinterlegen.
 Sein interner Container-Port bleibt HTTP. Ollama und cloudflared erhalten keinen
 Web-UI-Knopf, weil diese Vorlagen keine lokale Benutzeroberfläche bereitstellen.
 
-SolidCraft verwendet das offizielle Image `ghcr.io/tangency-labs/solidcraft-web:latest`
-mit wählbarem Host-Port (Standard `8103`). Entwürfe bleiben im jeweiligen Browser,
-nicht auf dem NAS. Zum Speichern beim Zugriff von anderen Geräten HTTPS über einen
-Reverse-Proxy einrichten und dessen URL in TitanOS hinterlegen. Wichtige Entwürfe
-zusätzlich als Datei exportieren; NAS-Backups sichern den Browserspeicher nicht.
-Das Image wird vom SolidCraft-Projekt bereitgestellt und nicht durch unseren
-Storytold-Build-Workflow gebaut. Siehe die
-[offizielle Docker-Anleitung](https://docs.solidcraft.io/guide/getting-started.html#self-hosting-with-docker).
+SolidCraft wird aus dem offiziellen Web-Release des Projekts als
+`ghcr.io/ra5on/titanos-solidcraft:latest` paketiert (Host-Port standardmäßig `8103`).
+Das in der Upstream-Anleitung genannte Image verweigert derzeit anonyme Downloads.
+Der Workflow stellt den Katalogeintrag erst nach Build, Browserprüfung und
+anonymer Downloadprüfung auf das TitanOS-Image um. Entwürfe bleiben im jeweiligen
+Browser, nicht auf dem NAS. Zum Speichern von anderen Geräten ist HTTPS über einen
+Reverse-Proxy erforderlich. Wichtige Entwürfe zusätzlich als Datei exportieren;
+NAS-Backups sichern den Browserspeicher nicht.
 
 ## Storytold / Craft-Apps
 
 Der Workflow [Storytold web images](.github/workflows/storytold.yml) prüft alle sechs Stunden sowie manuell neue
-stabile Releases der 13 konfigurierten Craft-Apps. Er lädt die offiziellen
+stabile Releases der 14 konfigurierten Craft-Apps (einschließlich SolidCraft von Tangency Labs). Er lädt die offiziellen
 Web-ZIPs, prüft Größe und SHA-256 aus GitHubs Release-Metadaten und übernimmt die
 Original-Lizenztexte und Quellverweise der exakten Version. Anschließend baut
 er ein schlankes, nicht privilegiertes NGINX-Image und prüft HTTP, fehlende

@@ -77,6 +77,12 @@ jobs:
           docker tag "test-$APP" "$image:latest"
           docker push "$image:$version"
           docker push "$image:latest"
+          # A successful authenticated push does not prove that NAS users can pull.
+          # Do not update the catalog while a newly created GHCR package is private.
+          anonymous_config=$(mktemp -d)
+          docker --config "$anonymous_config" pull "$image:$version"
+          docker --config "$anonymous_config" pull "$image:latest"
+          rm -rf "$anonymous_config"
           python3 scripts/storytold.py catalog --app "$APP" --record "$RECORD"
       - uses: actions/upload-artifact@v7
         if: github.event_name != 'pull_request'
