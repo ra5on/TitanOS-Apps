@@ -22,7 +22,18 @@ class Catalog(unittest.TestCase):
  def test_existing_ports_remain_stable(self):
   self.assertEqual(list(module.APPS)[:8], ['photocraft','pdfcraft','filmcraft','vectorcraft','lightcraft','designcraft','effectcraft','figcraft'])
  def test_all_released_craft_web_apps_are_discovered(self):
-  self.assertEqual(set(module.APPS), {'photocraft','pdfcraft','filmcraft','vectorcraft','lightcraft','designcraft','effectcraft','figcraft','wordcraft','gridcraft','deckcraft','cadcraft','soundcraft'})
+  self.assertEqual(set(module.APPS), {'photocraft','pdfcraft','filmcraft','vectorcraft','lightcraft','designcraft','effectcraft','figcraft','wordcraft','gridcraft','deckcraft','cadcraft','soundcraft','solidcraft'})
+ def test_solidcraft_keeps_its_port_and_comes_from_tangency_labs(self):
+  self.assertEqual(8090+list(module.APPS).index('solidcraft'), 8103)
+  self.assertEqual(module.owner('solidcraft'), 'tangency-labs')
+  self.assertEqual(module.owner('cadcraft'), 'storytold')
+ def test_storytold_catalog_is_unchanged(self):
+  repo=Path(__file__).resolve().parents[1]
+  record=__import__('json').loads((repo/'cadcraft'/'release.json').read_text())
+  with tempfile.TemporaryDirectory() as d, patch.object(module,'ROOT',Path(d)):
+   module.catalog('cadcraft',record)
+   expected=(repo/'cadcraft'/'compose.yaml').read_text()
+   self.assertEqual((Path(d)/'cadcraft'/'compose.yaml').read_text(),expected)
 class UpstreamRegressions(unittest.TestCase):
  def release(self,tag):
   return {'tag_name':tag,'draft':False,'prerelease':False,'assets':[{'name':'deckcraft-web-'+tag[1:]+'.zip','digest':'sha256:'+'a'*64,'size':10,'browser_download_url':'https://github.com/storytold/deckcraft/releases/download/'+tag+'/web.zip'}]}
