@@ -3,7 +3,7 @@ x-titanos:
   name: PhotoCraft
   main: photocraft
   category: photos
-  icon: "https://raw.githubusercontent.com/storytold/photocraft/v0.10.0/assets/app-icon/hicolor/128x128/apps/ai.storyteller.photocraft.png"
+  icon: "https://raw.githubusercontent.com/storytold/photocraft/v0.11.1/assets/app-icon/hicolor/128x128/apps/ai.storyteller.photocraft.png"
   description:
     de: "Bilder bearbeiten im Browser. Verarbeitung auf deinem Endgerät."
     en: "Edit images in your browser. Processing runs on your device."
