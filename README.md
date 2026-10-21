@@ -52,6 +52,7 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [SolidCraft](solidcraft/compose.yaml) | 3D-CAD-Modelle im Browser erstellen und bearbeiten |
 | [SoundCraft](soundcraft/compose.yaml) | Audio aufnehmen und bearbeiten |
 | [Syncthing](syncthing/compose.yaml) | Ordner zwischen Geräten synchronisieren |
+| [TitanOS-Agent](titanos-agent/compose.yaml) | Mit einem lokalen Ollama-Modell über den Zustand des NAS chatten |
 | [Uptime Kuma](uptime-kuma/compose.yaml) | Erreichbarkeit von Diensten überwachen |
 | [Vaultwarden](vaultwarden/compose.yaml) | Passwortmanager für Bitwarden-Clients |
 | [VectorCraft](vectorcraft/compose.yaml) | Vektorgrafiken bearbeiten |
@@ -92,6 +93,11 @@ Vaultwarden benötigt für den Web-Tresor einen sicheren Browserkontext: HTTPS a
 Reverse-Proxy einrichten und die entsprechende öffentliche URL hinterlegen.
 Sein interner Container-Port bleibt HTTP. Ollama und cloudflared erhalten keinen
 Web-UI-Knopf, weil diese Vorlagen keine lokale Benutzeroberfläche bereitstellen.
+Der TitanOS-Agent (Port `8765`) läuft über HTTP und fragt nach dem beim Installieren
+erzeugten Passwort; er gehört ins Heimnetz, nicht ins Internet. Er braucht einen
+API-Schlüssel aus TitanOS (ab Version mit „Agenten und API-Schlüssel“ unter
+Einstellungen › Zugang) und eine laufende Ollama-App mit einem Modell, das
+Werkzeuge aufrufen kann.
 
 SolidCraft (Tangency Labs) wird wie die Craft-Apps aus dem offiziellen Web-ZIP
 des jeweiligen Releases gebaut und als `ghcr.io/ra5on/titanos-solidcraft`
