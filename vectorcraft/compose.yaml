@@ -3,7 +3,7 @@ x-titanos:
   name: VectorCraft
   main: vectorcraft
   category: productivity
-  icon: "https://raw.githubusercontent.com/storytold/vectorcraft/v0.13.1/assets/app-icon/hicolor/128x128/apps/ai.storyteller.vectorcraft.png"
+  icon: "https://raw.githubusercontent.com/storytold/vectorcraft/v0.15.0/assets/app-icon/hicolor/128x128/apps/ai.storyteller.vectorcraft.png"
   description:
     de: "Vektorgrafiken bearbeiten im Browser. Verarbeitung auf deinem Endgerät."
     en: "Edit vector graphics in your browser. Processing runs on your device."
