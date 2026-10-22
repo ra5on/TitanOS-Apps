@@ -3,7 +3,7 @@ x-titanos:
   name: CADCraft
   main: cadcraft
   category: productivity
-  icon: "https://raw.githubusercontent.com/storytold/cadcraft/v0.8.0/assets/app-icon/hicolor/128x128/apps/ai.storyteller.cadcraft.png"
+  icon: "https://raw.githubusercontent.com/storytold/cadcraft/v0.11.0/assets/app-icon/hicolor/128x128/apps/ai.storyteller.cadcraft.png"
   description:
     de: "Technische Zeichnungen erstellen im Browser. Verarbeitung auf deinem Endgerät."
     en: "Create technical drawings in your browser. Processing runs on your device."
