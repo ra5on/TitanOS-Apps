@@ -1,0 +1,90 @@
+x-titanos:
+  name: Zigbee2MQTT
+  main: zigbee2mqtt
+  category: home
+  description:
+    de: Zigbee-Geräte über MQTT verbinden. Mit privatem MQTT-Broker und Einrichtungsassistent.
+    en: Connect Zigbee devices over MQTT. Includes a private MQTT broker and onboarding wizard.
+  tips:
+    de: "Ein kompatibler Zigbee-Koordinator ist erforderlich und wird nicht automatisch zugeordnet. Für
+      USB zuerst im Container-Editor das einzelne Gerät durchreichen und danach im Assistenten den
+      Containerpfad angeben; ein Netzwerk-Koordinator kann per TCP-Adresse verwendet werden. Die
+      Vorlage gewährt keine pauschalen USB- oder Host-Rechte. Im Assistenten mqtt://broker:1883 als
+      MQTT-Server verwenden. Dieser Broker hat keinen veröffentlichten Port und gehört nur zu dieser
+      Instanz. Der erste Einrichtungsassistent ist noch nicht durch den Frontend-Schlüssel
+      geschützt: nur im vertrauenswürdigen Netz einrichten. Danach schützt der erzeugte
+      Frontend-Schlüssel den Zugriff. Für Home Assistant dessen MQTT-Anbindung separat einrichten;
+      für einen gemeinsamen Broker die MQTT-Adresse in der App-Konfiguration ändern. Funkbetrieb und
+      echte Adapter sind hardwareabhängig."
+    en: "A compatible Zigbee coordinator is required and is not assigned automatically. For USB, first
+      pass through the single device in the container editor and enter its container path in
+      onboarding; network coordinators can use a TCP address. The template grants no broad USB or
+      host privileges. Use mqtt://broker:1883 as the MQTT server in onboarding. This private broker
+      publishes no port and belongs only to this instance. Initial onboarding is not yet protected
+      by the frontend key: configure it on a trusted network. Afterwards the generated frontend key
+      protects access. Configure Home Assistant MQTT access separately; change the app MQTT URL to
+      use a shared broker. Radio operation and real adapters depend on hardware."
+  variables:
+    ZIGBEE2MQTT_CONFIG_FRONTEND_AUTH_TOKEN:
+      label:
+        de: Zugriffsschlüssel der Weboberfläche
+        en: Web interface access key
+      secret: generate
+      required: true
+    TZ:
+      label:
+        de: Zeitzone
+        en: Timezone
+      fill: timezone
+  paths:
+    /app/data:
+      label:
+        de: Zigbee-Konfiguration und Netzwerkdaten
+        en: Zigbee configuration and network data
+  ports:
+    "8080":
+      label: WebUI / Onboarding
+      webui: true
+  icon: https://raw.githubusercontent.com/Koenkk/zigbee2mqtt/master/images/logo.png
+services:
+  broker:
+    image: eclipse-mosquitto:2
+    restart: unless-stopped
+    configs:
+      - source: mqtt
+        target: /mosquitto/config/mosquitto.conf
+    volumes:
+      - mqtt-data:/mosquitto/data
+    logging: &a1
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+  zigbee2mqtt:
+    image: ghcr.io/koenkk/zigbee2mqtt:2.14.2
+    restart: unless-stopped
+    labels:
+      titanos.webui: http://[host]:8082
+    ports:
+      - 8082:8080
+    logging: *a1
+    depends_on:
+      - broker
+    environment:
+      TZ: ""
+      ZIGBEE2MQTT_CONFIG_MQTT_SERVER: mqtt://broker:1883
+      ZIGBEE2MQTT_CONFIG_FRONTEND_ENABLED: "true"
+      ZIGBEE2MQTT_CONFIG_FRONTEND_AUTH_TOKEN: ""
+      Z2M_ONBOARD_URL: http://0.0.0.0:8080
+    volumes:
+      - ./data:/app/data
+volumes:
+  mqtt-data: {}
+configs:
+  mqtt:
+    content: |
+      listener 1883
+      allow_anonymous true
+      persistence true
+      persistence_location /mosquitto/data/
+      log_dest stdout

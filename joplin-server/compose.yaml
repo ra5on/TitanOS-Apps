@@ -1,0 +1,105 @@
+x-titanos:
+  name: Joplin Server
+  main: joplin
+  category: productivity
+  description:
+    de: Notizen zwischen Joplin-Apps synchronisieren, mit getrennten Konten und PostgreSQL.
+    en: Synchronize notes between Joplin apps, with separate accounts and PostgreSQL.
+  tips:
+    de: Synchronisationsserver für die Joplin-Apps, kein Notizeditor im Browser. APP_BASE_URL muss exakt
+      zur erreichbaren Adresse mit dem gewählten NAS-Port passen; bei einer Portänderung ebenfalls
+      anpassen. Nach dem ersten Start im Web mit admin@localhost / admin anmelden und sofort E-Mail
+      sowie Passwort ändern. Anschließend persönliche Konten anlegen und in den Joplin-Apps als
+      Synchronisationsziel Joplin Server auswählen. Die TitanOS-Anmeldung wird nicht übernommen. Die
+      Daten liegen in PostgreSQL auf dem Daten-Volume. Für Fernzugriff HTTPS am Reverse-Proxy
+      separat einrichten; alle Clients müssen dieselbe Basisadresse verwenden. Transkription ist
+      nicht enthalten.
+    en: Synchronization server for Joplin apps, not a browser note editor. APP_BASE_URL must exactly
+      match the reachable address and selected NAS port; update it when changing ports. Initially
+      sign in on the web with admin@localhost / admin and immediately change the email and password.
+      Create personal accounts and select Joplin Server as the sync target in your Joplin apps.
+      TitanOS authentication is separate. Data is stored in PostgreSQL on the data volume. Configure
+      HTTPS separately at a reverse proxy for remote access; all clients must use the same base URL.
+      Transcription is not included.
+  variables:
+    APP_BASE_URL:
+      label:
+        de: Adresse des Joplin-Servers
+        en: Joplin server URL
+      required: true
+      placeholder: http://nas.example:22300
+      help:
+        de: Vollständige Adresse einschließlich des gewählten NAS-Ports.
+        en: Full URL including the selected NAS port.
+    JOPLIN_DBPASS:
+      label:
+        de: Datenbankpasswort
+        en: Database password
+      secret: generate
+      required: true
+    POSTGRES_PASSWORD:
+      from: JOPLIN_DBPASS
+    TZ:
+      label:
+        de: Zeitzone
+        en: Timezone
+      fill: timezone
+  paths:
+    /var/lib/postgresql/data:
+      label:
+        de: Datenbank und synchronisierte Notizen
+        en: Database and synchronized notes
+  ports:
+    "22300":
+      label: WebUI / Sync
+      webui: true
+  icon: https://raw.githubusercontent.com/laurent22/joplin/dev/Assets/JoplinIcon.svg
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: joplin
+      POSTGRES_USER: joplin
+      POSTGRES_PASSWORD: ${JOPLIN_DBPASS:-}
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD
+        - pg_isready
+        - -U
+        - joplin
+        - -d
+        - joplin
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    stop_grace_period: 60s
+    logging: &a1
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+  joplin:
+    image: joplin/server:3.7.3
+    restart: unless-stopped
+    labels:
+      titanos.webui: http://[host]:22300
+    ports:
+      - 22300:22300
+    logging: *a1
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_PORT: "22300"
+      APP_BASE_URL: ""
+      DB_CLIENT: pg
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      POSTGRES_DATABASE: joplin
+      POSTGRES_USER: joplin
+      POSTGRES_PASSWORD: ${JOPLIN_DBPASS:-}
+      JOPLIN_DBPASS: ""
+      TZ: ""
