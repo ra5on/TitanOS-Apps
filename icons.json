@@ -20,5 +20,7 @@
   "esphome": "https://raw.githubusercontent.com/home-assistant/brands/master/core_integrations/esphome/icon.png",
   "n8n": "https://raw.githubusercontent.com/n8n-io/n8n/master/assets/n8n-logo.png",
   "mealie": "https://raw.githubusercontent.com/mealie-recipes/mealie/mealie-next/frontend/public/icons/android-chrome-192x192.png",
-  "grocy": "https://raw.githubusercontent.com/grocy/grocy/master/public/img/icon.svg"
+  "grocy": "https://raw.githubusercontent.com/grocy/grocy/master/public/img/icon.svg",
+  "jellyfin": "https://raw.githubusercontent.com/jellyfin/jellyfin-ux/master/branding/SVG/icon-transparent.svg",
+  "paperless-ngx": "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docs/assets/logo_leaf.svg"
 }

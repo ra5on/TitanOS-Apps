@@ -1,0 +1,36 @@
+name: Paperless and Jellyfin smoke
+on:
+  workflow_dispatch:
+  push:
+    paths: ['paperless-ngx/**', 'jellyfin/**', 'scripts/catalog-app-smoke.mjs', '.github/workflows/catalog-apps.yml']
+  pull_request:
+    paths: ['paperless-ngx/**', 'jellyfin/**', 'scripts/catalog-app-smoke.mjs', '.github/workflows/catalog-apps.yml']
+permissions:
+  contents: read
+jobs:
+  smoke:
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [paperless-ngx, jellyfin]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Install browser test client (use runner's Chrome)
+        run: |
+          npm install --prefix /tmp/browser playwright
+          google-chrome --version
+      - name: Test installation, synthetic content and persistence
+        env:
+          PLAYWRIGHT_PATH: /tmp/browser/node_modules/playwright/index.mjs
+          APP: ${{ matrix.app }}
+        run: node scripts/catalog-app-smoke.mjs "$APP"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: browser-${{ matrix.app }}
+          path: '*-login-smoke.png'
