@@ -37,6 +37,7 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [DeckCraft](deckcraft/compose.yaml) | Präsentationen erstellen und bearbeiten |
 | [DesignCraft](designcraft/compose.yaml) | Seiten und Layouts gestalten |
 | [EffectCraft](effectcraft/compose.yaml) | Animationen und Effekte gestalten |
+| [Eclipse Mosquitto](mosquitto/compose.yaml) | Passwortgeschützter MQTT-Broker für Geräte und Automationen |
 | [ESPHome](esphome/compose.yaml) | Gerätekonfiguration und Firmware mit ESPHome Device Builder erstellen |
 | [FigCraft](figcraft/compose.yaml) | Oberflächen und Prototypen entwerfen |
 | [FilmCraft](filmcraft/compose.yaml) | Videos bearbeiten |
@@ -53,6 +54,7 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [Nextcloud + MariaDB](nextcloud/compose.yaml) | Private Cloud für Dateien und Zusammenarbeit |
 | [Node-RED](node-red/compose.yaml) | Abläufe und Geräte visuell automatisieren |
 | [Ollama](ollama/compose.yaml) | Lokale KI-Modelle über eine API ausführen |
+| [PairDrop](pairdrop/compose.yaml) | Dateien und Text zwischen Browsern übertragen |
 | [Paperless-ngx](paperless-ngx/compose.yaml) | Dokumente mit OCR archivieren und durchsuchen |
 | [PdfCraft](pdfcraft/compose.yaml) | PDFs bearbeiten |
 | [PhotoCraft](photocraft/compose.yaml) | Bilder bearbeiten |
@@ -62,6 +64,7 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [Syncthing](syncthing/compose.yaml) | Ordner zwischen Geräten synchronisieren |
 | [Thunderbird](thunderbird/compose.yaml) | Vorhandene E-Mail-Konten, Kontakte und Kalender im Browser nutzen |
 | [TitanOS-Agent](titanos-agent/compose.yaml) | Mit einem lokalen Ollama-Modell über den Zustand des NAS chatten |
+| [Trilium Notes](trilium/compose.yaml) | Persönliche Wissensdatenbank mit Browsereditor |
 | [Uptime Kuma](uptime-kuma/compose.yaml) | Erreichbarkeit von Diensten überwachen |
 | [Vaultwarden](vaultwarden/compose.yaml) | Passwortmanager für Bitwarden-Clients |
 | [VectorCraft](vectorcraft/compose.yaml) | Vektorgrafiken bearbeiten |
@@ -288,6 +291,34 @@ ersetzen installierte Compose-Dateien nicht automatisch. Images, Anwendungen
 und Icons behalten die Rechte ihrer jeweiligen Projekte; insbesondere sind
 die Nutzungsbedingungen von Joplin Server und n8n eigenständig zu prüfen.
 
+## Trilium, Mosquitto und PairDrop
+
+- **Trilium Notes:** Einzelbenutzer-Wissensdatenbank mit eigener Passwort-Einrichtung.
+  Für jede Person eine eigene Installation mit getrenntem Datenordner und Port
+  anlegen. `./data` enthält Notizen, Anhänge, Konfiguration und Trilium-Backups;
+  zusätzlich außerhalb der App sichern. Die Vorlage verwendet die stabile Version
+  `v0.106.1`; Desktop-Clients für die Synchronisation kompatibel halten.
+- **Eclipse Mosquitto:** eigenständiger MQTT-Broker auf TCP-Port 1883 ohne WebUI.
+  Ein Benutzername und ein erzeugtes Passwort sind im Formular hinterlegt; beide
+  in den Clients verwenden. Anonyme Zugriffe sind gesperrt. Der vorbereitete
+  gemeinsame Zugang darf alle Topics verwenden; getrennte Client-Rechte/ACLs sind
+  nicht vorkonfiguriert. Retained-Nachrichten und Sitzungsdaten liegen in `./data`,
+  das Passwort wird beim Start aus der App-Konfiguration übernommen. Diese samt
+  Zugangsdaten ebenfalls sichern. Ohne TLS nur im vertrauenswürdigen LAN oder
+  über Tailscale einsetzen. Der interne Broker der Zigbee2MQTT-Vorlage bleibt
+  davon unabhängig.
+- **PairDrop:** Browser auf beiden Geräten öffnen, Ziel wählen und die Übertragung
+  am Empfänger annehmen. Keine Benutzerkonten und keine automatische NAS-Ablage.
+  Server ohne Datenvolume; Kopplungen und Einstellungen liegen im Browser. HTTPS
+  wird für dauerhafte Kopplung und weitere Browserfunktionen benötigt. Für
+  öffentliche Adressen einen Reverse-Proxy mit korrektem `X-Forwarded-For`
+  konfigurieren; andernfalls sehen sich alle Clients. Für netzübergreifende
+  WebRTC-Verbindungen kann ein eigener TURN-Server nötig sein. Der voreingestellte
+  STUN-Server ist von Google, WebSocket-Fallback ist ausgeschaltet.
+
+Die TitanOS-Anmeldung wird von diesen Diensten nicht übernommen. Ihre Web- und
+MQTT-Ports sind nach Installation direkt im Netzwerk erreichbar.
+
 ## Storytold / Craft-Apps
 
 Der Workflow [Storytold web images](.github/workflows/storytold.yml) prüft alle sechs Stunden sowie manuell neue
@@ -399,6 +430,20 @@ isolierten Datenordnern: Log-Eigentümer und Rechte, HTTPS, Ablehnung falscher
 Zugangsdaten, Anmeldung, erhaltene Konten nach Container-Neuerstellung und
 sauberes Beenden. Kameras, Aufnahmen und Hardwarebeschleunigung sind damit
 nicht abgenommen.
+
+Die [Trilium-/MQTT-/PairDrop-Prüfung](.github/workflows/trilium-mosquitto-pairdrop.yml)
+verwendet neue temporäre Datenordner, synthetische Zugangsdaten und Inhalte.
+Trilium wird im Browser eingerichtet und angemeldet; falsches Passwort und
+anonyme API-Zugriffe werden abgewiesen. Eine über ETAPI erstellte Notiz und das
+Passwort müssen eine Container-Neuerstellung überstehen. Mosquitto wird über den
+veröffentlichten MQTT-Port auf Anmeldung sowie Ablehnung anonymer/falscher
+Zugänge geprüft; Publish/Subscribe und eine nach Neuerstellung erhaltene Retained-
+Nachricht werden verifiziert. PairDrop überträgt eine Datei zwischen zwei
+getrennten Browser-Kontexten; der Test vergleicht die heruntergeladenen Bytes
+und prüft den Neustart des zustandslosen Servers. Nicht abgenommen sind echte
+Trilium-Desktop-Synchronisation, Mehrinstanzbetrieb, MQTT-Geräte/ACLs/TLS,
+PairDrop-Transfers zwischen unterschiedlichen Netzen, TURN, mobile Browser,
+dauerhafte Kopplung sowie Reverse-Proxy-Betrieb.
 
 ## Lizenzen und Herkunft
 
