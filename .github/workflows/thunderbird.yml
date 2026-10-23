@@ -1,0 +1,31 @@
+name: Thunderbird smoke
+on:
+  workflow_dispatch:
+  push:
+    paths: ['thunderbird/**', 'scripts/thunderbird-smoke.mjs', '.github/workflows/thunderbird.yml']
+  pull_request:
+    paths: ['thunderbird/**', 'scripts/thunderbird-smoke.mjs', '.github/workflows/thunderbird.yml']
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Install browser
+        run: |
+          npm install --prefix /tmp/browser playwright
+          /tmp/browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: Test HTTPS, login, desktop and persistent profile
+        env:
+          PLAYWRIGHT_PATH: /tmp/browser/node_modules/playwright/index.mjs
+        run: node scripts/thunderbird-smoke.mjs
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: thunderbird-browser
+          path: 'thunderbird-*-smoke.png'

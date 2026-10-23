@@ -53,6 +53,7 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [SolidCraft](solidcraft/compose.yaml) | 3D-CAD-Modelle im Browser erstellen und bearbeiten |
 | [SoundCraft](soundcraft/compose.yaml) | Audio aufnehmen und bearbeiten |
 | [Syncthing](syncthing/compose.yaml) | Ordner zwischen Geräten synchronisieren |
+| [Thunderbird](thunderbird/compose.yaml) | Vorhandene E-Mail-Konten, Kontakte und Kalender im Browser nutzen |
 | [TitanOS-Agent](titanos-agent/compose.yaml) | Mit einem lokalen Ollama-Modell über den Zustand des NAS chatten |
 | [Uptime Kuma](uptime-kuma/compose.yaml) | Erreichbarkeit von Diensten überwachen |
 | [Vaultwarden](vaultwarden/compose.yaml) | Passwortmanager für Bitwarden-Clients |
@@ -88,7 +89,7 @@ HTTP oder HTTPS richtet sich nach der jeweiligen App. Tailscale übernimmt
 Protokoll, Port und Pfad; es wandelt HTTP nicht automatisch in HTTPS um.
 Bei selbst signierten App-Zertifikaten kann der Browser eine Ausnahme verlangen.
 
-Bambu Studio und Frigate verwenden standardmäßig HTTPS mit eigenem Zertifikat.
+Bambu Studio, Frigate und Thunderbird verwenden standardmäßig HTTPS mit eigenem Zertifikat.
 Pi-hole öffnet `/admin/`; die aktuelle Vorlage veröffentlicht nur den HTTP-Port.
 Vaultwarden benötigt für den Web-Tresor einen sicheren Browserkontext: HTTPS am
 Reverse-Proxy einrichten und die entsprechende öffentliche URL hinterlegen.
@@ -99,6 +100,41 @@ erzeugten Passwort; er gehört ins Heimnetz, nicht ins Internet. Er braucht eine
 API-Schlüssel aus TitanOS (ab Version mit „Agenten und API-Schlüssel“ unter
 Einstellungen › Zugang) und eine laufende Ollama-App mit einem Modell, das
 Werkzeuge aufrufen kann.
+
+### Thunderbird: persönliche Mailclients
+
+Die [Thunderbird-Vorlage](thunderbird/compose.yaml) verwendet den
+[Drittanbieter-Container von jlesage](https://github.com/jlesage/docker-thunderbird)
+in Version `v26.09.1`, kein offizielles Image des Thunderbird-Projekts.
+Beim Installieren einen Web-Benutzernamen festlegen und das erzeugte Passwort
+aufbewahren. Die geschützte WebUI über **Web UI** öffnen, gegebenenfalls das
+selbst signierte Zertifikat bestätigen und anschließend vorhandene Mailkonten
+in Thunderbird einrichten. Ein eigener Mailserver ist dafür nicht erforderlich.
+
+Eine Instanz entspricht einem gemeinsam bedienten Thunderbird-Profil. Für
+private Konten und Einstellungen pro Person die App mehrfach mit verschiedenen
+Namen installieren, zum Beispiel `thunderbird-alex` und `thunderbird-sam`.
+Jede Installation erhält eigene Zugangsdaten, einen eigenen Datenordner und
+einen freien Web-Port. Die Browser-Anmeldung ist unabhängig vom TitanOS-Konto;
+mehrere Browser-Logins innerhalb derselben Instanz trennen keine Profile.
+Alle Personen mit Zugriff auf eine Instanz sehen deren gesamten Mailclient.
+
+`/config` enthält Profil, Kontoeinstellungen und lokale Nachrichten;
+`/storage` ist für Anhänge und übertragene Dateien vorgesehen. Der Dateimanager
+der WebUI ist auf `/storage` begrenzt. Beide Ordner liegen auf dem ausgewählten
+Daten-Volume und sollten gesichert werden. Nur HTTPS-Port `5800` wird angeboten,
+direkter VNC-Zugriff ist deaktiviert. Fernzugriff bevorzugt über Tailscale.
+
+### Bestehende Frigate-Installation mit „manifest unknown“
+
+Die korrigierte Vorlage verwendet `ghcr.io/blakeblackshear/frigate:stable`.
+Frigate bietet den Standardkanal als `stable` statt `latest` an. Bei bereits
+installierten Apps unter **Docker › App bearbeiten** das Image entsprechend
+ändern und übernehmen bzw. erneut starten. Die Katalogänderung schreibt eine
+vorhandene Compose-Datei nicht um. Das frühere Feld `FRIGATE_IMAGE_TAG` hatte
+keine Wirkung auf das Image und wurde entfernt. Andere Varianten direkt im
+Image-Feld wählen, etwa `ghcr.io/blakeblackshear/frigate:stable-tensorrt` für
+NVIDIA. Vor Versionswechseln Konfiguration und Datenbank sichern.
 
 SolidCraft (Tangency Labs) wird wie die Craft-Apps aus dem offiziellen Web-ZIP
 des jeweiligen Releases gebaut und als `ghcr.io/ra5on/titanos-solidcraft`
@@ -183,6 +219,14 @@ Die Craft-Images werden zusätzlich in GitHub Actions gebaut und im Browser
 geprüft. Tests verwenden isolierte Runner ohne produktive NAS-Daten. Eine
 Compose-Prüfung oder ein erfolgreicher Starttest bestätigt keine vollständige
 Funktionsprüfung jeder App oder Gleichheit mit ihrer Desktop-Version.
+
+Der [Thunderbird-Starttest](.github/workflows/thunderbird.yml) prüft HTTPS,
+Ablehnung falscher Zugangsdaten, Anmeldung und Desktopübertragung im Browser,
+den laufenden Thunderbird-Prozess sowie ein erhaltenes Profil nach dem
+Neuerstellen des Containers. Echte Mailkonten, Versand/Empfang, OAuth,
+Kalendersynchronisation und mehrere gleichzeitige Instanzen sind damit nicht
+abgenommen. Die Katalogprüfung prüft zusätzlich das Frigate-`stable`-Manifest;
+Kameras und Hardwarebeschleunigung benötigen gesonderte Tests.
 
 ## Lizenzen und Herkunft
 
