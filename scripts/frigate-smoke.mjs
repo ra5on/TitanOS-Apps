@@ -44,15 +44,14 @@ function req(path,method='GET',body,cookie){
 }
 async function ready(){
  base=`https://${compose('port','frigate','8971').trim()}`;
- await waitFor(async()=>(await req('/api/version')).status===200,'Frigate HTTPS API startup');
- assert.equal((await req('/login')).status,200);
+ await waitFor(async()=>(await req('/login')).status===200,'Frigate HTTPS login page');
 }
 function checkLogs(){
  const logs=compose('logs','--no-color','frigate');
  assert.ok(!/Operation not permitted|unable to start service log-prepare|setgid.*failed|setuid.*failed/.test(logs),'No startup permission errors');
 }
 async function login(user,password){
- const result=await req('/api/login','POST',{user,password});assert.equal(result.status,200);
+ const result=await waitFor(async()=>{const response=await req('/api/login','POST',{user,password});return response.status===200?response:null},'Frigate authenticated API startup');
  assert.ok(result.headers['set-cookie']?.length,'Authenticated session cookie');
  return result.headers['set-cookie'].map(value=>value.split(';',1)[0]).join('; ');
 }
@@ -67,10 +66,10 @@ try{
  for(const name of ['frigate','go2rtc','nginx','certsync']){
   assert.equal(compose('exec','-T','frigate','stat','-c','%U:%G %a',`/dev/shm/logs/${name}`).trim(),'nobody:nogroup 2755');
  }
- assert.equal((await req('/api/stats')).status,401,'Stats must require authentication');
- assert.equal((await req('/api/login','POST',{user:'admin',password:'incorrect-test-password'})).status,401);
  const initial=await waitFor(()=>compose('logs','--no-color','frigate').match(/Password:\s+([a-f0-9]{32})\s+\*\*\*/)?.[1],'generated initial administrator');
  const adminCookie=await login('admin',initial);
+ assert.equal((await req('/api/stats')).status,401,'Stats must require authentication');
+ assert.equal((await req('/api/login','POST',{user:'admin',password:'incorrect-test-password'})).status,401);
  assert.equal((await req('/api/stats','GET',undefined,adminCookie)).status,200);
  assert.equal((await req('/api/users','POST',{username:'catalogtest',password,role:'admin'},adminCookie)).status,200);
  compose('up','-d','--force-recreate');await ready();checkLogs();
@@ -84,7 +83,7 @@ try{
  assert.equal(state.State.ExitCode,0,'Frigate must shut down cleanly');
  console.log('Corrected template: log ownership, HTTPS, authentication, account persistence and clean shutdown passed. Cameras/recording/GPU not tested.');
 }catch(error){
- try{console.error(compose('logs','--no-color','--tail','100','frigate').replace(/Password:[^\n]*/g,'Password: [test secret]').replaceAll(password,'[test secret]'))}catch{}
+ try{console.error(compose('logs','--no-color','frigate').split('\n').filter((_,i,lines)=>i<100||i>lines.length-60).join('\n').replace(/Password:[^\n]*/g,'Password: [test secret]').replaceAll(password,'[test secret]'))}catch{}
  throw error;
 }finally{
  try{compose('down','--volumes')}finally{
