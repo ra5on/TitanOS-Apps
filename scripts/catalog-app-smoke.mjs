@@ -81,11 +81,17 @@ async function paperlessLogin() {
 }
 const jellyfinClient = 'MediaBrowser Client="TitanOS Catalog Test", Device="CI", DeviceId="catalog-test", Version="1"';
 async function jellyfinLogin() {
-  const response = await request('/Users/AuthenticateByName', {
-    method: 'POST', headers: { Authorization: jellyfinClient }, body: { Username: 'catalog-test', Pw: password }
-  });
+  const response = await waitFor(async () => {
+    const response = await request('/Users/AuthenticateByName', {
+      method: 'POST', headers: { Authorization: jellyfinClient }, body: { Username: 'catalog-test', Pw: password }
+    });
+    return response.status === 503 ? false : response;
+  }, 'Jellyfin authentication API startup');
   assert.equal(response.status, 200, 'Jellyfin login must succeed');
-  return { 'X-Emby-Token': (await response.json()).AccessToken };
+  const token = (await response.json()).AccessToken;
+  assert.equal(typeof token, 'string');
+  // Jellyfin 12 disables legacy X-Emby-Token authorization by default.
+  return { Authorization: `${jellyfinClient}, Token="${token}"` };
 }
 try {
   compose('up', '-d');
