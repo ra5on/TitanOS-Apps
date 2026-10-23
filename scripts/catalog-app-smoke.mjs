@@ -150,7 +150,7 @@ try {
     console.log('Jellyfin: setup, protected API, login, read-only media scan, direct audio stream and persistence passed.');
   }
   const { chromium } = await import(process.env.PLAYWRIGHT_PATH);
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({ channel: 'chrome' });
   try {
     const page = await browser.newPage();
     await page.goto(base + (app === 'jellyfin' ? '/web/index.html#!/login.html' : '/accounts/login/'), { waitUntil: 'networkidle', timeout: 60000 });
