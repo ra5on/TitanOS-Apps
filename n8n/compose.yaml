@@ -1,0 +1,87 @@
+x-titanos:
+  name: n8n
+  main: n8n
+  category: productivity
+  description:
+    de: Visuelle Workflows zur Verbindung von Apps, APIs und KI-Diensten.
+    en: Visual workflows connecting apps, APIs and AI services.
+  tips:
+    de: "Direkt nach der Installation im Assistenten das Besitzerkonto anlegen. Benutzerverwaltung und
+      Anmeldung sind unabhängig von TitanOS. Den erzeugten Verschlüsselungsschlüssel dauerhaft
+      aufbewahren und zusammen mit den Daten sichern: ohne ihn sind gespeicherte Zugangsdaten nicht
+      entschlüsselbar. Die Datenbank liegt in einem benannten Docker-Volume auf dem gewählten
+      Docker-Daten-Volume, nicht im RAM-Overlay. Der direkte HTTP-Zugang ist für ein
+      vertrauenswürdiges Netz bzw. Tailscale vorbereitet; bei HTTPS über einen separat
+      eingerichteten Proxy N8N_SECURE_COOKIE auf true setzen und WEBHOOK_URL sowie
+      N8N_EDITOR_BASE_URL auf die externen Adressen einstellen. Die Vorlage veröffentlicht keine
+      Webhooks im Internet und richtet keinen Proxy ein."
+    en: "Create the owner account in the wizard immediately after installation. Accounts and
+      authentication are independent of TitanOS. Keep the generated encryption key and back it up
+      with the data: stored credentials cannot be decrypted without it. The database uses a named
+      Docker volume on the selected Docker data volume, not the RAM overlay. Direct HTTP access is
+      prepared for a trusted network or Tailscale; with a separately configured HTTPS proxy, set
+      N8N_SECURE_COOKIE to true and configure WEBHOOK_URL and N8N_EDITOR_BASE_URL to the external
+      addresses. The template does not publish internet webhooks or configure a proxy."
+  variables:
+    N8N_ENCRYPTION_KEY:
+      label:
+        de: Schlüssel für gespeicherte Zugangsdaten
+        en: Credential encryption key
+      secret: generate
+      required: true
+    GENERIC_TIMEZONE:
+      label:
+        de: Zeitzone für Workflows
+        en: Workflow timezone
+      fill: timezone
+    TZ:
+      label:
+        de: Systemzeitzone
+        en: System timezone
+      fill: timezone
+    N8N_SECURE_COOKIE:
+      label:
+        de: Cookies nur über HTTPS
+        en: HTTPS-only cookies
+      help:
+        de: Für HTTPS auf true setzen; false erlaubt den direkten HTTP-Zugang im vertrauenswürdigen Netz.
+        en: Set true for HTTPS; false permits direct HTTP access on a trusted network.
+    WEBHOOK_URL:
+      label:
+        de: Externe Webhook-Adresse (optional)
+        en: External webhook URL (optional)
+    N8N_EDITOR_BASE_URL:
+      label:
+        de: Externe Editor-Adresse (optional)
+        en: External editor URL (optional)
+  ports:
+    "5678":
+      label: WebUI
+      webui: true
+  icon: https://raw.githubusercontent.com/n8n-io/n8n/master/assets/n8n-logo.png
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:2.44.6
+    restart: unless-stopped
+    labels:
+      titanos.webui: http://[host]:5678
+    ports:
+      - 5678:5678
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    environment:
+      N8N_ENCRYPTION_KEY: ""
+      GENERIC_TIMEZONE: ""
+      TZ: ""
+      N8N_SECURE_COOKIE: "false"
+      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: "true"
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      WEBHOOK_URL: ""
+      N8N_EDITOR_BASE_URL: ""
+    volumes:
+      - n8n-data:/home/node/.n8n
+volumes:
+  n8n-data: {}

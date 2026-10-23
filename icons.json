@@ -14,5 +14,11 @@
   "uptime-kuma": "https://raw.githubusercontent.com/louislam/uptime-kuma/master/public/icon.svg",
   "vaultwarden": "https://raw.githubusercontent.com/dani-garcia/vaultwarden/main/resources/vaultwarden-icon.svg",
   "cloudflare-tunnel": "https://raw.githubusercontent.com/cloudflare/cloudflare-docs/production/public/favicon.png",
-  "solidcraft": "https://raw.githubusercontent.com/tangency-labs/solidcraft/main/assets/icons/app/linux/exports/hicolor/128x128/apps/ai.storyteller.solidcraft.png"
+  "solidcraft": "https://raw.githubusercontent.com/tangency-labs/solidcraft/main/assets/icons/app/linux/exports/hicolor/128x128/apps/ai.storyteller.solidcraft.png",
+  "joplin-server": "https://raw.githubusercontent.com/laurent22/joplin/dev/Assets/JoplinIcon.svg",
+  "zigbee2mqtt": "https://raw.githubusercontent.com/Koenkk/zigbee2mqtt/master/images/logo.png",
+  "esphome": "https://raw.githubusercontent.com/home-assistant/brands/master/core_integrations/esphome/icon.png",
+  "n8n": "https://raw.githubusercontent.com/n8n-io/n8n/master/assets/n8n-logo.png",
+  "mealie": "https://raw.githubusercontent.com/mealie-recipes/mealie/mealie-next/frontend/public/icons/android-chrome-192x192.png",
+  "grocy": "https://raw.githubusercontent.com/grocy/grocy/master/public/img/icon.svg"
 }
