@@ -211,6 +211,17 @@ services:
     cap_drop:
       - ALL
 
+    # s6 log ownership/user switching, file permissions and clean NGINX shutdown.
+    # Keep other capabilities dropped; no privileged mode or host access.
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - FSETID
+      - SETGID
+      - SETUID
+      - KILL
+
     # ==========================================
     # PROTOKOLLIERUNG
     # ==========================================
