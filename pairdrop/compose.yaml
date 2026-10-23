@@ -1,7 +1,7 @@
 x-titanos:
   name: PairDrop
   main: pairdrop
-  category: tools
+  category: network
   description:
     de: Dateien und Text zwischen Browsern im lokalen Netzwerk übertragen.
     en: Transfer files and text between browsers on the local network.
@@ -45,7 +45,7 @@ x-titanos:
     "3000":
       label: WebUI
       webui: true
-  icon: https://raw.githubusercontent.com/schlagmichdoch/PairDrop/master/public/images/safari-pinned-tab.svg
+  icon: https://raw.githubusercontent.com/schlagmichdoch/PairDrop/master/public/images/android-chrome-512x512.png
 services:
   pairdrop:
     image: lscr.io/linuxserver/pairdrop:latest

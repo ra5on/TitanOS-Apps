@@ -45,7 +45,7 @@ x-titanos:
     "1883":
       label: MQTT (TCP)
       webui: false
-  icon: https://raw.githubusercontent.com/eclipse-mosquitto/mosquitto/master/logo/mosquitto-logo-only.svg
+  icon: https://raw.githubusercontent.com/eclipse-mosquitto/mosquitto/master/logo/mosquitto-logo-min.svg
 services:
   mosquitto:
     image: eclipse-mosquitto:2.1.2-alpine

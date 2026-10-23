@@ -24,6 +24,6 @@
   "jellyfin": "https://raw.githubusercontent.com/jellyfin/jellyfin-ux/master/branding/SVG/icon-transparent.svg",
   "paperless-ngx": "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docs/assets/logo_leaf.svg",
   "trilium": "https://raw.githubusercontent.com/TriliumNext/Trilium/v0.106.1/apps/client/src/assets/icon-color.svg",
-  "mosquitto": "https://raw.githubusercontent.com/eclipse-mosquitto/mosquitto/master/logo/mosquitto-logo-only.svg",
-  "pairdrop": "https://raw.githubusercontent.com/schlagmichdoch/PairDrop/master/public/images/safari-pinned-tab.svg"
+  "mosquitto": "https://raw.githubusercontent.com/eclipse-mosquitto/mosquitto/master/logo/mosquitto-logo-min.svg",
+  "pairdrop": "https://raw.githubusercontent.com/schlagmichdoch/PairDrop/master/public/images/android-chrome-512x512.png"
 }

@@ -431,6 +431,20 @@ Zugangsdaten, Anmeldung, erhaltene Konten nach Container-Neuerstellung und
 sauberes Beenden. Kameras, Aufnahmen und Hardwarebeschleunigung sind damit
 nicht abgenommen.
 
+Die [Trilium-/MQTT-/PairDrop-Prüfung](.github/workflows/trilium-mosquitto-pairdrop.yml)
+verwendet neue temporäre Datenordner, synthetische Zugangsdaten und Inhalte.
+Trilium wird im Browser eingerichtet und angemeldet; falsches Passwort und
+anonyme API-Zugriffe werden abgewiesen. Eine über ETAPI erstellte Notiz und das
+Passwort müssen eine Container-Neuerstellung überstehen. Mosquitto wird über den
+veröffentlichten MQTT-Port auf Anmeldung sowie Ablehnung anonymer/falscher
+Zugänge geprüft; Publish/Subscribe und eine nach Neuerstellung erhaltene Retained-
+Nachricht werden verifiziert. PairDrop überträgt eine Datei zwischen zwei
+getrennten Browser-Kontexten; der Test vergleicht die heruntergeladenen Bytes
+und prüft den Neustart des zustandslosen Servers. Nicht abgenommen sind echte
+Trilium-Desktop-Synchronisation, Mehrinstanzbetrieb, MQTT-Geräte/ACLs/TLS,
+PairDrop-Transfers zwischen unterschiedlichen Netzen, TURN, mobile Browser,
+dauerhafte Kopplung sowie Reverse-Proxy-Betrieb.
+
 ## Lizenzen und Herkunft
 
 Die Anwendungen, Container-Images und Logos unterliegen den Lizenzen und
