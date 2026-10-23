@@ -13,3 +13,5 @@ jobs:
           for file in */compose.yaml; do
             docker compose -f "$file" config --quiet
           done
+      - name: Check Frigate image availability
+        run: docker manifest inspect ghcr.io/blakeblackshear/frigate:stable > /dev/null

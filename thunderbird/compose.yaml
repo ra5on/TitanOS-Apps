@@ -1,0 +1,98 @@
+x-titanos:
+  icon: "https://raw.githubusercontent.com/jlesage/docker-templates/master/jlesage/images/thunderbird-icon.png"
+  name: Thunderbird
+  main: thunderbird
+  category: productivity
+  description:
+    de: Thunderbird im Browser für vorhandene E-Mail-Konten, Kontakte und Kalender. Profil und lokale Nachrichten bleiben auf dem NAS.
+    en: Thunderbird in your browser for existing email accounts, contacts and calendars. The profile and local messages stay on the NAS.
+  tips:
+    de: >-
+      Drittanbieter-Container von jlesage, kein offizielles Thunderbird-Image.
+      Die WebUI über HTTPS öffnen und gegebenenfalls das selbst signierte
+      Zertifikat bestätigen. Mit dem hier festgelegten Web-Benutzernamen und
+      Passwort anmelden; anschließend die E-Mail-Konten in Thunderbird einrichten.
+      Das Web-Passwort ist unabhängig vom E-Mail-Passwort und der TitanOS-Anmeldung.
+      Alle Besucher dieser Instanz teilen dasselbe Thunderbird-Profil;
+      für getrennte Postfächer pro Person eine eigene App-Instanz installieren.
+      Profil, lokale Mails und Anhänge liegen auf dem gewählten Daten-Volume.
+      Dateien über den Dateimanager der WebUI nach /storage übertragen.
+      Die Vorlage veröffentlicht nur den geschützten Browserzugang, keinen VNC-Port.
+      Fernzugriff bevorzugt über Tailscale. Vor Image-Upgrades das Profil sichern.
+    en: >-
+      Third-party container by jlesage, not an official Thunderbird image.
+      Open the WebUI over HTTPS and accept the self-signed certificate if prompted.
+      Sign in with the web username and password configured here, then add your
+      email accounts in Thunderbird. The web password is separate from your email
+      password and TitanOS login. All visitors to this instance share the same
+      Thunderbird profile; install a separate app instance for each person's
+      private mailboxes. The profile, local mail and attachments are stored on
+      the selected data volume. Transfer files to /storage using the WebUI file
+      manager. Only the protected browser interface is published, not a VNC port.
+      Prefer Tailscale for remote access. Back up the profile before image upgrades.
+  variables:
+    WEB_AUTHENTICATION_USERNAME:
+      label: { de: Benutzername für den Browserzugang, en: Browser access username }
+      required: true
+    WEB_AUTHENTICATION_PASSWORD:
+      label: { de: Passwort für den Browserzugang, en: Browser access password }
+      help:
+        de: Wird automatisch erzeugt und kann vor der Installation geändert werden. Für die Anmeldung an der Thunderbird-WebUI aufbewahren.
+        en: Generated automatically and editable before installation. Keep it for signing in to the Thunderbird WebUI.
+      secret: generate
+      required: true
+    USER_ID:
+      label: { de: Benutzer-ID, en: User ID }
+      fill: uid
+    GROUP_ID:
+      label: { de: Gruppen-ID, en: Group ID }
+      fill: gid
+    TZ:
+      label: { de: Zeitzone, en: Timezone }
+      fill: timezone
+    LANG:
+      label: { de: Anwendungssprache, en: Application language }
+      help:
+        de: Zum Beispiel de_DE.UTF-8 oder en_US.UTF-8; verfügbare Übersetzungen hängen vom Image ab.
+        en: For example de_DE.UTF-8 or en_US.UTF-8; available translations depend on the image.
+  paths:
+    /config:
+      label: { de: Thunderbird-Profil und lokale Nachrichten, en: Thunderbird profile and local messages }
+    /storage:
+      label: { de: Anhänge und übertragene Dateien, en: Attachments and transferred files }
+  ports:
+    "5800":
+      label: WebUI (HTTPS)
+      webui: true
+
+services:
+  thunderbird:
+    image: jlesage/thunderbird:v26.09.1
+    restart: unless-stopped
+    labels:
+      titanos.webui: "https://[host]:5800"
+    environment:
+      USER_ID: ""
+      GROUP_ID: ""
+      TZ: ""
+      LANG: "de_DE.UTF-8"
+      UMASK: "0077"
+      SECURE_CONNECTION: "1"
+      WEB_AUTHENTICATION: "1"
+      WEB_AUTHENTICATION_USERNAME: ""
+      WEB_AUTHENTICATION_PASSWORD: ""
+      VNC_LISTENING_PORT: "-1"
+      WEB_FILE_MANAGER: "1"
+      WEB_FILE_MANAGER_ALLOWED_PATHS: "/storage"
+      WEB_TERMINAL: "0"
+    volumes:
+      - "./config:/config"
+      - "./files:/storage"
+    ports:
+      - "5800:5800"
+    shm_size: "256mb"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
