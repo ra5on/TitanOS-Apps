@@ -44,12 +44,6 @@ x-titanos:
       Back up the config before upgrading.
 
   variables:
-    FRIGATE_IMAGE_TAG:
-      label:
-        de: Frigate-Version und Image-Variante
-        en: Frigate version and image variant
-      required: true
-
     TZ:
       label:
         de: Zeitzone
@@ -117,17 +111,12 @@ services:
   frigate:
     labels:
       titanos.webui: "https://[host]:8971"
-    image: "ghcr.io/blakeblackshear/frigate:${FRIGATE_IMAGE_TAG:-latest}"
+    image: "ghcr.io/blakeblackshear/frigate:stable"
     restart: unless-stopped
     stop_grace_period: 30s
 
     environment:
       TZ: "Europe/Berlin"
-
-      # Versionsfeld für TitanOS.
-      # Image-Auswahl benötigt zusätzlich
-      # Compose-Variablen oder Image-Ersetzung.
-      FRIGATE_IMAGE_TAG: "latest"
 
       # Optionale Kamera-Zugangsdaten
       FRIGATE_RTSP_USER: ""
@@ -191,7 +180,7 @@ services:
     # OPTIONAL: NVIDIA / TENSORRT
     # ==========================================
 
-    # Frigate-Image auf 0.18.2-tensorrt ändern
+    # Frigate-Image auf stable-tensorrt ändern
     # und die GPU-Freigabe aktivieren.
     #
     # deploy:
