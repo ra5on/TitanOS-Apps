@@ -172,7 +172,7 @@ URL-Feld erzeugt nur den Link; es richtet keinen Proxy ein und ändert diese
 anwendungseigenen Einstellungen nicht.
 
 **Joplin Server** ist ein Synchronisationsziel für die Joplin-Apps, kein
-Notizeditor im Browser. Die Vorlage verwendet den stabilen Image-Zweig `3`
+Notizeditor im Browser. Die Vorlage verwendet den geprüften Image-Tag `3.7.3`
 mit PostgreSQL `16`; das Datenbankpasswort wird einmal erzeugt und an beide
 Dienste übergeben. Die Datenbank hat keinen veröffentlichten Port. Notizen
 und Konten liegen in PostgreSQL; für ein Backup die Datenbank konsistent

@@ -107,8 +107,8 @@ try{
  const {chromium}=await import(process.env.PLAYWRIGHT_PATH);browser=await chromium.launch({channel:'chrome'});
  const page=await browser.newPage();await page.goto(base,{waitUntil:'networkidle',timeout:60000});
  if(app==='grocy'){
-  await page.locator('input[name="username"]').fill('admin');await page.locator('input[name="password"]').fill('admin');
-  await page.locator('button[type="submit"]').click();await page.waitForURL(url=>!url.pathname.includes('login'),{timeout:30000});
+  await page.locator('#username').fill('admin');await page.locator('#password_input').fill('admin');
+  await page.locator('#login-button').click();await page.waitForURL(url=>!url.pathname.includes('login'),{timeout:30000});
  }
  await page.screenshot({path:`${app}-selected-smoke.png`});
  console.log(`${app}: startup, supported authentication checks, browser page and isolated data persistence passed. Hardware and external services not tested.`);
