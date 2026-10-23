@@ -1,0 +1,67 @@
+x-titanos:
+  name: PairDrop
+  main: pairdrop
+  category: tools
+  description:
+    de: Dateien und Text zwischen Browsern im lokalen Netzwerk übertragen.
+    en: Transfer files and text between browsers on the local network.
+  tips:
+    de: >-
+      Auf beiden Geräten dieselbe PairDrop-Adresse öffnen und das Zielgerät auswählen. Es gibt
+      keine Benutzerkonten; die TitanOS-Anmeldung schützt diesen Dienst nicht. Dateien werden an
+      den empfangenden Browser übertragen, nicht automatisch auf dem NAS gespeichert. PairDrop
+      benötigt deshalb keinen NAS-Datenordner. Gerätepaare und Einstellungen liegen im Browser.
+      Für dauerhafte Kopplung und einige Browserfunktionen HTTPS am Reverse-Proxy einrichten.
+      Nur im vertrauenswürdigen LAN oder über Tailscale verwenden; bei öffentlichen Adressen
+      muss ein Reverse-Proxy X-Forwarded-For korrekt setzen, sonst sehen sich alle Clients.
+      Netzwerkübergreifende Transfers können einen eigenen TURN-Server benötigen. Standardmäßig
+      wird Googles STUN-Server verwendet; WebSocket-Dateiübertragung als Ersatz ist ausgeschaltet.
+    en: >-
+      Open the same PairDrop address on both devices and select the destination device. There
+      are no user accounts; TitanOS authentication does not protect this service. Files are sent
+      to the receiving browser, not automatically stored on the NAS, so no NAS data folder is
+      needed. Device pairings and settings reside in the browser. Configure HTTPS at a reverse
+      proxy for persistent pairing and some browser features. Use a trusted LAN or Tailscale;
+      public deployments require a reverse proxy that correctly sets X-Forwarded-For, otherwise
+      all clients can see each other. Cross-network transfers may require your own TURN server.
+      Google's STUN server is used by default; WebSocket file-transfer fallback is disabled.
+  variables:
+    PUID:
+      label:
+        de: Benutzer-ID
+        en: User ID
+      fill: uid
+    PGID:
+      label:
+        de: Gruppen-ID
+        en: Group ID
+      fill: gid
+    TZ:
+      label:
+        de: Zeitzone
+        en: Timezone
+      fill: timezone
+  ports:
+    "3000":
+      label: WebUI
+      webui: true
+  icon: https://raw.githubusercontent.com/schlagmichdoch/PairDrop/master/public/images/safari-pinned-tab.svg
+services:
+  pairdrop:
+    image: lscr.io/linuxserver/pairdrop:latest
+    restart: unless-stopped
+    labels:
+      titanos.webui: http://[host]:3000
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: ""
+      WS_FALLBACK: "false"
+      DEBUG_MODE: "false"
+    ports:
+      - "3000:3000"
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"

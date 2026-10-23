@@ -1,0 +1,92 @@
+x-titanos:
+  name: Eclipse Mosquitto
+  main: mosquitto
+  category: network
+  description:
+    de: MQTT-Broker mit Passwortschutz für Home Assistant, Node-RED und andere Geräte.
+    en: Password-protected MQTT broker for Home Assistant, Node-RED and other devices.
+  tips:
+    de: >-
+      MQTT-Dienst ohne Weboberfläche. In den Clients die NAS-Adresse, den gewählten MQTT-Port
+      sowie den hier gewählten Benutzernamen und das erzeugte Passwort eintragen. Anonyme Zugriffe
+      sind gesperrt. Ein gemeinsamer Broker-Zugang ist vorbereitet; alle damit angemeldeten Clients
+      dürfen alle Topics verwenden. Die TitanOS-Anmeldung wird nicht übernommen. Nachrichten und
+      Sitzungsdaten liegen auf dem Daten-Volume; Zugangsdaten mit der App-Konfiguration sichern.
+      Der Port 1883 verwendet kein TLS: nur im vertrauenswürdigen LAN oder über Tailscale verwenden.
+      Die Zugangsdaten werden bei jedem Containerstart aus den App-Einstellungen übernommen.
+    en: >-
+      MQTT service without a web interface. Configure clients with the NAS address, selected
+      MQTT port, chosen username and generated password. Anonymous access is disabled. One shared
+      broker login is prepared; all clients using it can access all topics. TitanOS authentication
+      is separate. Messages and session data reside on the data volume; back up credentials with
+      the app configuration. Port 1883 does not use TLS: use a trusted LAN or Tailscale.
+      Credentials are applied from the app settings on every container start.
+  variables:
+    MQTT_USERNAME:
+      label:
+        de: MQTT-Benutzername
+        en: MQTT username
+      required: true
+      help:
+        de: Buchstaben, Ziffern, Unterstrich und Bindestrich; nicht mit Bindestrich beginnen.
+        en: Letters, digits, underscore and hyphen; must not start with a hyphen.
+    MQTT_PASSWORD:
+      label:
+        de: MQTT-Passwort
+        en: MQTT password
+      required: true
+      secret: generate
+  paths:
+    /mosquitto/data:
+      label:
+        de: MQTT-Nachrichten und Sitzungen
+        en: MQTT messages and sessions
+  ports:
+    "1883":
+      label: MQTT (TCP)
+      webui: false
+  icon: https://raw.githubusercontent.com/eclipse-mosquitto/mosquitto/master/logo/mosquitto-logo-only.svg
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2.1.2-alpine
+    restart: unless-stopped
+    environment:
+      MQTT_USERNAME: mqtt
+      MQTT_PASSWORD: ""
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./data:/mosquitto/data
+    configs:
+      - source: mosquitto_config
+        target: /mosquitto/config/mosquitto.conf
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        case "$${MQTT_USERNAME}" in
+          ""|-*|*[!A-Za-z0-9_-]*) echo "Invalid MQTT username" >&2; exit 1 ;;
+        esac
+        test -n "$${MQTT_PASSWORD}" || { echo "MQTT password is required" >&2; exit 1; }
+        umask 077
+        mkdir -p /mosquitto/data
+        mosquitto_passwd -b -c /mosquitto/data/passwords.new "$${MQTT_USERNAME}" "$${MQTT_PASSWORD}"
+        chown mosquitto:mosquitto /mosquitto/data /mosquitto/data/passwords.new
+        chmod 0700 /mosquitto/data
+        mv -f /mosquitto/data/passwords.new /mosquitto/data/passwords
+        exec /docker-entrypoint.sh /usr/sbin/mosquitto -c /mosquitto/config/mosquitto.conf
+    stop_grace_period: 60s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+configs:
+  mosquitto_config:
+    content: |
+      user mosquitto
+      listener 1883
+      allow_anonymous false
+      password_file /mosquitto/data/passwords
+      persistence true
+      persistence_location /mosquitto/data/
+      log_dest stdout
