@@ -3,7 +3,7 @@ x-titanos:
   name: SolidCraft
   main: solidcraft
   category: productivity
-  icon: "https://raw.githubusercontent.com/tangency-labs/solidcraft/v0.19.0/assets/icons/app/linux/exports/hicolor/128x128/apps/ai.storyteller.solidcraft.png"
+  icon: "https://raw.githubusercontent.com/tangency-labs/solidcraft/v0.20.0/assets/icons/app/linux/exports/hicolor/128x128/apps/ai.storyteller.solidcraft.png"
   description:
     de: "3D-CAD-Modelle erstellen und bearbeiten im Browser. Verarbeitung auf deinem Endgerät."
     en: "Create and edit 3D CAD models in your browser. Processing runs on your device."
