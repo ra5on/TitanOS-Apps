@@ -1,0 +1,69 @@
+x-titanos:
+  name: Jellyfin
+  main: jellyfin
+  category: media
+  icon: "https://raw.githubusercontent.com/jellyfin/jellyfin-ux/master/branding/SVG/icon-transparent.svg"
+  description:
+    de: Filme, Serien und Musik vom NAS an Browser, Fernseher und Mobilgeräte streamen. Mit eigenen Benutzerkonten und Medienbibliotheken.
+    en: Stream movies, shows and music from your NAS to browsers, TVs and mobile devices. Includes individual user accounts and media libraries.
+  tips:
+    de: >-
+      Nach der Installation sofort die WebUI öffnen und im Einrichtungsassistenten
+      ein Administratorkonto mit Passwort anlegen. Weitere Personen und deren
+      Bibliotheksrechte in Jellyfin verwalten; keine automatische Übernahme
+      von TitanOS-Konten. Den Medienordner im Installationsformular wählen und
+      im Assistenten als /media hinzufügen. Medien sind standardmäßig nur
+      lesbar, Konfiguration und Transcoding-Cache liegen auf dem Daten-Volume.
+      Hardwarebeschleunigung bei Bedarf ausdrücklich im TitanOS-Editor für
+      den Dienst freigeben und anschließend in Jellyfin konfigurieren.
+      Ohne GPU-Zuordnung arbeitet die Vorlage mit Software-Decodierung.
+      DLNA ist in dieser Bridge-Vorlage nicht eingerichtet. Fernzugriff
+      bevorzugt über Tailscale; für eine eigene Domain HTTPS am Reverse-Proxy
+      separat einrichten. Vor Versionswechseln die Konfiguration sichern.
+    en: >-
+      Open the WebUI immediately after installation and create an administrator
+      account with a password in the setup wizard. Manage additional people
+      and their library permissions in Jellyfin; TitanOS accounts are not
+      imported. Select the media folder during installation and add it as
+      /media in the wizard. Media is read-only by default; configuration and
+      the transcoding cache are stored on the data volume. If needed,
+      explicitly grant hardware access to this service in the TitanOS editor
+      and then configure acceleration in Jellyfin. Without GPU access the
+      template uses software decoding. DLNA is not configured in this bridge
+      template. Prefer Tailscale for remote access; configure HTTPS separately
+      at a reverse proxy for your own domain. Back up configuration before upgrades.
+  variables:
+    TZ:
+      label: { de: Zeitzone, en: Timezone }
+      fill: timezone
+  paths:
+    /config:
+      label: { de: Konten, Bibliotheken und Einstellungen, en: Accounts, libraries and settings }
+    /cache:
+      label: { de: Cache und temporäre Transcoding-Dateien, en: Cache and temporary transcoding files }
+    /media:
+      label: { de: Medienbibliothek (nur lesen), en: Media library (read-only) }
+      suggest: media
+  ports:
+    "8096":
+      label: WebUI
+      webui: true
+
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:12.3
+    restart: unless-stopped
+    labels:
+      titanos.webui: "http://[host]:8096"
+    environment:
+      TZ: ""
+    volumes:
+      - "./config:/config"
+      - "./cache:/cache"
+      - "./media:/media:ro"
+    ports:
+      - "8096:8096"
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
