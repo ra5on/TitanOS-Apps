@@ -185,6 +185,36 @@ keine Wirkung auf das Image und wurde entfernt. Andere Varianten direkt im
 Image-Feld wählen, etwa `ghcr.io/blakeblackshear/frigate:stable-tensorrt` für
 NVIDIA. Vor Versionswechseln Konfiguration und Datenbank sichern.
 
+### Frigate startet nicht: `log-prepare` / `chown: Operation not permitted`
+
+Die frühere Vorlage entfernte mit `cap_drop: ALL` sämtliche Container-Capabilities.
+Frigates s6-Start muss die Logordner unter `/dev/shm/logs` an `nobody:nogroup`
+übergeben und die Logger mit dieser Identität starten. Die aktuelle Vorlage
+behält `cap_drop: ALL` und `no-new-privileges`, ergänzt aber gezielt `CHOWN`,
+`DAC_OVERRIDE`, `FOWNER`, `FSETID`, `SETGID`, `SETUID` und `KILL` für Dateirechte,
+Benutzerwechsel und sauberes Beenden der Dienste. Kein privilegierter Modus nötig.
+
+Bei einer bestehenden Installation unter **Docker › App bearbeiten** in der
+Compose-Datei beim Dienst `frigate` ergänzen, auf derselben Ebene wie `cap_drop`:
+
+```yaml
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - FSETID
+      - SETGID
+      - SETUID
+      - KILL
+```
+
+Änderung übernehmen und den Container neu erstellen lassen. Ein bloßer Neustart
+übernimmt geänderte Docker-Rechte nicht. Bestehende Konfiguration und Medienpfade
+beibehalten; kein Löschen der App-Daten erforderlich. Eine Katalogaktualisierung
+ändert bereits installierte Compose-Dateien nicht automatisch. Die Vorlage
+setzt den vom Image vorgesehenen Benutzer voraus; eine selbst ergänzte `user:`-
+Vorgabe für einen unprivilegierten Benutzer kann den Start weiterhin verhindern.
+
 SolidCraft (Tangency Labs) wird wie die Craft-Apps aus dem offiziellen Web-ZIP
 des jeweiligen Releases gebaut und als `ghcr.io/ra5on/titanos-solidcraft`
 veröffentlicht, weil das Image des Projekts auf GHCR nicht öffentlich abrufbar ist.
@@ -362,6 +392,13 @@ Joplin-Synchronisation, Zigbee-Kopplung, USB-/Netzwerk-Koordinatoren, Firmware-
 Kompilierung oder Flash-Vorgänge, externen Workflows, Rezeptimporte oder
 Mehrbenutzer-Berechtigungen behaupten. Der Test verwendet Chrome auf dem
 wegwerfbaren GitHub-Runner, keine produktiven NAS-Dateien oder Host-Geräte.
+
+Der [Frigate-Starttest](.github/workflows/frigate.yml) reproduziert zunächst
+`log-prepare` ohne Capabilities und prüft danach die korrigierte Vorlage mit
+isolierten Datenordnern: Log-Eigentümer und Rechte, HTTPS, Ablehnung falscher
+Zugangsdaten, Anmeldung, erhaltene Konten nach Container-Neuerstellung und
+sauberes Beenden. Kameras, Aufnahmen und Hardwarebeschleunigung sind damit
+nicht abgenommen.
 
 ## Lizenzen und Herkunft
 
