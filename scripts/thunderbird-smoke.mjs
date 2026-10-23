@@ -60,6 +60,8 @@ try {
       await page.locator('#loginButton').click();
       await page.locator('#loginStatus:not(.d-none)').waitFor();
       assert.ok(page.url().includes('/login/'), 'Incorrect password must not grant access');
+      // A rejected form submission reloads the page and clears both inputs.
+      await page.locator('#usernameInput').fill('smoke-user');
       await page.locator('#passwordInput').fill(password);
       await page.locator('#loginButton').click();
       await page.waitForURL(current => !current.pathname.includes('/login'), { timeout: 30000 });
