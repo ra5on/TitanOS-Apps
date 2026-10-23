@@ -1,0 +1,161 @@
+x-titanos:
+  name: Paperless-ngx
+  main: paperless
+  category: productivity
+  icon: "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docs/assets/logo_leaf.svg"
+  description:
+    de: Dokumentenarchiv mit Texterkennung, Suche und eigenen Benutzerkonten. Mit PostgreSQL und Valkey, OCR für Deutsch und Englisch.
+    en: Document archive with OCR, search and individual user accounts. Includes PostgreSQL and Valkey, with German and English OCR.
+  tips:
+    de: >-
+      Administratorname festlegen und das erzeugte Administratorpasswort aufbewahren.
+      Nach der Installation über die WebUI anmelden und weitere Konten samt
+      Dokumentberechtigungen in Paperless verwalten. Keine automatische
+      Übernahme von TitanOS-Konten. Der erste Start mit Datenbankeinrichtung
+      kann einige Minuten dauern. Der Importordner ist ein Eingang:
+      erfolgreich importierte Dateien werden daraus entfernt und im Archiv
+      gespeichert. Nur einen eigenen Eingangsordner verwenden, keine bestehende
+      Dokumentensammlung direkt einbinden. Daten, Medien und Datenbank gemeinsam
+      sichern. Office-Konvertierung über Tika/Gotenberg ist nicht enthalten.
+      Für eine eigene HTTPS-Domain zusätzlich PAPERLESS_URL auf genau diese
+      Adresse setzen und den Reverse-Proxy separat einrichten. Fernzugriff
+      bevorzugt über Tailscale; HTTPS für unverschlüsselte Netze einrichten.
+    en: >-
+      Choose an administrator name and keep the generated administrator password.
+      After installation sign in through the WebUI and manage additional accounts
+      and document permissions in Paperless. TitanOS accounts are not imported.
+      Initial database setup may take several minutes. The consumption directory
+      is an inbox: successfully imported files are removed from it and stored
+      in the archive. Use a dedicated inbox, not an existing document collection.
+      Back up data, media and the database together. Office conversion through
+      Tika/Gotenberg is not included. For your own HTTPS domain, also set
+      PAPERLESS_URL to that exact address and configure the reverse proxy
+      separately. Prefer Tailscale for remote access; configure HTTPS on
+      unencrypted networks.
+  variables:
+    PAPERLESS_ADMIN_USER:
+      label: { de: Administratorname, en: Administrator username }
+      required: true
+    PAPERLESS_ADMIN_PASSWORD:
+      label: { de: Erstes Administratorpasswort, en: Initial administrator password }
+      help:
+        de: Wird erzeugt. Nach dem ersten Start das Passwort in Paperless verwalten; diese Variable setzt bestehende Konten nicht zurück.
+        en: Generated automatically. Manage the password in Paperless after first startup; this variable does not reset existing accounts.
+      secret: generate
+      required: true
+    PAPERLESS_SECRET_KEY:
+      label: { de: Anwendungsschlüssel, en: Application secret }
+      secret: generate
+      required: true
+    PAPERLESS_DBPASS:
+      label: { de: Datenbankpasswort, en: Database password }
+      secret: generate
+      required: true
+    POSTGRES_PASSWORD:
+      from: PAPERLESS_DBPASS
+    USERMAP_UID:
+      label: { de: Benutzer-ID für Dokumentdateien, en: Document file user ID }
+      fill: uid
+    USERMAP_GID:
+      label: { de: Gruppen-ID für Dokumentdateien, en: Document file group ID }
+      fill: gid
+    PAPERLESS_TIME_ZONE:
+      label: { de: Zeitzone, en: Timezone }
+      fill: timezone
+    PAPERLESS_OCR_LANGUAGE:
+      label: { de: OCR-Sprachen, en: OCR languages }
+      help:
+        de: deu+eng erkennt deutsche und englische Dokumente.
+        en: deu+eng recognizes German and English documents.
+    PAPERLESS_URL:
+      label: { de: Adresse am Reverse-Proxy (optional), en: Reverse proxy URL (optional) }
+      placeholder: https://paperless.example.org
+      help:
+        de: Leer lassen für direkten Zugriff. Bei Reverse-Proxy exakt dessen externe Adresse eintragen; das Feld richtet keinen Proxy ein.
+        en: Leave empty for direct access. With a reverse proxy, enter its exact external URL; this field does not configure a proxy.
+  paths:
+    /usr/src/paperless/data:
+      label: { de: Index und Anwendungsdaten, en: Index and application data }
+    /usr/src/paperless/media:
+      label: { de: Dokumentenarchiv, en: Document archive }
+    /usr/src/paperless/consume:
+      label: { de: Eingang für den Dokumentimport, en: Document import inbox }
+    /usr/src/paperless/export:
+      label: { de: Dokumentexport, en: Document export }
+    /var/lib/postgresql:
+      label: { de: PostgreSQL-Datenbank, en: PostgreSQL database }
+    /data:
+      label: { de: Valkey-Auftragsdaten, en: Valkey task data }
+  ports:
+    "8000":
+      label: WebUI
+      webui: true
+
+services:
+  db:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: paperless
+      POSTGRES_USER: paperless
+      POSTGRES_PASSWORD: "${PAPERLESS_DBPASS:-}"
+    volumes:
+      - "./postgres:/var/lib/postgresql"
+    healthcheck:
+      test: [CMD, pg_isready, -U, paperless, -d, paperless]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    stop_grace_period: 60s
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+  broker:
+    image: valkey/valkey:9-alpine
+    restart: unless-stopped
+    volumes:
+      - "./broker:/data"
+    healthcheck:
+      test: [CMD, valkey-cli, ping]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+  paperless:
+    image: ghcr.io/paperless-ngx/paperless-ngx:3.3.4
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+      broker: { condition: service_healthy }
+    labels:
+      titanos.webui: "http://[host]:8000"
+    environment:
+      PAPERLESS_DBENGINE: postgresql
+      PAPERLESS_DBHOST: db
+      PAPERLESS_DBNAME: paperless
+      PAPERLESS_DBUSER: paperless
+      PAPERLESS_DBPASS: ""
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_SECRET_KEY: ""
+      PAPERLESS_ADMIN_USER: ""
+      PAPERLESS_ADMIN_PASSWORD: ""
+      PAPERLESS_TIME_ZONE: ""
+      PAPERLESS_OCR_LANGUAGE: deu+eng
+      PAPERLESS_URL: ""
+      USERMAP_UID: ""
+      USERMAP_GID: ""
+      PAPERLESS_TASK_WORKERS: "1"
+      PAPERLESS_THREADS_PER_WORKER: "2"
+    volumes:
+      - "./data:/usr/src/paperless/data"
+      - "./media:/usr/src/paperless/media"
+      - "./consume:/usr/src/paperless/consume"
+      - "./export:/usr/src/paperless/export"
+    ports:
+      - "8000:8000"
+    stop_grace_period: 60s
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
