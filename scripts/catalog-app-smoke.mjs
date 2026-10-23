@@ -112,7 +112,11 @@ try {
     assert.equal((await persisted.json()).count, 1, 'Document and database must survive recreation');
     console.log('Paperless: protected API, login, raster OCR import and database/document persistence passed.');
   } else {
-    assert.equal((await request('/Startup/User')).status, 200);
+    await waitFor(async () => {
+      const response = await request('/Startup/User');
+      if (!response.ok) console.log(`Jellyfin startup: ${response.status} ${(await response.text()).slice(0, 200)}`);
+      return response.status === 200;
+    }, 'Jellyfin startup user API');
     assert.equal((await request('/Startup/User', { method: 'POST', body: { Name: 'catalog-test', Password: password } })).status, 204);
     assert.equal((await request('/Startup/Complete', { method: 'POST' })).status, 204);
     assert.equal((await request('/Users')).status, 401);
@@ -147,6 +151,13 @@ try {
     await page.locator('input[type="password"]').first().waitFor({ state: 'visible', timeout: 30000 });
     await page.screenshot({ path: `${app}-login-smoke.png` });
   } finally { await browser.close(); }
+} catch (error) {
+  if (app === 'jellyfin') {
+    // Jellyfin has only synthetic credentials in this disposable stack.
+    const logs = compose('logs', '--no-color', '--tail', '100', 'jellyfin');
+    console.error(logs.replaceAll(password, '[test password]'));
+  }
+  throw error;
 } finally {
   try { compose('down', '--volumes'); }
   finally {
