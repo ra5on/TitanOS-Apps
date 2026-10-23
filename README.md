@@ -37,14 +37,19 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [DeckCraft](deckcraft/compose.yaml) | Präsentationen erstellen und bearbeiten |
 | [DesignCraft](designcraft/compose.yaml) | Seiten und Layouts gestalten |
 | [EffectCraft](effectcraft/compose.yaml) | Animationen und Effekte gestalten |
+| [ESPHome](esphome/compose.yaml) | Gerätekonfiguration und Firmware mit ESPHome Device Builder erstellen |
 | [FigCraft](figcraft/compose.yaml) | Oberflächen und Prototypen entwerfen |
 | [FilmCraft](filmcraft/compose.yaml) | Videos bearbeiten |
 | [Frigate NVR](frigate/compose.yaml) | Videoüberwachung mit Objekterkennung |
 | [GridCraft](gridcraft/compose.yaml) | Tabellen und Berechnungen bearbeiten |
+| [Grocy](grocy/compose.yaml) | Vorräte, Einkäufe und Haushaltsaufgaben verwalten |
 | [Hermes Agent](hermes-agent/compose.yaml) | KI-Agent mit Web-Dashboard |
 | [Immich](immich/compose.yaml) | Fotos und Videos verwalten und sichern |
 | [Jellyfin](jellyfin/compose.yaml) | Filme, Serien und Musik an Browser, Fernseher und Mobilgeräte streamen |
+| [Joplin Server](joplin-server/compose.yaml) | Notizen zwischen Joplin-Apps synchronisieren |
 | [LightCraft](lightcraft/compose.yaml) | Fotos entwickeln |
+| [Mealie](mealie/compose.yaml) | Rezepte, Essenspläne und Einkaufslisten verwalten |
+| [n8n](n8n/compose.yaml) | Workflows zwischen Apps und APIs automatisieren |
 | [Nextcloud + MariaDB](nextcloud/compose.yaml) | Private Cloud für Dateien und Zusammenarbeit |
 | [Node-RED](node-red/compose.yaml) | Abläufe und Geräte visuell automatisieren |
 | [Ollama](ollama/compose.yaml) | Lokale KI-Modelle über eine API ausführen |
@@ -61,6 +66,7 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [Vaultwarden](vaultwarden/compose.yaml) | Passwortmanager für Bitwarden-Clients |
 | [VectorCraft](vectorcraft/compose.yaml) | Vektorgrafiken bearbeiten |
 | [WordCraft](wordcraft/compose.yaml) | Textdokumente erstellen und bearbeiten |
+| [Zigbee2MQTT](zigbee2mqtt/compose.yaml) | Zigbee-Geräte mit einem privaten MQTT-Broker verbinden |
 
 ## Speicherpfade und Dokumente
 
@@ -188,6 +194,70 @@ Reverse-Proxy einrichten und dessen URL in TitanOS hinterlegen. Wichtige Entwür
 zusätzlich als Datei exportieren; NAS-Backups sichern den Browserspeicher nicht.
 Siehe die [Anleitung von SolidCraft](https://docs.solidcraft.io/guide/getting-started.html).
 
+## Notizen, Automationen und Haushalt
+
+Node-RED und Vaultwarden sind bereits im Katalog vorhanden. Die sechs weiteren
+Vorlagen verwalten ihre Konten und Einstellungen selbst; die Anmeldung an
+TitanOS wird nicht automatisch übernommen.
+
+| App | Standard-Web-Port am NAS | Erste Einrichtung |
+| --- | --- | --- |
+| Joplin Server | `22300` | `APP_BASE_URL` exakt einschließlich NAS-Port setzen. Anfangs `admin@localhost` / `admin`; sofort ändern und persönliche Sync-Konten anlegen. |
+| Zigbee2MQTT | `8082` | Koordinator auswählen, anschließend Onboarding durchführen. Interner MQTT-Server: `mqtt://broker:1883`. |
+| ESPHome | `6052` | Gewählten Benutzernamen und erzeugtes Dashboard-Passwort verwenden. |
+| n8n | `5678` | Im ersten Assistenten das Besitzerkonto anlegen. |
+| Mealie | `9925` | `BASE_URL` einschließlich NAS-Port setzen. Anfangs `changeme@example.com` / `MyPassword`; sofort ändern. |
+| Grocy | `9283` | Anfangs `admin` / `admin`; sofort ändern und weitere Konten anlegen. |
+
+TitanOS kann belegte Web-Ports beim Installieren ersetzen. Joplin `APP_BASE_URL`
+und Mealie `BASE_URL` müssen dann zur gewählten Adresse passen. Das öffentliche
+URL-Feld erzeugt nur den Link; es richtet keinen Proxy ein und ändert diese
+anwendungseigenen Einstellungen nicht.
+
+**Joplin Server** ist ein Synchronisationsziel für die Joplin-Apps, kein
+Notizeditor im Browser. Die Vorlage verwendet den geprüften Image-Tag `3.7.3`
+mit PostgreSQL `16`; das Datenbankpasswort wird einmal erzeugt und an beide
+Dienste übergeben. Die Datenbank hat keinen veröffentlichten Port. Notizen
+und Konten liegen in PostgreSQL; für ein Backup die Datenbank konsistent
+sichern. Transkription ist nicht enthalten.
+
+**Zigbee2MQTT** verwendet Version `2.14.2` mit einem privaten Mosquitto-Broker
+aus dem Zweig `2`. Der Broker besitzt keine veröffentlichten Ports und darf
+ohne zusätzliche Konfiguration nicht als allgemeiner MQTT-Server ins Netz
+gestellt werden. Home Assistant benötigt entweder eine separat eingerichtete
+Verbindung oder einen gemeinsamen MQTT-Broker, dessen Adresse in Zigbee2MQTT
+eingetragen wird. Ein kompatibler USB- oder Netzwerk-Koordinator ist erforderlich.
+Einzelne USB-Geräte im TitanOS-Editor ausdrücklich zuweisen; keine pauschale
+USB- oder Host-Freigabe. Der erste Onboarding-Assistent ist noch nicht durch
+den Frontend-Schlüssel geschützt und gehört ins vertrauenswürdige Netz.
+Im regulären Frontend gilt anschließend der erzeugte Zugriffsschlüssel.
+
+**ESPHome** verwendet `2026.10.0` mit dem Device Builder. `/config` und `/cache`
+liegen auf dem Daten-Volume und halten auch Bauartefakte und Werkzeugketten.
+Das Bridge-Netz begrenzt mDNS-Erkennung; gegebenenfalls Geräte-IP bzw.
+`use_address` festlegen. USB-Flashen am NAS erfordert eine gezielte Gerätefreigabe.
+Firmware kann alternativ heruntergeladen und auf einem anderen Rechner
+geflasht werden. Kein privilegierter Container und kein Host-Netzwerk ab Werk.
+
+**n8n** verwendet `2.44.6` mit einem benannten Daten-Volume für SQLite und
+Konfiguration. Es liegt auf dem ausgewählten Docker-Daten-Volume. Den erzeugten
+`N8N_ENCRYPTION_KEY` zusammen mit den Daten sichern und nicht beiläufig ersetzen;
+sonst sind gespeicherte Zugangsdaten nicht mehr entschlüsselbar. Der direkte
+HTTP-Zugang hat `N8N_SECURE_COOKIE=false` und gehört ins vertrauenswürdige Netz
+bzw. hinter Tailscale. Bei HTTPS am separaten Reverse-Proxy auf `true` wechseln
+und die externen Editor-/Webhook-Adressen konfigurieren. Webhook-Erreichbarkeit
+aus dem Internet entsteht nicht durch die Installation.
+
+**Mealie** verwendet `v3.29.0`, SQLite und einen persistenten `/app/data`-Ordner.
+Registrierung ist deaktiviert. Einladungen und Passwort-Rücksetzungen per
+E-Mail benötigen eine separate SMTP-Einrichtung. **Grocy** verwendet das
+LinuxServer-Image mit persistentem `/config`, PUID/PGID und NAS-Zeitzone.
+
+Alle Vorlagen enthalten deutsche und englische Hinweise. Versionswechsel
+ersetzen installierte Compose-Dateien nicht automatisch. Images, Anwendungen
+und Icons behalten die Rechte ihrer jeweiligen Projekte; insbesondere sind
+die Nutzungsbedingungen von Joplin Server und n8n eigenständig zu prüfen.
+
 ## Storytold / Craft-Apps
 
 Der Workflow [Storytold web images](.github/workflows/storytold.yml) prüft alle sechs Stunden sowie manuell neue
@@ -280,6 +350,18 @@ direktem Abruf einer erzeugten Audiodatei und erhaltener Konfiguration
 geprüft. Beide Loginseiten werden in Chromium geladen. Reale Dokumentbestände,
 Mehrbenutzer-Berechtigungen, Fernseher/Mobilgeräte, Video-Transcoding,
 GPU-Beschleunigung, DLNA und Reverse-Proxy-Betrieb sind damit nicht abgenommen.
+
+Der [Test der ausgewählten Apps](.github/workflows/selected-apps.yml) startet
+sechs isolierte Stacks mit synthetischen Zugangsdaten und neuen Datenordnern
+bzw. eindeutig benannten Docker-Volumes. Geprüft werden HTTP-Start, Browserseite
+und Erhalt gespeicherter Daten nach Container-Neuerstellung. Dazu kommen
+Joplin-Anmeldung/Datenbank, ESPHome-WebSocket-Authentifizierung, n8n-Kontoeinrichtung,
+Mealie-Anmeldung sowie Grocy-Browseranmeldung. Zigbee2MQTT wird nur bis zum
+Onboarding und mit einem internen MQTT-Publish/Subscribe geprüft. Keine echte
+Joplin-Synchronisation, Zigbee-Kopplung, USB-/Netzwerk-Koordinatoren, Firmware-
+Kompilierung oder Flash-Vorgänge, externen Workflows, Rezeptimporte oder
+Mehrbenutzer-Berechtigungen behaupten. Der Test verwendet Chrome auf dem
+wegwerfbaren GitHub-Runner, keine produktiven NAS-Dateien oder Host-Geräte.
 
 ## Lizenzen und Herkunft
 
