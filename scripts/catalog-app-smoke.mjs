@@ -71,7 +71,8 @@ async function waitFor(check, label, attempts = 120) {
 }
 async function ready() {
   base = `http://${compose('port', main, port).trim()}`;
-  await waitFor(async () => (await request(app === 'jellyfin' ? '/health' : '/accounts/login/')).ok, 'server startup');
+  // Jellyfin's health route can answer before startup middleware permits API calls.
+  await waitFor(async () => (await request(app === 'jellyfin' ? '/System/Info/Public' : '/accounts/login/')).ok, 'server startup');
 }
 async function paperlessLogin() {
   const response = await request('/api/token/', { method: 'POST', body: { username: 'catalog-test', password } });
@@ -89,10 +90,12 @@ async function jellyfinLogin() {
 try {
   compose('up', '-d');
   await ready();
+  console.log(`${app}: server API ready`);
   if (app === 'paperless-ngx') {
     assert.ok([401, 403].includes((await request('/api/documents/')).status));
     assert.equal((await request('/api/token/', { method: 'POST', body: { username: 'catalog-test', password: 'wrong' } })).status, 400);
     const headers = await paperlessLogin();
+    console.log('Paperless: administrator login passed; importing synthetic raster document');
     // A generated raster image exercises actual OCR, not just PDF text extraction.
     compose('exec', '-T', 'paperless', 'python3', '-c',
       "from PIL import Image,ImageDraw,ImageFont; im=Image.new('RGB',(1800,1000),'white'); d=ImageDraw.Draw(im); d.text((100,150),'TITANOS DOCUMENT 2026',font=ImageFont.load_default(size=64),fill='black'); im.save('/usr/src/paperless/consume/catalog-test.png')");
@@ -102,6 +105,7 @@ try {
       const data = await response.json();
       return data.count === 1 && /TITANOS/i.test(data.results[0].content) && /2026/.test(data.results[0].content);
     }, 'OCR document import');
+    console.log('Paperless: OCR document imported; recreating stack');
     compose('up', '-d', '--force-recreate');
     await ready();
     const persisted = await request('/api/documents/', { headers: await paperlessLogin() });
@@ -116,6 +120,7 @@ try {
       method: 'POST', headers: { Authorization: jellyfinClient }, body: { Username: 'catalog-test', Pw: 'wrong' }
     })).status, 401);
     const headers = await jellyfinLogin();
+    console.log('Jellyfin: setup and login passed; scanning synthetic media');
     assert.equal((await request('/Library/VirtualFolders?name=CatalogMusic&collectionType=music&refreshLibrary=true', {
       method: 'POST', headers, body: { LibraryOptions: { PathInfos: [{ Path: '/media' }], EnableRealtimeMonitor: false,
         TypeOptions: ['MusicAlbum', 'MusicArtist', 'Audio'].map(Type => ({ Type, MetadataFetchers: [], ImageFetchers: [] })) } }
