@@ -80,7 +80,10 @@ try{
  const id=compose('ps','-a','-q','frigate').trim();
  const state=JSON.parse(docker('inspect',id))[0];
  assert.equal(state.HostConfig.Privileged,false);
- assert.equal(state.State.ExitCode,0,'Frigate must shut down cleanly');
+ assert.ok([0,143].includes(state.State.ExitCode),'Normal exit or SIGTERM; no forced SIGKILL');
+ assert.equal(state.State.OOMKilled,false);
+ const shutdownLogs=compose('logs','--no-color','frigate');
+ for(const name of ['nginx','frigate','go2rtc','log-prepare'])assert.ok(shutdownLogs.includes(`service ${name} successfully stopped`),`${name} orderly service shutdown`);
  console.log('Corrected template: log ownership, HTTPS, authentication, account persistence and clean shutdown passed. Cameras/recording/GPU not tested.');
 }catch(error){
  try{console.error(compose('logs','--no-color','frigate').split('\n').filter((_,i,lines)=>i<100||i>lines.length-60).join('\n').replace(/Password:[^\n]*/g,'Password: [test secret]').replaceAll(password,'[test secret]'))}catch{}
