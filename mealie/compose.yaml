@@ -1,0 +1,74 @@
+x-titanos:
+  name: Mealie
+  main: mealie
+  category: productivity
+  description:
+    de: Rezepte, Essenspläne und Einkaufslisten mit eigenen Konten und Haushalten.
+    en: Recipes, meal plans and shopping lists with individual accounts and households.
+  tips:
+    de: Nach dem ersten Start mit changeme@example.com / MyPassword anmelden und das Passwort sowie die
+      E-Mail sofort ändern. Danach eigene Konten und Haushalte in Mealie verwalten. BASE_URL auf die
+      tatsächlich verwendete Adresse mit dem gewählten NAS-Port setzen; eine Portänderung dort
+      ebenfalls nachführen. Registrierung ist ab Werk deaktiviert. Rezepte, Datenbank, Bilder und
+      Anwendungsschlüssel liegen auf dem Daten-Volume. Für Einladungen und Passwort-Rücksetzungen
+      kann SMTP separat eingerichtet werden. Fernzugriff über Tailscale oder einen separat
+      eingerichteten HTTPS-Proxy. Keine automatische Übernahme von TitanOS-Konten.
+    en: Initially sign in with changeme@example.com / MyPassword and immediately change the password and
+      email. Manage personal accounts and households in Mealie. Set BASE_URL to the actual address
+      including the selected NAS port; update it when changing ports. Sign-ups are disabled by
+      default. Recipes, database, images and application keys are stored on the data volume.
+      Configure SMTP separately for invitations and password resets. Use Tailscale or a separately
+      configured HTTPS proxy remotely. TitanOS accounts are not imported.
+  variables:
+    BASE_URL:
+      label:
+        de: Adresse der Mealie-Instanz
+        en: Mealie instance URL
+      required: true
+      placeholder: http://nas.example:9925
+    PUID:
+      label:
+        de: Benutzer-ID
+        en: User ID
+      fill: uid
+    PGID:
+      label:
+        de: Gruppen-ID
+        en: Group ID
+      fill: gid
+    TZ:
+      label:
+        de: Zeitzone
+        en: Timezone
+      fill: timezone
+  paths:
+    /app/data:
+      label:
+        de: Rezepte, Datenbank und Bilder
+        en: Recipes, database and images
+  ports:
+    "9000":
+      label: WebUI
+      webui: true
+  icon: https://raw.githubusercontent.com/mealie-recipes/mealie/mealie-next/frontend/public/icons/android-chrome-192x192.png
+services:
+  mealie:
+    image: ghcr.io/mealie-recipes/mealie:v3.29.0
+    restart: unless-stopped
+    labels:
+      titanos.webui: http://[host]:9925
+    ports:
+      - 9925:9000
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    environment:
+      BASE_URL: ""
+      PUID: ""
+      PGID: ""
+      TZ: ""
+      ALLOW_SIGNUP: "false"
+    volumes:
+      - ./data:/app/data

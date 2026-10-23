@@ -1,0 +1,62 @@
+x-titanos:
+  name: Grocy
+  main: grocy
+  category: productivity
+  description:
+    de: Vorräte, Einkäufe, Haushaltsaufgaben und Geräte im Haushalt verwalten.
+    en: Manage groceries, shopping, chores and household equipment.
+  tips:
+    de: Nach dem ersten Start mit admin / admin anmelden und das Passwort sofort ändern. Weitere Konten
+      in Grocy anlegen; die TitanOS-Anmeldung wird nicht übernommen. Einstellungen, Datenbank und
+      hochgeladene Dateien liegen dauerhaft auf dem Daten-Volume. Für Fernzugriff Tailscale oder
+      einen separat eingerichteten HTTPS-Proxy verwenden. Sprache und Haushaltseinstellungen nach
+      der Anmeldung in Grocy auswählen.
+    en: Initially sign in with admin / admin and immediately change the password. Create additional
+      accounts in Grocy; TitanOS authentication is separate. Settings, database and uploaded files
+      persist on the data volume. Use Tailscale or a separately configured HTTPS proxy remotely.
+      Select language and household settings in Grocy after signing in.
+  variables:
+    PUID:
+      label:
+        de: Benutzer-ID
+        en: User ID
+      fill: uid
+    PGID:
+      label:
+        de: Gruppen-ID
+        en: Group ID
+      fill: gid
+    TZ:
+      label:
+        de: Zeitzone
+        en: Timezone
+      fill: timezone
+  paths:
+    /config:
+      label:
+        de: Datenbank, Einstellungen und Dateien
+        en: Database, settings and files
+  ports:
+    "80":
+      label: WebUI
+      webui: true
+  icon: https://raw.githubusercontent.com/grocy/grocy/master/public/img/icon.svg
+services:
+  grocy:
+    image: lscr.io/linuxserver/grocy:latest
+    restart: unless-stopped
+    labels:
+      titanos.webui: http://[host]:9283
+    ports:
+      - 9283:80
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    environment:
+      PUID: ""
+      PGID: ""
+      TZ: ""
+    volumes:
+      - ./config:/config

@@ -1,0 +1,74 @@
+x-titanos:
+  name: ESPHome
+  main: esphome
+  category: home
+  description:
+    de: ESPHome Device Builder zum Konfigurieren und Bauen von Firmware für ESP-Geräte.
+    en: ESPHome Device Builder for configuring and building firmware for ESP devices.
+  tips:
+    de: Mit dem festgelegten Benutzernamen und erzeugten Passwort anmelden. Konfiguration, Bauartefakte
+      und heruntergeladene Werkzeugketten liegen auf dem Daten-Volume. Die Vorlage verwendet
+      Bridge-Netzwerk; automatische mDNS-Suche kann eingeschränkt sein. Geräte gegebenenfalls über
+      feste IP bzw. use_address konfigurieren. Flashen über USB am NAS erfordert eine ausdrücklich
+      gewählte einzelne Gerätefreigabe im Editor. Alternativ die Firmware herunterladen und über
+      einen unterstützten Browser am eigenen PC flashen. Kein pauschaler Zugriff auf USB oder das
+      Host-Netz. Für Fernzugriff Tailscale oder einen separat eingerichteten HTTPS-Proxy verwenden.
+      Der erste Firmwarebau lädt zusätzliche Werkzeuge und benötigt freien Platz.
+    en: Sign in with the configured username and generated password. Configuration, build artifacts and
+      downloaded toolchains are stored on the data volume. The template uses bridge networking;
+      automatic mDNS discovery may be limited. Configure device IPs or use_address when needed.
+      Flashing through NAS USB requires explicitly passing through a single device in the editor.
+      Alternatively download firmware and flash from a supported browser on your computer. No broad
+      USB or host-network access. Use Tailscale or a separately configured HTTPS proxy for remote
+      access. The first firmware build downloads extra tools and needs free space.
+  variables:
+    ESPHOME_USERNAME:
+      label:
+        de: Benutzername der Weboberfläche
+        en: Web interface username
+      required: true
+    ESPHOME_PASSWORD:
+      label:
+        de: Passwort der Weboberfläche
+        en: Web interface password
+      secret: generate
+      required: true
+    TZ:
+      label:
+        de: Zeitzone
+        en: Timezone
+      fill: timezone
+  paths:
+    /config:
+      label:
+        de: Gerätekonfigurationen und Bauartefakte
+        en: Device configuration and build artifacts
+    /cache:
+      label:
+        de: Werkzeugketten und Build-Cache
+        en: Toolchains and build cache
+  ports:
+    "6052":
+      label: WebUI
+      webui: true
+  icon: https://raw.githubusercontent.com/home-assistant/brands/master/core_integrations/esphome/icon.png
+services:
+  esphome:
+    image: ghcr.io/esphome/esphome:2026.10.0
+    restart: unless-stopped
+    labels:
+      titanos.webui: http://[host]:6052
+    ports:
+      - 6052:6052
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    environment:
+      ESPHOME_USERNAME: ""
+      ESPHOME_PASSWORD: ""
+      TZ: ""
+    volumes:
+      - ./config:/config
+      - ./cache:/cache
