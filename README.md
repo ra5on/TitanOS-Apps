@@ -43,10 +43,12 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [GridCraft](gridcraft/compose.yaml) | Tabellen und Berechnungen bearbeiten |
 | [Hermes Agent](hermes-agent/compose.yaml) | KI-Agent mit Web-Dashboard |
 | [Immich](immich/compose.yaml) | Fotos und Videos verwalten und sichern |
+| [Jellyfin](jellyfin/compose.yaml) | Filme, Serien und Musik an Browser, Fernseher und Mobilgeräte streamen |
 | [LightCraft](lightcraft/compose.yaml) | Fotos entwickeln |
 | [Nextcloud + MariaDB](nextcloud/compose.yaml) | Private Cloud für Dateien und Zusammenarbeit |
 | [Node-RED](node-red/compose.yaml) | Abläufe und Geräte visuell automatisieren |
 | [Ollama](ollama/compose.yaml) | Lokale KI-Modelle über eine API ausführen |
+| [Paperless-ngx](paperless-ngx/compose.yaml) | Dokumente mit OCR archivieren und durchsuchen |
 | [PdfCraft](pdfcraft/compose.yaml) | PDFs bearbeiten |
 | [PhotoCraft](photocraft/compose.yaml) | Bilder bearbeiten |
 | [Pi-hole](pihole/compose.yaml) | DNS-Werbeblocker mit Dashboard |
@@ -100,6 +102,47 @@ erzeugten Passwort; er gehört ins Heimnetz, nicht ins Internet. Er braucht eine
 API-Schlüssel aus TitanOS (ab Version mit „Agenten und API-Schlüssel“ unter
 Einstellungen › Zugang) und eine laufende Ollama-App mit einem Modell, das
 Werkzeuge aufrufen kann.
+
+### Paperless-ngx: Dokumentenarchiv
+
+Die Vorlage verwendet Paperless-ngx `3.3.4`, PostgreSQL `18` und Valkey
+`9-alpine`. Nur der Web-Port `8000` wird veröffentlicht; Datenbank und Broker
+bleiben im Compose-Netz. Beim Installieren einen Administratornamen festlegen
+und das erzeugte Passwort aufbewahren. Weitere Konten und Dokumentrechte
+werden in Paperless verwaltet, unabhängig von TitanOS-Konten.
+
+OCR ist für Deutsch und Englisch (`deu+eng`) eingestellt. Der Eingang
+`/usr/src/paperless/consume` ist ausschließlich für neue Importe gedacht:
+Paperless entfernt erfolgreich importierte Originale daraus und legt sie
+im Archiv ab. Keine bestehende Dokumentensammlung als Eingang auswählen.
+Index/Anwendungsdaten, Dokumentarchiv, Datenbank, Broker, Eingang und Export
+liegen getrennt im Datenordner der App auf dem ausgewählten Volume. Für
+Sicherungen die Datenbank und Dokumentdaten konsistent gemeinsam sichern.
+Office-Konvertierung über Tika/Gotenberg ist nicht Teil dieses Stacks.
+
+Der direkte Webzugang verwendet HTTP. Für Fernzugriff Tailscale verwenden
+oder HTTPS an einem separat eingerichteten Reverse-Proxy einrichten. Bei
+Reverse-Proxy-Nutzung `PAPERLESS_URL` auf dessen vollständige externe Adresse
+setzen; das öffentliche URL-Feld von TitanOS richtet keinen Proxy ein und
+setzt diese Paperless-Einstellung nicht automatisch.
+
+### Jellyfin: Medienserver
+
+Die Vorlage verwendet das offizielle Image `jellyfin/jellyfin:12.3` und
+veröffentlicht Web-Port `8096`. Direkt nach der Installation den Assistenten
+öffnen und ein Administratorkonto mit Passwort anlegen. Weitere Personen
+und Bibliotheksrechte in Jellyfin verwalten. Die TitanOS-Anmeldung wird
+nicht automatisch übernommen.
+
+Im Installationsformular einen Medienordner wählen und in Jellyfin als
+`/media` zur Bibliothek hinzufügen. Medien sind standardmäßig nur lesend
+eingebunden. Einstellungen und Konten liegen unter `/config`; `/cache`
+enthält Cache und temporäre Transcoding-Dateien. Alle drei Pfade zeigen
+auf das Daten-Volume. Weitere Bibliotheksordner können im Editor ergänzt
+werden. Hardwarebeschleunigung bei Bedarf ausdrücklich für den Dienst
+freigeben und zusätzlich in Jellyfin konfigurieren; die Vorlage verlangt
+keine GPU und richtet kein DLNA/Host-Netzwerk ein. Fernzugriff über Tailscale
+oder einen separat eingerichteten HTTPS-Reverse-Proxy verwenden.
 
 ### Thunderbird: persönliche Mailclients
 
@@ -227,6 +270,16 @@ Neuerstellen des Containers. Echte Mailkonten, Versand/Empfang, OAuth,
 Kalendersynchronisation und mehrere gleichzeitige Instanzen sind damit nicht
 abgenommen. Die Katalogprüfung prüft zusätzlich das Frigate-`stable`-Manifest;
 Kameras und Hardwarebeschleunigung benötigen gesonderte Tests.
+
+Die [Paperless-/Jellyfin-Starttests](.github/workflows/catalog-apps.yml)
+verwenden ausschließlich neue temporäre Datenordner und synthetische Inhalte.
+Paperless wird mit Datenbank, Anmeldung, Import eines Rasterbilds samt OCR
+und erhaltener Dokumentdatenbank nach Container-Neuerstellung geprüft.
+Jellyfin wird mit Einrichtung, Anmeldung, nur lesender Medienbibliothek,
+direktem Abruf einer erzeugten Audiodatei und erhaltener Konfiguration
+geprüft. Beide Loginseiten werden in Chromium geladen. Reale Dokumentbestände,
+Mehrbenutzer-Berechtigungen, Fernseher/Mobilgeräte, Video-Transcoding,
+GPU-Beschleunigung, DLNA und Reverse-Proxy-Betrieb sind damit nicht abgenommen.
 
 ## Lizenzen und Herkunft
 
