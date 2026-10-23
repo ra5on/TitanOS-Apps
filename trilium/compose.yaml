@@ -11,8 +11,8 @@ x-titanos:
       Passwort setzen. Trilium ist eine Einzelbenutzer-Anwendung; für mehrere Personen getrennte
       Installationen mit eigenen Datenordnern und Ports verwenden. Die TitanOS-Anmeldung wird nicht
       übernommen. Notizen, Anhänge, Konfiguration und Trilium-Backups liegen im Datenordner auf dem
-      Volume; diesen regelmäßig zusätzlich sichern. Für Desktop-Synchronisation passende Trilium-
-      Versionen verwenden. Für Fernzugriff HTTPS am Reverse-Proxy separat einrichten.
+      Volume; diesen regelmäßig zusätzlich sichern. Für Desktop-Synchronisation passende
+      Trilium-Versionen verwenden. Für Fernzugriff HTTPS am Reverse-Proxy separat einrichten.
     en: >-
       On first opening, create or synchronize a knowledge base and set your own password.
       Trilium is a single-user application; use separate installations with separate data folders

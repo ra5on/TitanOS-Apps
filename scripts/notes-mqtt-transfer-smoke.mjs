@@ -87,10 +87,10 @@ try{
    await page.locator('input[name="password1"]').fill(password,{timeout:120000});
    await page.locator('input[name="password2"]').fill(password);
    await page.locator('form[action="set-password"] button').click();
-   await page.waitForURL('**/login');
+   await page.waitForURL(url=>url.searchParams.has('login')||url.pathname==='/login');
    await page.locator('input[type="password"]').fill(password);
    await page.locator('form button[type="submit"], form button.btn-primary').first().click();
-   await page.waitForURL(url=>!url.pathname.includes('login'));
+   await page.waitForURL(url=>!url.searchParams.has('login')&&!url.pathname.includes('login'));
    const wrong=await jsonPost('/etapi/auth/login',{password:'wrong'});assert.equal(wrong.status,401);
    assert.equal((await req('/etapi/notes/root')).status,401);
    const login=await jsonPost('/etapi/auth/login',{password,tokenName:'Isolated catalog test'});assert.equal(login.status,201);
@@ -106,7 +106,7 @@ try{
    await page.context().close();page=await browser.newPage({locale:'en-US'});
    await page.goto(base);await page.locator('input[type="password"]').fill(password);
    await page.locator('form button[type="submit"], form button.btn-primary').first().click();
-   await page.waitForURL(url=>!url.pathname.includes('login'));await page.screenshot({path:'trilium-catalog-smoke.png'});
+   await page.waitForURL(url=>!url.searchParams.has('login')&&!url.pathname.includes('login'));await page.screenshot({path:'trilium-catalog-smoke.png'});
    console.log('Trilium: browser setup/password/login, rejected anonymous/wrong credentials, actual note creation and persistence after recreation passed.');
   }else{
    const senderContext=await browser.newContext({locale:'en-US'}),receiverContext=await browser.newContext({locale:'en-US',acceptDownloads:true});
