@@ -7,9 +7,9 @@ hierfür nicht erforderlich. Bereits installierte Apps werden nicht verändert.
 | Eintrag | Image / Start | Zugriff |
 | --- | --- | --- |
 | Minecraft Java | `itzg/minecraft-server:2026.10.0-java25`, Vanilla und aktuelle stabile Spielversion | Java-Client, TCP 25565; RCON nur intern |
-| Minecraft Bedrock | `itzg/minecraft-bedrock-server:latest` | Bedrock-Client, UDP 19132; Xbox-Authentifizierung aktiv |
+| Minecraft Bedrock | `itzg/minecraft-bedrock-server:latest` | Bedrock-Client, TCP 19132 und UDP 19140–19155; Xbox-Authentifizierung aktiv |
 | Valheim | `ghcr.io/community-valheim-tools/valheim-server:latest` | Steam-Client, UDP 2456–2458, privates Serverpasswort |
-| Terraria / tModLoader | `jacobsmile/tmodloader1.4:latest` | passender tModLoader-Client, NAS-TCP 7778 → Container 7777 |
+| Terraria / tModLoader | `ghcr.io/crosis47/tmodloader:latest` | passender tModLoader-Client, NAS-TCP 7778 → Container 7777 |
 | Satisfactory | `robtme/satisfactory-server:latest` | Server-Manager im Spiel; TCP/UDP 7777 und TCP 8888 |
 | Palworld | `thijsvanloef/palworld-server-docker:v2.8.1` | Spielclient, UDP 8211; REST-API nur intern |
 | Firefox | `jlesage/firefox:v26.09.1` | HTTPS 5801 → Container 5800 mit eigener Anmeldung |
@@ -29,7 +29,11 @@ Minecraft verlangt in beiden Formularen eine ausdrückliche EULA-Eingabe `TRUE`.
 `ONLINE_MODE` bleibt an. Java 25 ist für die aktuelle Spielversion vorgesehen;
 ältere Modpacks können ein anderes Java-Image benötigen. Java und Bedrock sind
 getrennte Editionen. Konsolen können das Hinzufügen privater Bedrock-Server
-beschränken. Terraria startet über tModLoader; Vanilla-Clients sind dafür ungeeignet.
+beschränken. Bedrock nutzt NetherNet mit TCP-Signalisierung und einem festen
+UDP-Portbereich. `SERVER_UDP_PORTS` muss die vom Client erreichbare NAS-IP und
+die beiden Bereiche enthalten. Die 16 einzelnen UDP-Portabbildungen müssen
+mit dem angekündigten Bereich übereinstimmen. Die zusätzliche Namens-Allowlist
+ist aus; Xbox-Authentifizierung bleibt an. Terraria startet über tModLoader; Vanilla-Clients sind dafür ungeeignet.
 
 Valheim aktualisiert die Serverdateien beim Start und prüft täglich um 05:00 Uhr
 auf Updates, wenn niemand verbunden ist. Palworld und Satisfactory laden beim
@@ -69,8 +73,9 @@ Anruf-Infrastruktur sind nicht vorkonfiguriert. Keine gemeinsame Anmeldung mit T
 
 Bind-Mounts bleiben relativ zum App-Ordner auf dem ausgewählten Daten-Volume.
 Valheim legt auch die heruntergeladenen Serverdateien dort ab. tModLoader
-speichert Welten, Mods und Modkonfiguration in `/data`; das Serverprogramm kommt
-aus dem Docker-Image, dessen Layer ebenfalls im Docker-Datenverzeichnis liegen.
+speichert Welten, Mods und Modkonfiguration in `/data`; auch .NET und tModLoader werden beim ersten Start nach `/data` heruntergeladen.
+Der erste Start benötigt daher eine Internetverbindung. Das optionale Web-Dashboard
+und spätere automatische Spielupdates sind ausgeschaltet.
 Die schweren Daten gehören nie auf den USB-Stick oder ins RAM-Overlay.
 
 Matrix verwendet die projektspezifischen Docker-Volumes `matrix-data`
@@ -96,8 +101,8 @@ auf Wegwerf-Runnern. Keine echten Konten, NAS-Freigaben oder Produktivdaten.
 | Eintrag | Prüfung mit tatsächlichem Container |
 | --- | --- |
 | Minecraft Java | Serverlisten-Protokoll, internes RCON, erzeugte Welt, Wiederanlauf nach Neuerstellung |
-| Minecraft Bedrock | RakNet/Bedrock-Pong, erzeugte Welt, Wiederanlauf nach Neuerstellung |
-| Valheim | Steam-A2S-Abfrage, gespeicherte Welt, Wiederanlauf nach Neuerstellung |
+| Minecraft Bedrock | NetherNet-Signalisierung, erzeugte Welt, Wiederanlauf nach Neuerstellung |
+| Valheim | privater Serverstart und gebundener UDP-Port, gespeicherte Welt, Wiederanlauf nach Neuerstellung |
 | Terraria / tModLoader | gestarteter Server, TCP-Port, gespeicherte Welt, Wiederanlauf nach Neuerstellung |
 | Satisfactory | HTTPS-API, Erstbeanspruchung, Passwortanmeldung und erhaltene Serverkonfiguration |
 | Palworld | authentifizierte REST-API, falsches Passwort abgewiesen, Welt speichern und wieder laden |
@@ -110,6 +115,10 @@ Installationsparser aufgebaut: Pflichtfelder, erzeugte Geheimnisse und deren
 Wiederverwendung sowie Pfade und WebUI-Links. Geheimnisse bleiben in der privaten
 Umgebungsdatei und werden nicht in Compose eingebettet. Die Katalog-CI prüft die
 Compose-Syntax aller Einträge.
+
+Private Valheim-Server beantworten keine Steam-A2S-Abfragen; geprüft werden
+daher der tatsächliche Bereitschaftsstatus, der gebundene UDP-Port und die
+gespeicherte Welt.
 
 Grenzen: keine vollständigen Spielrunden oder echten Spielclients, keine Mods,
 keine externe Router-/Firewall-/Tailscale-Abnahme, keine SMTP-Zustellung, keine
@@ -125,7 +134,7 @@ nicht abgedeckt.
 - [Minecraft Java Image](https://github.com/itzg/docker-minecraft-server)
 - [Minecraft Bedrock Image](https://github.com/itzg/docker-minecraft-bedrock-server)
 - [Valheim Image](https://github.com/community-valheim-tools/valheim-server-docker)
-- [tModLoader Image](https://github.com/jacobsmile/tmodloader1.4)
+- [tModLoader Image](https://github.com/Crosis47/tmodloader)
 - [Satisfactory Image und API-Dokumentation](https://github.com/robtme/satisfactory-server)
 - [Palworld Image](https://github.com/thijsvanloef/palworld-server-docker)
 - [Firefox Image](https://github.com/jlesage/docker-firefox)

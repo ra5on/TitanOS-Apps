@@ -6,19 +6,26 @@ x-titanos:
     de: Eigener Minecraft-Bedrock-Server mit dauerhafter Welt und Xbox-Anmeldung.
     en: Your own Minecraft Bedrock server with a persistent world and Xbox authentication.
   tips:
-    de: Gameserver ohne Weboberfläche. Im passenden Spielclient mit NAS-Adresse und dem gewählten Spielport
-      verbinden. Welten und Einstellungen liegen auf dem Daten-Volume. Fernzugriff und Router-Freigaben
-      werden nicht automatisch eingerichtet. Vor Versionswechseln die Welten sichern; Spielclient und
-      Server müssen zusammenpassen. Vor Installation die Minecraft-EULA lesen und selbst mit TRUE
-      akzeptieren. Für die Bedrock Edition; Java-Clients können nicht direkt beitreten. ONLINE_MODE
-      bleibt aktiv. Konsolen können eigene Beschränkungen beim Hinzufügen externer Server haben.
-      VERSION=LATEST aktualisiert beim Start.
-    en: Game server without a web interface. Connect from the matching game client using the NAS address and
-      selected game port. Worlds and settings reside on the data volume. Remote access and router
-      forwarding are not configured automatically. Back up worlds before version changes; client and
-      server versions must match. Read and explicitly accept the Minecraft EULA by entering TRUE before
-      installation. For Bedrock Edition; Java clients cannot join directly. ONLINE_MODE remains enabled.
-      Consoles may restrict adding external servers. VERSION=LATEST updates on startup.
+    de: "Aktuelle Bedrock-Version mit NetherNet: TCP 19132 für Verbindungsaufbau und UDP 19140–19155 für
+      Spielverbindungen. SERVER_UDP_PORTS muss die vom Spielclient erreichbare NAS-IP mit beiden
+      Bereichen enthalten, etwa 192.168.1.10:19140-19155:19140-19155. UDP-Portgruppe und angekündigten
+      Bereich gemeinsam ändern; die voreingestellten einzelnen UDP-Ports müssen frei sein. Für
+      Internetzugriff die tatsächlich erreichbare öffentliche IP und passende Routerfreigaben separat
+      einrichten. Java-Clients sind nicht kompatibel. Minecraft-EULA lesen und ausdrücklich TRUE
+      eingeben. Xbox-Anmeldung bleibt erforderlich; die zusätzliche Namens-Allowlist ist zunächst aus.
+      Bei Bedarf ALLOW_LIST und ALLOW_LIST_USERS in Compose konfigurieren. Konsolen können externe Server
+      beschränken. Welten und Einstellungen liegen auf dem Daten-Volume. VERSION=LATEST aktualisiert beim
+      Start. Kein Browser-WebUI; der TCP-Endpunkt gehört zum Spielprotokoll."
+    en: "Current Bedrock version using NetherNet: TCP 19132 for signaling and UDP 19140–19155 for gameplay.
+      SERVER_UDP_PORTS must contain the NAS IP reachable by game clients with both ranges, for example
+      192.168.1.10:19140-19155:19140-19155. Change the UDP mappings and advertised range together; the
+      default individual UDP ports must be free. Internet access requires a reachable public IP and
+      matching router forwarding configured separately. Java clients are incompatible. Read and
+      explicitly accept the Minecraft EULA with TRUE. Xbox authentication remains required; the
+      additional name allowlist is initially disabled. Configure ALLOW_LIST and ALLOW_LIST_USERS in
+      Compose if needed. Consoles may restrict external servers. Worlds and settings reside on the data
+      volume. VERSION=LATEST updates on startup. No browser WebUI; the TCP endpoint belongs to the game
+      protocol."
   variables:
     EULA:
       label:
@@ -70,14 +77,68 @@ x-titanos:
         de: Zeitzone
         en: Timezone
       fill: timezone
+    SERVER_UDP_PORTS:
+      label:
+        de: Erreichbare NAS-IP und UDP-Portbereich
+        en: Reachable NAS IP and UDP port range
+      required: true
+      placeholder: 192.168.1.10:19140-19155:19140-19155
   paths:
     /data:
       label:
         de: Bedrock-Welt und Einstellungen
         en: Bedrock world and settings
   ports:
-    19132/udp:
-      label: Minecraft Bedrock (UDP)
+    "19132":
+      label: Bedrock NetherNet signaling (TCP)
+      webui: false
+    19140/udp:
+      label: Bedrock gameplay 1 (UDP)
+      webui: false
+    19141/udp:
+      label: Bedrock gameplay 2 (UDP)
+      webui: false
+    19142/udp:
+      label: Bedrock gameplay 3 (UDP)
+      webui: false
+    19143/udp:
+      label: Bedrock gameplay 4 (UDP)
+      webui: false
+    19144/udp:
+      label: Bedrock gameplay 5 (UDP)
+      webui: false
+    19145/udp:
+      label: Bedrock gameplay 6 (UDP)
+      webui: false
+    19146/udp:
+      label: Bedrock gameplay 7 (UDP)
+      webui: false
+    19147/udp:
+      label: Bedrock gameplay 8 (UDP)
+      webui: false
+    19148/udp:
+      label: Bedrock gameplay 9 (UDP)
+      webui: false
+    19149/udp:
+      label: Bedrock gameplay 10 (UDP)
+      webui: false
+    19150/udp:
+      label: Bedrock gameplay 11 (UDP)
+      webui: false
+    19151/udp:
+      label: Bedrock gameplay 12 (UDP)
+      webui: false
+    19152/udp:
+      label: Bedrock gameplay 13 (UDP)
+      webui: false
+    19153/udp:
+      label: Bedrock gameplay 14 (UDP)
+      webui: false
+    19154/udp:
+      label: Bedrock gameplay 15 (UDP)
+      webui: false
+    19155/udp:
+      label: Bedrock gameplay 16 (UDP)
       webui: false
   icon: https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/minecraft.svg
 services:
@@ -96,8 +157,27 @@ services:
       UID: "1000"
       GID: "1000"
       TZ: ""
+      TRANSPORT: nethernet
+      SERVER_UDP_PORTS: ""
+      ALLOW_LIST: "false"
     ports:
-      - 19132:19132/udp
+      - 19132:19132/tcp
+      - 19140:19140/udp
+      - 19141:19141/udp
+      - 19142:19142/udp
+      - 19143:19143/udp
+      - 19144:19144/udp
+      - 19145:19145/udp
+      - 19146:19146/udp
+      - 19147:19147/udp
+      - 19148:19148/udp
+      - 19149:19149/udp
+      - 19150:19150/udp
+      - 19151:19151/udp
+      - 19152:19152/udp
+      - 19153:19153/udp
+      - 19154:19154/udp
+      - 19155:19155/udp
     volumes:
       - ./data:/data
     stdin_open: true

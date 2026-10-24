@@ -32,7 +32,8 @@ for(const service of Object.values(config.services)){
 }
 for(const value of Object.values(config.volumes??{}))delete value.name;
 const env=config.services[main].environment??={};
-if(app.startsWith('minecraft-'))env.EULA='TRUE'; // Explicitly accepted only for this disposable test.
+if(app.startsWith('minecraft-'))env.EULA='TRUE';
+if(app==='minecraft-bedrock'){env.SERVER_UDP_PORTS='127.0.0.1:19140-19155:19140-19155';for(const p of config.services.bedrock.ports)if(p.protocol==='udp')p.published=String(p.target)} // Explicitly accepted only for this disposable test.
 if(app==='firefox')env.WEB_AUTHENTICATION_USERNAME=username;
 if(app==='matrix-element'){
  Object.assign(config.services.init.environment,{MATRIX_SERVER_NAME:'catalog.test',MATRIX_PUBLIC_URL:`https://127.0.0.1:${ports.get(8448)}`});
@@ -54,7 +55,8 @@ function portNumber(target,protocol='tcp'){return Number(endpoint(target,protoco
 function varint(n){const bytes=[];do{let b=n&127;n>>>=7;if(n)b|=128;bytes.push(b)}while(n);return Buffer.from(bytes)}
 function packet(body){return Buffer.concat([varint(body.length),body])}
 async function javaPing(){const host=Buffer.from('localhost'),port=Buffer.alloc(2);port.writeUInt16BE(25565);const handshake=packet(Buffer.concat([Buffer.from([0]),varint(767),varint(host.length),host,port,Buffer.from([1])]));const response=await tcp(portNumber(25565),Buffer.concat([handshake,Buffer.from([1,0])]));assert.ok(response.includes(Buffer.from('"players"')));assert.ok(response.includes(Buffer.from('"version"')));return true}
-async function bedrockPing(){const ping=Buffer.concat([Buffer.from([1]),Buffer.alloc(8),Buffer.from('00ffff00fefefefefdfdfdfd12345678','hex'),randomBytes(8)]);const pong=await udp(portNumber(19132,'udp'),ping);assert.equal(pong[0],0x1c);assert.ok(pong.includes(Buffer.from('MCPE;')));return true}
+async function bedrockPing(){const r=await request(baseFor(19132),'/v1/join');assert.equal(r.status,200);const info=await r.json();assert.ok(Object.keys(info).length>0);return true}
+
 function recreate(){compose('stop');compose('up','-d','--force-recreate')}
 let browser;
 try{
@@ -65,17 +67,19 @@ try{
   const world=await waitFor(()=>files(temp).find(p=>p.endsWith('/world/level.dat')),'Java world');const before=readFileSync(world);assert.ok(before.length>100);
   recreate();await waitFor(javaPing,'Minecraft Java after recreation');assert.ok(existsSync(world));assert.match(compose('exec','-T',main,'rcon-cli','list'),/players/i);
  }else if(app==='minecraft-bedrock'){
-  await waitFor(bedrockPing,'Bedrock RakNet ping');const world=await waitFor(()=>files(temp).find(p=>p.endsWith('/TitanOS/level.dat')),'Bedrock world');assert.ok(readFileSync(world).length>100);
+  await waitFor(bedrockPing,'Bedrock NetherNet signaling');const world=await waitFor(()=>files(temp).find(p=>p.endsWith('/TitanOS/level.dat')),'Bedrock world');assert.ok(readFileSync(world).length>100);
   recreate();await waitFor(bedrockPing,'Bedrock after recreation');assert.ok(existsSync(world));
  }else if(app==='terraria'){
-  await waitFor(()=>/Server started|Listening on port|listening on port/i.test(logs()),'tModLoader server startup');await tcp(portNumber(7777));
-  compose('exec','-T',main,'inject','save');const world=await waitFor(()=>files(temp).find(p=>p.endsWith('/TitanOS.wld')),'tModLoader world');assert.ok(readFileSync(world).length>100);
-  recreate();await waitFor(()=>/Server started|Listening on port|listening on port/i.test(logs()),'tModLoader after recreation');await tcp(portNumber(7777));assert.ok(existsSync(world));
+  await waitFor(()=>tcp(portNumber(7777)),'tModLoader TCP startup');
+  compose('exec','--user','tml:tml','-T',main,'inject','save');const world=await waitFor(()=>files(temp).find(p=>p.endsWith('/TitanOS.wld')),'tModLoader world');assert.ok(readFileSync(world).length>100);
+  recreate();await waitFor(()=>tcp(portNumber(7777)),'tModLoader after recreation');assert.ok(existsSync(world));
  }else if(app==='valheim'){
   await waitFor(()=>/Game server connected|Session.*registered|DungeonDB Start|WorldGenerator version/i.test(logs()),'Valheim world startup');
   const query=Buffer.concat([Buffer.from('ffffffff54','hex'),Buffer.from('Source Engine Query\0')]);
-  await waitFor(async()=>{let response=await udp(portNumber(2457,'udp'),query);if(response[4]===0x41)response=await udp(portNumber(2457,'udp'),Buffer.concat([query,response.subarray(5,9)]));assert.equal(response[4],0x49);return true},'Valheim Steam A2S info');
-  compose('stop');const world=await waitFor(()=>files(temp).find(p=>p.endsWith('.fwl')),'Valheim saved world');assert.ok(readFileSync(world).length>0);
+  // Private Valheim servers deliberately do not answer Steam A2S queries.
+  await waitFor(()=>/Game server connected|Session.*registered/i.test(logs()),'Valheim private server ready');
+  compose('exec','-T',main,'sh','-ec',"cat /proc/net/udp /proc/net/udp6 | grep -E ':099[89A] '");
+  compose('stop');const world=await waitFor(()=>files(temp).find(p=>/\.fwl2?$/.test(p)),'Valheim saved world');assert.ok(readFileSync(world).length>0);
   compose('up','-d','--force-recreate');await waitFor(()=>/Game server connected|Session.*registered/i.test(logs()),'Valheim after recreation');assert.ok(existsSync(world));
  }else if(app==='satisfactory'){
   const base=baseFor(7777,true),api=async(name,data={},token)=>{const r=await post(base,'/api/v1/',{function:name,data},token?{Authorization:`Bearer ${token}`}:{ });const b=await r.json();assert.ok(!b.error,JSON.stringify(b));assert.equal(r.status,200,JSON.stringify(b));return b.data};
@@ -89,9 +93,9 @@ try{
   const api=path=>JSON.parse(compose('exec','-T',main,'curl','--fail','--silent','--max-time','10','--user',`admin:${password}`,`http://127.0.0.1:8212/v1/api/${path}`));
   const info=await waitFor(()=>api('info'),'Palworld authenticated REST API');assert.ok(info.version||info.servername||info.serverName);
   const metrics=await waitFor(()=>api('metrics'),'Palworld metrics');assert.ok(metrics);const wrong=compose('exec','-T',main,'curl','--silent','--output','/dev/null','--write-out','%{http_code}','--user','admin:wrong','http://127.0.0.1:8212/v1/api/info');assert.equal(wrong,'401');
-  compose('exec','-T',main,'curl','--fail','--silent','--user',`admin:${password}`,'-X','POST','http://127.0.0.1:8212/v1/api/save');
-  const saveFile=await waitFor(()=>files(temp).find(p=>p.endsWith('Level.sav')),'Palworld world save');assert.ok(readFileSync(saveFile).length>100);
-  recreate();await waitFor(()=>api('info'),'Palworld after recreation');assert.equal(api('info').worldguid,info.worldguid);assert.ok(existsSync(saveFile));
+  await waitFor(()=>{compose('exec','-T',main,'curl','--fail','--silent','--show-error','--user',`admin:${password}`,'-H','Content-Type: application/json','--data','{}','http://127.0.0.1:8212/v1/api/save');return true},'Palworld save request',180000);
+  const saveFile=await waitFor(()=>files(temp).find(p=>p.endsWith('Level.sav')),'Palworld world save');assert.ok(readFileSync(saveFile).length>100);const worldguid=api('info').worldguid;assert.equal(typeof worldguid,'string');assert.ok(worldguid.length>0);
+  recreate();await waitFor(()=>api('info'),'Palworld after recreation');assert.equal(api('info').worldguid,worldguid);assert.ok(existsSync(saveFile));
  }else if(app==='firefox'){
   const {chromium}=await import(process.env.PLAYWRIGHT_PATH);browser=await chromium.launch({channel:'chrome'});
   async function checkLogin(){const context=await browser.newContext({ignoreHTTPSErrors:true});const page=await context.newPage();let frames=0;page.on('websocket',ws=>ws.on('framereceived',()=>frames++));
