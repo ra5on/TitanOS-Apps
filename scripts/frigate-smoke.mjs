@@ -7,6 +7,9 @@ import {request} from 'node:https';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 
+const mode=process.env.FRIGATE_CONFIG_MODE ?? 'fresh';
+assert.ok(['fresh','seeded'].includes(mode));
+let browser;
 const temp=mkdtempSync(join(tmpdir(),'frigate-catalog-'));
 const project=`frigate-smoke-${randomBytes(6).toString('hex')}`;
 const password=randomBytes(24).toString('hex');
@@ -17,13 +20,16 @@ const service=config.services.frigate;
 assert.deepEqual(service.cap_drop,['ALL']);
 assert.ok(!service.privileged&&!service.devices&&!service.network_mode&&!service.user);
 assert.ok(service.security_opt.includes('no-new-privileges:true'));
-service.ports=[{target:8971,published:'0',host_ip:'127.0.0.1',protocol:'tcp'}];
+// Publish every template port, on unique loopback ports on this disposable runner.
+assert.deepEqual(service.ports.map(p=>[p.target,p.protocol]).sort((a,b)=>a[0]-b[0]||a[1].localeCompare(b[1])),[[8554,'tcp'],[8555,'tcp'],[8555,'udp'],[8971,'tcp']].sort((a,b)=>a[0]-b[0]||a[1].localeCompare(b[1])));
+for(const port of service.ports){port.published='0';port.host_ip='127.0.0.1'}
+
 for(const mount of service.volumes){
  if(mount.type!=='bind')continue;
  assert.ok(['/config','/media/frigate'].includes(mount.target));
  mount.source=join(temp,mount.target.replaceAll('/','_'));
  mkdirSync(mount.source,{recursive:true});
- if(mount.target==='/config')writeFileSync(join(mount.source,'config.yml'),'mqtt:\n  enabled: false\ncameras: {}\ndetect:\n  enabled: false\n');
+ if(mount.target==='/config' && mode==='seeded')writeFileSync(join(mount.source,'config.yml'),'mqtt:\n  enabled: false\ncameras: {}\ndetect:\n  enabled: false\n');
 }
 writeFileSync(join(temp,'compose.json'),JSON.stringify({services:{frigate:service}}),{mode:0o600});
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
@@ -63,11 +69,41 @@ try{
  assert.match(broken.stderr,/chown:.*Operation not permitted/);
  console.log('Original cap_drop ALL reproduces the reported log-prepare failure.');
  compose('up','-d');await ready();checkLogs();
+ console.log(`Frigate ${mode} mode: HTTPS listener ready with every template port published.`);
+ const id=compose('ps','-q','frigate').trim();
+ const imageInfo=JSON.parse(docker('image','inspect',service.image))[0];
+ console.log('Tested image digest:',imageInfo.RepoDigests);
+ const inspection=JSON.parse(docker('inspect',id))[0];
+ for(const port of ['8971/tcp','8554/tcp','8555/tcp','8555/udp'])assert.ok(inspection.NetworkSettings.Ports[port]?.length,`${port} is published`);
+ assert.ok(!inspection.NetworkSettings.Ports['5000/tcp']?.length,'Unauthenticated API must remain private');
+ assert.ok(!inspection.NetworkSettings.Ports['1984/tcp']?.length,'go2rtc administration must remain private');
+ if(mode==='fresh')await waitFor(()=>/No config file found, saving default config|Created default config file/.test(compose('logs','--no-color','frigate')),'default configuration creation');
+
  for(const name of ['frigate','go2rtc','nginx','certsync']){
   assert.equal(compose('exec','-T','frigate','stat','-c','%U:%G %a',`/dev/shm/logs/${name}`).trim(),'nobody:nogroup 2755');
  }
  const initial=await waitFor(()=>compose('logs','--no-color','frigate').match(/Password:\s+([a-f0-9]{32})\s+\*\*\*/)?.[1],'generated initial administrator');
  const adminCookie=await login('admin',initial);
+ const {chromium}=await import(process.env.PLAYWRIGHT_PATH);
+ browser=await chromium.launch({channel:'chrome'});
+ const context=await browser.newContext({ignoreHTTPSErrors:true,locale:'en-US'});
+ const page=await context.newPage();
+ const failedAssets=[];
+ page.on('requestfailed',request=>{if(/\.(js|css)(\?|$)/.test(request.url()))failedAssets.push(request.url())});
+ page.on('response',response=>{if(response.status()>=400 && /\.(js|css)(\?|$)/.test(response.url()))failedAssets.push(`${response.status()} ${response.url()}`)});
+ await page.goto(base,{waitUntil:'domcontentloaded',timeout:60000});
+ await page.locator('input[name="user"], input[name="username"], input#user, input#username').first().fill('admin',{timeout:60000});
+ await page.locator('input[type="password"]').fill(initial);
+ await page.locator('form button').last().click();
+ await page.waitForURL(url=>!url.pathname.includes('login'),{timeout:60000});
+ await waitFor(async()=>{const response=await context.request.get(base+'/api/stats');return response.status()===200},'browser authenticated API');
+ await page.waitForLoadState('networkidle',{timeout:30000}).catch(()=>{});
+ await waitFor(async()=>!(await page.locator('input[type="password"]').count()) && (await page.locator('body').innerText()).trim().length>10,'nonempty rendered dashboard');
+ assert.deepEqual(failedAssets,[],'Browser JavaScript/CSS must load');
+ await page.screenshot({path:`frigate-${mode}-smoke.png`});
+ await context.close();
+ console.log(`Frigate ${mode}: real Chromium login, JavaScript/CSS loading and authenticated dashboard passed.`);
+
  assert.equal((await req('/api/stats')).status,401,'Stats must require authentication');
  assert.equal((await req('/api/login','POST',{user:'admin',password:'incorrect-test-password'})).status,401);
  assert.equal((await req('/api/stats','GET',undefined,adminCookie)).status,200);
@@ -77,8 +113,8 @@ try{
  assert.equal((await req('/api/stats','GET',undefined,cookie)).status,200);
  assert.match((await req('/api/users','GET',undefined,cookie)).body,/catalogtest/);
  compose('stop','-t','30');checkLogs();
- const id=compose('ps','-a','-q','frigate').trim();
- const state=JSON.parse(docker('inspect',id))[0];
+ const stoppedId=compose('ps','-a','-q','frigate').trim();
+ const state=JSON.parse(docker('inspect',stoppedId))[0];
  assert.equal(state.HostConfig.Privileged,false);
  assert.ok([0,143].includes(state.State.ExitCode),'Normal exit or SIGTERM; no forced SIGKILL');
  assert.equal(state.State.OOMKilled,false);
@@ -86,9 +122,14 @@ try{
  for(const name of ['nginx','frigate','go2rtc','log-prepare'])assert.ok(shutdownLogs.includes(`service ${name} successfully stopped`),`${name} orderly service shutdown`);
  console.log('Corrected template: log ownership, HTTPS, authentication, account persistence and clean shutdown passed. Cameras/recording/GPU not tested.');
 }catch(error){
+ if(browser)for(const context of browser.contexts())for(const page of context.pages()){
+  console.error('Browser:',page.url(),(await page.locator('body').innerText().catch(()=>'' )).slice(0,1400));
+  await page.screenshot({path:`frigate-${mode}-smoke.png`}).catch(()=>{});
+ }
  try{console.error(compose('logs','--no-color','frigate').split('\n').filter((_,i,lines)=>i<100||i>lines.length-60).join('\n').replace(/Password:[^\n]*/g,'Password: [test secret]').replaceAll(password,'[test secret]'))}catch{}
  throw error;
 }finally{
+ await browser?.close();
  try{compose('down','--volumes')}finally{
   try{rmSync(temp,{recursive:true,force:true})}catch(error){if(!process.env.GITHUB_ACTIONS)throw error;execFileSync('sudo',['rm','-rf','--',temp])}
  }
