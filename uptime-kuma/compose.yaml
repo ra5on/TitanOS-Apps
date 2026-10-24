@@ -17,7 +17,7 @@ services:
   uptime-kuma:
     labels:
       titanos.webui: "http://[host]:3001"
-    image: louislam/uptime-kuma:latest
+    image: louislam/uptime-kuma:${UPTIME_KUMA_UPTIME_KUMA_IMAGE_TAG:-latest}
     restart: unless-stopped
     environment:
       TZ: ""

@@ -30,7 +30,7 @@ x-titanos:
       webui: true
 services:
   lightcraft:
-    image: ghcr.io/ra5on/titanos-lightcraft:latest
+    image: ghcr.io/ra5on/titanos-lightcraft:${LIGHTCRAFT_LIGHTCRAFT_IMAGE_TAG:-latest}
     restart: unless-stopped
     labels:
       titanos.webui: "http://[host]:8094"

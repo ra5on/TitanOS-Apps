@@ -30,7 +30,7 @@ x-titanos:
       webui: true
 services:
   filmcraft:
-    image: ghcr.io/ra5on/titanos-filmcraft:latest
+    image: ghcr.io/ra5on/titanos-filmcraft:${FILMCRAFT_FILMCRAFT_IMAGE_TAG:-latest}
     restart: unless-stopped
     labels:
       titanos.webui: "http://[host]:8092"

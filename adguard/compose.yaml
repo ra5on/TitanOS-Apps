@@ -103,7 +103,7 @@ services:
   adguard:
     labels:
       titanos.webui: "http://[host]:3000"
-    image: adguard/adguardhome:latest
+    image: adguard/adguardhome:${ADGUARD_ADGUARD_IMAGE_TAG:-latest}
     restart: unless-stopped
 
     # ==========================================

@@ -161,7 +161,7 @@ services:
   hermes:
     labels:
       titanos.webui: "http://[host]:9119"
-    image: nousresearch/hermes-agent:latest
+    image: nousresearch/hermes-agent:${HERMES_AGENT_HERMES_IMAGE_TAG:-latest}
     restart: unless-stopped
 
     # ==========================================

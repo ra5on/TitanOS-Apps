@@ -31,20 +31,37 @@ Server und ML (`release`) sowie PostgreSQL/VectorChord (`pg18-latest`). Das sind
 laufend aktualisierte Kanäle ihrer jeweiligen Herausgeber; nicht vorhandene
 `latest`-Tags werden nicht eingetragen.
 
-Die Version jedes Containers lässt sich ohne TitanOS-Update über dessen
-vorhandenes **Image**-Feld unter **Docker › App bearbeiten** ändern, zum Beispiel
-`jellyfin/jellyfin:latest` zu `jellyfin/jellyfin:12.3`. Bei der Installation den
-`image:`-Eintrag in der Compose-Ansicht anpassen. Zusammengehörige Dienste wie
-Nextcloud und Nextcloud-Cron oder Synapse und seine Einrichtungsdienste auf
-kompatiblen Versionen halten. Die Auswahl gilt nur für den bearbeiteten Dienst.
+Jeder Container besitzt eine eigene Compose-Variable für seinen Image-Tag,
+zum Beispiel in Immich:
 
+```yaml
+image: ghcr.io/immich-app/immich-server:${IMMICH_IMMICH_SERVER_IMAGE_TAG:-release}
+```
+
+Jeder App-Ordner enthält eine `.env.example` mit sämtlichen Tag-Variablen und
+Vorgaben; die [vollständige Tabelle](docs/IMAGE-TAGS.md) listet alle 66 Dienste. In der Compose-Umgebung kann zum Beispiel
+`IMMICH_IMMICH_SERVER_IMAGE_TAG=v3.3.5` gesetzt werden. Compose übernimmt diesen
+Wert beim Auflösen des Images; bleibt die Variable ungesetzt, greift der Wert
+hinter `:-`. Jeder Dienst kann unabhängig gewählt werden. Zusammengehörige
+Dienste wie Immich Server/ML, Nextcloud/Cron oder Synapse/Einrichtungsdienste
+müssen dabei auf kompatiblen Versionen bleiben.
+
+Ohne zusätzliche `.env`-Einträge lässt sich beim Installieren in der Compose-
+Ansicht oder später im vorhandenen **Image**-Feld unter **Docker › App bearbeiten**
+die Vorgabe hinter `:-` ändern oder ein vollständiges versioniertes Image setzen.
+Das benötigt keine Änderung an TitanOS. Eine `.env.example` dient als Vorlage,
+sie wird vom App-Store nicht automatisch installiert. Bei installierten Apps
+Tag-Variablen in der vorhandenen Compose-`.env` ergänzen und erzeugte Passwörter
+beibehalten; die Datei nicht durch die Beispieldatei ersetzen.
+
+Einträge unter Container-`environment` sind von der Compose-Umgebung getrennt.
 Die früheren Felder `NODE_RED_IMAGE_TAG`, `BAMBU_STUDIO_VERSION`,
-`NEXTCLOUD_VERSION` und `MARIADB_VERSION` wurden entfernt: Der vorhandene
-TitanOS-Installer speicherte diese als Container-Umgebung und verwendete sie
-nicht zur Auswahl des Images. Ein frei gewählter Wert hatte deshalb keine
-Wirkung. Echte Anwendungseinstellungen wie die Minecraft-Spielversion oder
-`DSH_VERSION` für das beim Start installierte npm-Paket bleiben erhalten;
-DeepSeek Harness verwendet dafür standardmäßig `latest`.
+`NEXTCLOUD_VERSION` und `MARIADB_VERSION` wurden deshalb als Container-Felder
+entfernt: Der bisherige Installer übergab sie nicht zur Image-Interpolation.
+Die neuen Tag-Variablen werden mit echtem Docker Compose auf Standardwerte und
+unterschiedliche Versionen pro Container geprüft. Echte Anwendungseinstellungen
+wie die Minecraft-Spielversion oder `DSH_VERSION` für das beim Start installierte
+npm-Paket bleiben erhalten; DeepSeek Harness verwendet dafür standardmäßig `latest`.
 
 `latest` kann auch eine neue Hauptversion bringen. Aktuelle PostgreSQL-Images
 verwenden PostgreSQL 18 und den Datenpfad `/var/lib/postgresql`; neue Vorlagen

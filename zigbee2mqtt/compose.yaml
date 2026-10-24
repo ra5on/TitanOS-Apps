@@ -48,7 +48,7 @@ x-titanos:
   icon: https://raw.githubusercontent.com/Koenkk/zigbee2mqtt/master/images/logo.png
 services:
   broker:
-    image: eclipse-mosquitto:latest
+    image: eclipse-mosquitto:${ZIGBEE2MQTT_BROKER_IMAGE_TAG:-latest}
     restart: unless-stopped
     configs:
       - source: mqtt
@@ -61,7 +61,7 @@ services:
         max-size: 10m
         max-file: "3"
   zigbee2mqtt:
-    image: ghcr.io/koenkk/zigbee2mqtt:latest
+    image: ghcr.io/koenkk/zigbee2mqtt:${ZIGBEE2MQTT_ZIGBEE2MQTT_IMAGE_TAG:-latest}
     restart: unless-stopped
     labels:
       titanos.webui: http://[host]:8082

@@ -33,7 +33,7 @@ x-titanos:
       webui: true
 services:
   solidcraft:
-    image: ghcr.io/ra5on/titanos-solidcraft:latest
+    image: ghcr.io/ra5on/titanos-solidcraft:${SOLIDCRAFT_SOLIDCRAFT_IMAGE_TAG:-latest}
     restart: unless-stopped
     labels:
       titanos.webui: "http://[host]:8103"

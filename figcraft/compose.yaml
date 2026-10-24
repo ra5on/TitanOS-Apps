@@ -30,7 +30,7 @@ x-titanos:
       webui: true
 services:
   figcraft:
-    image: ghcr.io/ra5on/titanos-figcraft:latest
+    image: ghcr.io/ra5on/titanos-figcraft:${FIGCRAFT_FIGCRAFT_IMAGE_TAG:-latest}
     restart: unless-stopped
     labels:
       titanos.webui: "http://[host]:8097"

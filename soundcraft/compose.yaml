@@ -30,7 +30,7 @@ x-titanos:
       webui: true
 services:
   soundcraft:
-    image: ghcr.io/ra5on/titanos-soundcraft:latest
+    image: ghcr.io/ra5on/titanos-soundcraft:${SOUNDCRAFT_SOUNDCRAFT_IMAGE_TAG:-latest}
     restart: unless-stopped
     labels:
       titanos.webui: "http://[host]:8102"
