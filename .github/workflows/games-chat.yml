@@ -2,9 +2,13 @@ name: Games browser and chat smoke
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     paths: ['minecraft-java/**', 'minecraft-bedrock/**', 'valheim/**', 'terraria/**', 'satisfactory/**', 'palworld/**', 'firefox/**', 'matrix-element/**', 'mattermost/**', 'scripts/games-chat-smoke.mjs', '.github/workflows/games-chat.yml']
   pull_request:
     paths: ['minecraft-java/**', 'minecraft-bedrock/**', 'valheim/**', 'terraria/**', 'satisfactory/**', 'palworld/**', 'firefox/**', 'matrix-element/**', 'mattermost/**', 'scripts/games-chat-smoke.mjs', '.github/workflows/games-chat.yml']
+concurrency:
+  group: games-chat-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:

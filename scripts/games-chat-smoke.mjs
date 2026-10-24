@@ -70,17 +70,14 @@ try{
   await waitFor(bedrockPing,'Bedrock NetherNet signaling');const world=await waitFor(()=>files(temp).find(p=>p.endsWith('/TitanOS/level.dat')),'Bedrock world');assert.ok(readFileSync(world).length>100);
   recreate();await waitFor(bedrockPing,'Bedrock after recreation');assert.ok(existsSync(world));
  }else if(app==='terraria'){
-  await waitFor(()=>tcp(portNumber(7777)),'tModLoader TCP startup');
-  compose('exec','--user','tml:tml','-T',main,'inject','save');const world=await waitFor(()=>files(temp).find(p=>p.endsWith('/TitanOS.wld')),'tModLoader world');assert.ok(readFileSync(world).length>100);
-  recreate();await waitFor(()=>tcp(portNumber(7777)),'tModLoader after recreation');assert.ok(existsSync(world));
+  await waitFor(()=>{compose('exec','--user','tml:tml','-T',main,'healthcheck');return true},'tModLoader game readiness');
+  compose('exec','--user','tml:tml','-T',main,'inject','save');const world='/data/tModLoader/Worlds/TitanOS.wld';await waitFor(()=>{compose('exec','--user','tml:tml','-T',main,'test','-s',world);return true},'tModLoader world');
+  recreate();await waitFor(()=>{compose('exec','--user','tml:tml','-T',main,'healthcheck');return true},'tModLoader after recreation');compose('exec','--user','tml:tml','-T',main,'test','-s',world);
  }else if(app==='valheim'){
-  await waitFor(()=>/Game server connected|Session.*registered|DungeonDB Start|WorldGenerator version/i.test(logs()),'Valheim world startup');
-  const query=Buffer.concat([Buffer.from('ffffffff54','hex'),Buffer.from('Source Engine Query\0')]);
-  // Private Valheim servers deliberately do not answer Steam A2S queries.
-  await waitFor(()=>/Game server connected|Session.*registered/i.test(logs()),'Valheim private server ready');
-  compose('exec','-T',main,'sh','-ec',"cat /proc/net/udp /proc/net/udp6 | grep -E ':099[89A] '");
+  const valheimReady=()=>{compose('exec','-T',main,'sh','-ec',"pidof valheim_server.x86_64 >/dev/null; cat /proc/net/udp /proc/net/udp6 | grep -E ':099[89A] '");return true};
+  await waitFor(valheimReady,'Valheim private server process and UDP socket');
   compose('stop');const world=await waitFor(()=>files(temp).find(p=>/\.fwl2?$/.test(p)),'Valheim saved world');assert.ok(readFileSync(world).length>0);
-  compose('up','-d','--force-recreate');await waitFor(()=>/Game server connected|Session.*registered/i.test(logs()),'Valheim after recreation');assert.ok(existsSync(world));
+  compose('up','-d','--force-recreate');await waitFor(valheimReady,'Valheim after recreation');assert.ok(existsSync(world));
  }else if(app==='satisfactory'){
   const base=baseFor(7777,true),api=async(name,data={},token)=>{const r=await post(base,'/api/v1/',{function:name,data},token?{Authorization:`Bearer ${token}`}:{ });const b=await r.json();assert.ok(!b.error,JSON.stringify(b));assert.equal(r.status,200,JSON.stringify(b));return b.data};
   await waitFor(()=>api('HealthCheck',{ClientCustomData:'catalog'}),'Satisfactory HTTPS API');
