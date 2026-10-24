@@ -176,7 +176,7 @@ services:
   node-red:
     labels:
       titanos.webui: "http://[host]:1880"
-    image: "nodered/node-red:latest"
+    image: "nodered/node-red:${NODE_RED_NODE_RED_IMAGE_TAG:-latest}"
     restart: unless-stopped
 
     # ==========================================

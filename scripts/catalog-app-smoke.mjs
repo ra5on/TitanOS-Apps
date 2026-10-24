@@ -50,7 +50,9 @@ if (app === 'paperless-ngx') {
   wav.writeUInt32LE(16000, 24); wav.writeUInt32LE(32000, 28); wav.writeUInt16LE(2, 32);
   wav.writeUInt16LE(16, 34); wav.write('data', 36); wav.writeUInt32LE(samples * 2, 40);
   for (let i = 0; i < samples; i++) wav.writeInt16LE(Math.round(4000 * Math.sin(i * Math.PI * 880 / 16000)), 44 + i * 2);
-  writeFileSync(join(locations.get('jellyfin:/media'), 'TitanOS Test.wav'), wav);
+  const album = join(locations.get('jellyfin:/media'), 'TitanOS Artist', 'TitanOS Album');
+  mkdirSync(album, { recursive: true });
+  writeFileSync(join(album, '01 - TitanOS Test.wav'), wav);
 }
 writeFileSync(join(temp, 'compose.json'), JSON.stringify({ services: config.services }), { mode: 0o600 });
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -131,10 +133,14 @@ try {
     })).status, 401);
     const headers = await jellyfinLogin();
     console.log('Jellyfin: setup and login passed; scanning synthetic media');
-    assert.equal((await request('/Library/VirtualFolders?name=CatalogMusic&collectionType=music&refreshLibrary=true', {
+    assert.equal((await request('/Library/VirtualFolders?name=CatalogMusic&collectionType=music&paths=%2Fmedia&refreshLibrary=true', {
       method: 'POST', headers, body: { LibraryOptions: { PathInfos: [{ Path: '/media' }], EnableRealtimeMonitor: false,
         TypeOptions: ['MusicAlbum', 'MusicArtist', 'Audio'].map(Type => ({ Type, MetadataFetchers: [], ImageFetchers: [] })) } }
     })).status, 204);
+    const folders = await request('/Library/VirtualFolders', { headers });
+    assert.equal(folders.status, 200);
+    assert.ok((await folders.json()).some(folder => folder.Name === 'CatalogMusic' && folder.Locations?.includes('/media')), 'The actual media path is registered');
+    assert.equal((await request('/Library/Refresh', { method: 'POST', headers })).status, 204);
     const audio = await waitFor(async () => {
       const response = await request('/Items?Recursive=true&IncludeItemTypes=Audio', { headers });
       if (!response.ok) return false;

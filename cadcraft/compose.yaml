@@ -30,7 +30,7 @@ x-titanos:
       webui: true
 services:
   cadcraft:
-    image: ghcr.io/ra5on/titanos-cadcraft:latest
+    image: ghcr.io/ra5on/titanos-cadcraft:${CADCRAFT_CADCRAFT_IMAGE_TAG:-latest}
     restart: unless-stopped
     labels:
       titanos.webui: "http://[host]:8101"

@@ -170,7 +170,7 @@ x-titanos:
 services:
 
   bambustudio:
-    image: "lscr.io/linuxserver/bambustudio:latest"
+    image: "lscr.io/linuxserver/bambustudio:${BAMBU_LAB_BAMBUSTUDIO_IMAGE_TAG:-latest}"
     restart: unless-stopped
 
     # ==========================================

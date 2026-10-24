@@ -53,7 +53,7 @@ x-titanos:
   icon: https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/mattermost.svg
 services:
   mattermost:
-    image: mattermost/mattermost-team-edition:latest
+    image: mattermost/mattermost-team-edition:${MATTERMOST_MATTERMOST_IMAGE_TAG:-latest}
     restart: unless-stopped
     labels:
       titanos.webui: http://[host]:8065
@@ -87,7 +87,7 @@ services:
         max-size: 10m
         max-file: "3"
   db:
-    image: postgres:latest
+    image: postgres:${MATTERMOST_DB_IMAGE_TAG:-latest}
     restart: unless-stopped
     environment:
       POSTGRES_USER: mattermost
@@ -105,7 +105,7 @@ services:
     stop_grace_period: 60s
     logging: *a1
   init:
-    image: python:latest
+    image: python:${MATTERMOST_INIT_IMAGE_TAG:-latest}
     user: 0:0
     restart: no
     entrypoint:

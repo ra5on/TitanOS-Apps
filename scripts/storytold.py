@@ -128,6 +128,8 @@ def prepare(app, record, destination):
 
 def catalog(app,record):
  title,category,de,en=APPS[app];folder=ROOT/app;folder.mkdir(exist_ok=True)
+ variable=f'{app.upper()}_{app.upper()}_IMAGE_TAG'
+ image=f'ghcr.io/ra5on/titanos-{app}:${{{variable}:-latest}}'
  port=8090+list(APPS).index(app)
  icon_path=ICONS.get(app, f'assets/app-icon/hicolor/128x128/apps/ai.storyteller.{app}.png')
  icon=f'https://raw.githubusercontent.com/{owner(app)}/{app}/{record["tag"]}/{icon_path}'
@@ -164,7 +166,7 @@ x-titanos:
       webui: true
 services:
   {app}:
-    image: ghcr.io/ra5on/titanos-{app}:latest
+    image: {image}
     restart: unless-stopped
     labels:
       titanos.webui: "http://[host]:{port}"
@@ -180,6 +182,7 @@ services:
       options: {{max-size: "10m", max-file: "3"}}
 '''
  (folder/'compose.yaml').write_text(compose)
+ (folder/'.env.example').write_text('# Optional Compose image tags. The defaults also work without this file.\n# Copy or merge into the Compose project .env; container environment is separate.\n'+variable+'=latest\n')
  (folder/'release.json').write_text(json.dumps(record,indent=2)+'\n')
 
 if __name__=='__main__':

@@ -130,7 +130,7 @@ services:
   pihole:
     labels:
       titanos.webui: "http://[host]:8081/admin/"
-    image: pihole/pihole:latest
+    image: pihole/pihole:${PIHOLE_PIHOLE_IMAGE_TAG:-latest}
     restart: unless-stopped
 
     # ==========================================

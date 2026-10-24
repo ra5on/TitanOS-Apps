@@ -54,7 +54,7 @@ x-titanos:
   icon: https://raw.githubusercontent.com/home-assistant/brands/master/core_integrations/esphome/icon.png
 services:
   esphome:
-    image: ghcr.io/esphome/esphome:latest
+    image: ghcr.io/esphome/esphome:${ESPHOME_ESPHOME_IMAGE_TAG:-latest}
     restart: unless-stopped
     labels:
       titanos.webui: http://[host]:6052

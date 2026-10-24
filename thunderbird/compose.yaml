@@ -67,7 +67,7 @@ x-titanos:
 
 services:
   thunderbird:
-    image: jlesage/thunderbird:latest
+    image: jlesage/thunderbird:${THUNDERBIRD_THUNDERBIRD_IMAGE_TAG:-latest}
     restart: unless-stopped
     labels:
       titanos.webui: "https://[host]:5800"

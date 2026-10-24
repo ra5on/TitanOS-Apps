@@ -155,7 +155,7 @@ x-titanos:
 services:
 
   cloudflared:
-    image: cloudflare/cloudflared:latest
+    image: cloudflare/cloudflared:${CLOUDFLARE_TUNNEL_CLOUDFLARED_IMAGE_TAG:-latest}
     restart: unless-stopped
 
     # ==========================================
