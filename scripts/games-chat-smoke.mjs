@@ -78,12 +78,13 @@ try{
   compose('stop');const world=await waitFor(()=>files(temp).find(p=>p.endsWith('.fwl')),'Valheim saved world');assert.ok(readFileSync(world).length>0);
   compose('up','-d','--force-recreate');await waitFor(()=>/Game server connected|Session.*registered/i.test(logs()),'Valheim after recreation');assert.ok(existsSync(world));
  }else if(app==='satisfactory'){
-  const base=baseFor(7777,true),api=async(name,data={},token)=>{const r=await post(base,'/api/v1/',{function:name,data},token?{Authorization:`Bearer ${token}`}:{ });const b=await r.json();assert.ok(!b.error,JSON.stringify(b));assert.equal(r.status,200);return b.data};
+  const base=baseFor(7777,true),api=async(name,data={},token)=>{const r=await post(base,'/api/v1/',{function:name,data},token?{Authorization:`Bearer ${token}`}:{ });const b=await r.json();assert.ok(!b.error,JSON.stringify(b));assert.equal(r.status,200,JSON.stringify(b));return b.data};
   await waitFor(()=>api('HealthCheck',{ClientCustomData:'catalog'}),'Satisfactory HTTPS API');
-  await api('ClaimServer',{ServerName:'TitanOS isolated test',AdminPassword:password});
-  let login=await api('PasswordLogin',{MinimumPrivilegeLevel:'Administrator',Password:password});assert.ok(login.AuthenticationToken);
-  await api('QueryServerState',{},login.AuthenticationToken);
-  recreate();await waitFor(()=>api('HealthCheck',{ClientCustomData:'catalog'}),'Satisfactory after recreation');login=await api('PasswordLogin',{MinimumPrivilegeLevel:'Administrator',Password:password});assert.ok(login.AuthenticationToken);await api('QueryServerState',{},login.AuthenticationToken);
+  const initial=await api('PasswordlessLogin',{MinimumPrivilegeLevel:'Administrator'});assert.ok((initial.authenticationToken??initial.AuthenticationToken));
+  await api('ClaimServer',{ServerName:'TitanOS isolated test',AdminPassword:password},(initial.authenticationToken??initial.AuthenticationToken));
+  let login=await api('PasswordLogin',{MinimumPrivilegeLevel:'Administrator',Password:password});assert.ok((login.authenticationToken??login.AuthenticationToken));
+  await api('QueryServerState',{},(login.authenticationToken??login.AuthenticationToken));
+  recreate();await waitFor(()=>api('HealthCheck',{ClientCustomData:'catalog'}),'Satisfactory after recreation');login=await api('PasswordLogin',{MinimumPrivilegeLevel:'Administrator',Password:password});assert.ok((login.authenticationToken??login.AuthenticationToken));await api('QueryServerState',{},(login.authenticationToken??login.AuthenticationToken));
  }else if(app==='palworld'){
   const api=path=>JSON.parse(compose('exec','-T',main,'curl','--fail','--silent','--max-time','10','--user',`admin:${password}`,`http://127.0.0.1:8212/v1/api/${path}`));
   const info=await waitFor(()=>api('info'),'Palworld authenticated REST API');assert.ok(info.version||info.servername||info.serverName);
@@ -108,7 +109,7 @@ try{
   const roomResponse=await post(base,'/_matrix/client/v3/createRoom',{name:'Catalog persistence',preset:'private_chat'},headers);assert.equal(roomResponse.status,200);const room=(await roomResponse.json()).room_id;
   let response=await request(base,`/_matrix/client/v3/rooms/${encodeURIComponent(room)}/send/m.room.message/test`,{method:'PUT',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({msgtype:'m.text',body:'Synthetic persistent Matrix message'})});assert.equal(response.status,200);
   const client=await (await request(base,'/config.json')).json();assert.equal(client.default_server_config['m.homeserver'].base_url,base);
-  const {chromium}=await import(process.env.PLAYWRIGHT_PATH);browser=await chromium.launch({channel:'chrome'});const context=await browser.newContext({ignoreHTTPSErrors:true});const page=await context.newPage();await page.goto(base);await page.getByRole('button',{name:/sign in/i}).first().click();await page.locator('input[type="text"]').first().fill(username);await page.locator('input[type="password"]').fill(password);await page.getByRole('button',{name:/sign in/i}).last().click();await page.getByText(/catalog persistence/i).first().waitFor({timeout:90000});await page.screenshot({path:'matrix-element-catalog-smoke.png'});await context.close();
+  const {chromium}=await import(process.env.PLAYWRIGHT_PATH);browser=await chromium.launch({channel:'chrome'});const context=await browser.newContext({ignoreHTTPSErrors:true});const page=await context.newPage();await page.goto(base);await page.getByRole('link',{name:/sign in/i}).first().click();await page.locator('input[type="text"]').first().fill(username);await page.locator('input[type="password"]').fill(password);await page.getByRole('button',{name:/sign in/i}).last().click();await page.getByText(/catalog persistence/i).first().waitFor({timeout:90000});await page.screenshot({path:'matrix-element-catalog-smoke.png'});await context.close();
   recreate();await waitFor(async()=>(await request(base,'/_matrix/client/versions')).ok,'Matrix after recreation');assert.equal((await login(password)).status,200);response=await request(base,`/_matrix/client/v3/rooms/${encodeURIComponent(room)}/messages?dir=b`,{headers});assert.equal(response.status,200);assert.ok((await response.json()).chunk.some(e=>e.content?.body==='Synthetic persistent Matrix message'));
  }else if(app==='mattermost'){
   const base=baseFor(8065);await waitFor(async()=>(await request(base,'/api/v4/system/ping')).ok,'Mattermost API');

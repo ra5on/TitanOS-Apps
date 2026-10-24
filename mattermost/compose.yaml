@@ -36,8 +36,6 @@ x-titanos:
       required: true
     POSTGRES_PASSWORD:
       from: MATTERMOST_DATABASE_PASSWORD
-    MM_DATABASE_PASSWORD:
-      from: MATTERMOST_DATABASE_PASSWORD
     TZ:
       label:
         de: Zeitzone
@@ -64,16 +62,7 @@ services:
         condition: service_healthy
       init:
         condition: service_completed_successfully
-    entrypoint:
-      - /bin/sh
-      - -ec
-    command:
-      - |-
-        encoded=$$(printf %s "$$MM_DATABASE_PASSWORD" | od -An -v -tx1 | tr -d '[:space:]' | sed 's/../%&/g')
-        export MM_SQLSETTINGS_DATASOURCE="postgres://mattermost:$$encoded@db:5432/mattermost?sslmode=disable&connect_timeout=10"
-        exec /mattermost/bin/mattermost
     environment:
-      MM_DATABASE_PASSWORD: ${MATTERMOST_DATABASE_PASSWORD:-}
       MM_SQLSETTINGS_DRIVERNAME: postgres
       MM_SERVICESETTINGS_SITEURL: ""
       MM_SERVICESETTINGS_LISTENADDRESS: :8065
@@ -81,6 +70,7 @@ services:
       MM_TEAMSETTINGS_ENABLEOPENSERVER: "false"
       MM_BLEVESETTINGS_INDEXDIR: /mattermost/bleve-indexes
       TZ: ""
+      MM_CONFIG: /mattermost/config/config.json
     ports:
       - 8065:8065
     volumes:
@@ -103,7 +93,6 @@ services:
       POSTGRES_USER: mattermost
       POSTGRES_DB: mattermost
       POSTGRES_PASSWORD: ${MATTERMOST_DATABASE_PASSWORD:-}
-      MATTERMOST_DATABASE_PASSWORD: ""
     volumes:
       - ./postgres:/var/lib/postgresql/data
     healthcheck:
@@ -116,20 +105,26 @@ services:
     stop_grace_period: 60s
     logging: *a1
   init:
-    image: mattermost/mattermost-team-edition:12.0.1
+    image: python:3.14-alpine
     user: 0:0
     restart: no
     entrypoint:
-      - /bin/sh
-      - -ec
+      - python
+      - -c
     command:
-      - |-
-        chown 2000:2000 /mattermost/config; chmod 0750 /mattermost/config
-        chown 2000:2000 /mattermost/data; chmod 0750 /mattermost/data
-        chown 2000:2000 /mattermost/logs; chmod 0750 /mattermost/logs
-        chown 2000:2000 /mattermost/plugins; chmod 0750 /mattermost/plugins
-        chown 2000:2000 /mattermost/client/plugins; chmod 0750 /mattermost/client/plugins
-        chown 2000:2000 /mattermost/bleve-indexes; chmod 0750 /mattermost/bleve-indexes
+      - |
+        import os,json,pathlib
+        from urllib.parse import quote
+        paths=['/mattermost/config','/mattermost/data','/mattermost/logs','/mattermost/plugins','/mattermost/client/plugins','/mattermost/bleve-indexes']
+        for path in paths:
+            os.chown(path,2000,2000);os.chmod(path,0o750)
+        path=pathlib.Path('/mattermost/config/config.json')
+        config=json.loads(path.read_text()) if path.exists() else {}
+        settings=config.setdefault('SqlSettings',{})
+        settings['DriverName']='postgres'
+        settings['DataSource']='postgres://mattermost:'+quote(os.environ['MATTERMOST_DATABASE_PASSWORD'],safe='')+'@db:5432/mattermost?sslmode=disable&connect_timeout=10'
+        tmp=path.with_suffix('.json.new');tmp.write_text(json.dumps(config));os.chown(tmp,2000,2000);os.chmod(tmp,0o600);tmp.replace(path)
+        print('Mattermost directories and database configuration prepared.')
     volumes:
       - mattermost-config:/mattermost/config
       - mattermost-data:/mattermost/data
@@ -138,6 +133,8 @@ services:
       - mattermost-client-plugins:/mattermost/client/plugins
       - mattermost-bleve-indexes:/mattermost/bleve-indexes
     logging: *a1
+    environment:
+      MATTERMOST_DATABASE_PASSWORD: ""
 volumes:
   mattermost-config: {}
   mattermost-data: {}
