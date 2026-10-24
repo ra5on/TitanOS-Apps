@@ -106,7 +106,12 @@ try{
    await page.context().close();page=await browser.newPage({locale:'en-US'});
    await page.goto(base);await page.locator('input[type="password"]').fill(password);
    await page.locator('form button[type="submit"], form button.btn-primary').first().click();
-   await page.waitForURL(url=>!url.searchParams.has('login')&&!url.pathname.includes('login'));await page.screenshot({path:'trilium-catalog-smoke.png'});
+   await page.waitForURL(url=>!url.searchParams.has('login')&&!url.pathname.includes('login'));
+   // Account, API data and browser login assertions above remain mandatory.
+   // A compositor/screenshot timeout must be reported as an artifact failure,
+   // rather than misreporting the already verified application as unavailable.
+   try{await page.screenshot({path:'trilium-catalog-smoke.png',animations:'disabled',timeout:15000})}
+   catch(error){console.warn(`Trilium screenshot artifact unavailable: ${error.message}`)}
    console.log('Trilium: browser setup/password/login, rejected anonymous/wrong credentials, actual note creation and persistence after recreation passed.');
   }else{
    const senderContext=await browser.newContext({locale:'en-US'}),receiverContext=await browser.newContext({locale:'en-US',acceptDownloads:true});
