@@ -56,8 +56,8 @@ HTTPS-Adresse muss einschließlich NAS-Port genau stimmen. Der lokale Zugang
 verwendet ein selbstsigniertes Zertifikat. Für Element-Medien und Service Worker
 muss der Browser diesem Zertifikat vertrauen; das bloße Übergehen einer Warnung
 reicht nicht. Das öffentliche Zertifikat kann unter `/titanos-matrix.crt` geladen
-werden. Den SHA-256-Fingerabdruck vorher über die Gateway-Konsole vergleichen:
-`openssl x509 -in /etc/matrix/tls.crt -noout -fingerprint -sha256`. Beim erneuerten
+werden. Den SHA-256-Fingerabdruck vorher mit dem Fingerabdruck im Log des
+Matrix-init-Dienstes vergleichen. Beim erneuerten
 Zertifikat muss das Vertrauen erneuert werden. Alternativ einen HTTPS-Proxy mit
 vertrauenswürdigem Zertifikat einrichten; dies gilt auch für externe Clients. Element und Matrix-API
 liegen unter derselben Adresse. Das Gateway leitet die Synapse-Admin-API nicht
