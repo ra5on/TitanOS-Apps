@@ -74,7 +74,17 @@ try {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
       assert.ok(receivedFrames >= 5, 'The desktop must deliver actual WebSocket frames');
-      compose('exec', '-T', 'thunderbird', 'pidof', 'thunderbird');
+      // The web desktop can be ready before Thunderbird has finished starting.
+      // Require the application process and its initialized profile, with a deadline.
+      for (let attempt = 0;; attempt++) {
+        try {
+          compose('exec', '-T', 'thunderbird', 'sh', '-c', 'pidof thunderbird thunderbird-bin && test -s /config/profile/prefs.js');
+          break;
+        } catch (error) {
+          if (attempt >= 45) throw error;
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+      }
       await page.screenshot({ path: screenshot });
     } finally {
       await context.close();
@@ -88,6 +98,10 @@ try {
   assert.equal(readFileSync(marker, 'utf8'), 'isolated-profile');
   compose('exec', '-T', 'thunderbird', 'test', '-s', '/config/profile/prefs.js');
   console.log('Thunderbird: HTTPS, rejected invalid login, authenticated desktop, running process and persistent profile passed. No real mail accounts tested.');
+} catch (error) {
+  try { console.error(compose('logs', '--no-color', '--tail', '80').replaceAll(password, '[test secret]')); } catch {}
+  try { console.error(compose('exec', '-T', 'thunderbird', 'ps', '-ef')); } catch {}
+  throw error;
 } finally {
   await browser?.close();
   try { compose('down', '--volumes'); }
