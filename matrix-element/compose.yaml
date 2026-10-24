@@ -17,6 +17,13 @@ x-titanos:
       und Schlüssel liegen auf dem Daten-Volume und müssen gemeinsam gesichert werden. Für Fernzugriff
       eine passende HTTPS-Domain bzw. Tailscale verwenden. Matrix-Daten und TLS-Konfiguration liegen in
       Docker-Volumes im ausgewählten Docker-Datenverzeichnis; zusammen mit dem PostgreSQL-Ordner sichern.
+      Für Medien und vollständige Browserfunktionen muss das Zertifikat als vertrauenswürdig eingerichtet
+      sein; die bloße Bestätigung der Browserwarnung reicht nicht. Das öffentliche Zertifikat ist unter
+      /titanos-matrix.crt an derselben HTTPS-Adresse abrufbar. Vor dem Vertrauen den
+      SHA-256-Fingerabdruck mit openssl x509 -in /etc/matrix/tls.crt -noout -fingerprint -sha256 in der
+      Matrix-Gateway-Konsole vergleichen. Alternativ einen HTTPS-Proxy mit vertrauenswürdigem Zertifikat
+      verwenden. Nach automatischer Erneuerung des selbstsignierten Zertifikats das Vertrauen erneut
+      einrichten.
     en: Complete chat stack with Synapse, Element, PostgreSQL and an HTTPS gateway. MATRIX_SERVER_NAME
       defines permanent account IDs and cannot be changed later. MATRIX_PUBLIC_URL must exactly match the
       reachable HTTPS address and selected NAS port. On first startup a self-signed certificate and the
@@ -27,6 +34,12 @@ x-titanos:
       media, database, identity and keys reside on the data volume and must be backed up together. Use a
       suitable HTTPS domain or Tailscale for remote access. Matrix data and TLS configuration use Docker
       volumes in the selected Docker data directory; back them up together with the PostgreSQL directory.
+      Media and full browser features require a trusted certificate; merely bypassing the browser warning
+      is insufficient. Download the public certificate from /titanos-matrix.crt at the same HTTPS
+      address. Before trusting it, compare its SHA-256 fingerprint with openssl x509 -in
+      /etc/matrix/tls.crt -noout -fingerprint -sha256 in the Matrix gateway console. Alternatively use an
+      HTTPS proxy with a trusted certificate. Renew trust after automatic renewal of the self-signed
+      certificate.
   variables:
     MATRIX_SERVER_NAME:
       label:
@@ -214,6 +227,7 @@ services:
             ssl_certificate_key /etc/matrix/tls.key;
             ssl_protocols TLSv1.2 TLSv1.3;
             client_max_body_size 50m;
+            location = /titanos-matrix.crt { alias /etc/matrix/tls.crt; default_type application/x-x509-ca-cert; add_header Content-Disposition 'attachment; filename="titanos-matrix.crt"'; }
             location = /config.json { alias /etc/matrix/element.json; add_header Cache-Control no-store; }
             location = /.well-known/matrix/client { alias /etc/matrix/well-known.json; default_type application/json; add_header Access-Control-Allow-Origin *; }
             location /_matrix/ {
