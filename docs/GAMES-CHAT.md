@@ -1,20 +1,25 @@
 # Gameserver, Firefox und Teamchat
 
-Neun Katalogeinträge, Stand 24. Oktober 2026. Ein Merge in `main` veröffentlicht
+Neun Katalogeinträge, Stand 25. Oktober 2026. Ein Merge in `main` veröffentlicht
 sie über die bestehende TitanOS-Apps-Quelle. Ein OS-/App-Update von TitanOS ist
 hierfür nicht erforderlich. Bereits installierte Apps werden nicht verändert.
 
 | Eintrag | Image / Start | Zugriff |
 | --- | --- | --- |
-| Minecraft Java | `itzg/minecraft-server:2026.10.0-java25`, Vanilla und aktuelle stabile Spielversion | Java-Client, TCP 25565; RCON nur intern |
+| Minecraft Java | `itzg/minecraft-server:latest`, Vanilla und aktuelle stabile Spielversion | Java-Client, TCP 25565; RCON nur intern |
 | Minecraft Bedrock | `itzg/minecraft-bedrock-server:latest` | Bedrock-Client, TCP 19132 und UDP 19140–19155; Xbox-Authentifizierung aktiv |
 | Valheim | `ghcr.io/community-valheim-tools/valheim-server:latest` | Steam-Client, UDP 2456–2458, privates Serverpasswort |
 | Terraria / tModLoader | `ghcr.io/crosis47/tmodloader:latest` | passender tModLoader-Client, NAS-TCP 7778 → Container 7777 |
 | Satisfactory | `robtme/satisfactory-server:latest` | Server-Manager im Spiel; TCP/UDP 7777 und TCP 8888 |
-| Palworld | `thijsvanloef/palworld-server-docker:v2.8.1` | Spielclient, UDP 8211; REST-API nur intern |
-| Firefox | `jlesage/firefox:v26.09.1` | HTTPS 5801 → Container 5800 mit eigener Anmeldung |
-| Matrix + Element | Synapse `v1.163.2`, Element Web `v1.12.32`, PostgreSQL 17 und Nginx | gemeinsames HTTPS-Gateway 8448 |
-| Mattermost | Team Edition `12.0.1`, PostgreSQL 17, einmalige Python-Vorbereitung | HTTP 8065, eigenes Benutzerkonto |
+| Palworld | `thijsvanloef/palworld-server-docker:latest` | Spielclient, UDP 8211; REST-API nur intern |
+| Firefox | `jlesage/firefox:latest` | HTTPS 5801 → Container 5800 mit eigener Anmeldung |
+| Matrix + Element | Synapse, Element Web, PostgreSQL und Nginx jeweils `latest` | gemeinsames HTTPS-Gateway 8448 |
+| Mattermost | Team Edition, PostgreSQL und Python jeweils `latest` | HTTP 8065, eigenes Benutzerkonto |
+
+Die Image-Tags können pro Dienst im vorhandenen TitanOS-App-Editor geändert
+werden. Für neue Installationen verwendet PostgreSQL `latest` mit dem Datenpfad
+`/var/lib/postgresql`. Vorhandene PostgreSQL-17-Daten benötigen für den Wechsel
+auf PostgreSQL 18 eine Migration; die Katalogänderung führt diese nicht aus.
 
 ## Installation und Betrieb
 
