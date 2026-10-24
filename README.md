@@ -121,6 +121,29 @@ API-Schlüssel aus TitanOS (ab Version mit „Agenten und API-Schlüssel“ unte
 Einstellungen › Zugang) und eine laufende Ollama-App mit einem Modell, das
 Werkzeuge aufrufen kann.
 
+### Immich: Versionen je Dienst
+
+Die Vorlage verwendet den aktuellen Immich-Kanal für Server und Machine Learning
+(`release`) sowie `latest` für Valkey. Immich veröffentlicht für Server, ML und
+sein PostgreSQL-Image keinen Tag namens `latest`. Die Datenbank bleibt deshalb
+bei `14-vectorchord0.4.3-pgvectors0.2.0`, passend zum vorhandenen PostgreSQL-14-
+Datenverzeichnis. Alle vier Images sind ohne Digest-Bindung einzeln änderbar.
+
+Beim Installieren unter **Als Compose bearbeiten** den `image`-Eintrag des
+gewünschten Dienstes ändern. Nach der Installation unter **Docker › App bearbeiten**
+den Dienst auswählen und dessen **Image** ändern, zum Beispiel
+`ghcr.io/immich-app/immich-server:v3.3.3` und entsprechend
+`ghcr.io/immich-app/immich-machine-learning:v3.3.3`. Danach die Änderung übernehmen,
+damit die Container neu erstellt werden. Ein bloßer Neustart ändert das Image nicht.
+
+Server und ML aufeinander abstimmen; GPU-Varianten des ML-Images benötigen den
+passenden Tag und die Gerätefreigabe. Vor einem Versionswechsel Fotos und Datenbank
+konsistent sichern und die [Immich-Upgradehinweise](https://docs.immich.app/install/upgrading/)
+lesen. Ein Wechsel der PostgreSQL-Hauptversion benötigt eine Datenbankmigration.
+Bereits installierte Compose-Dateien werden durch eine Katalogaktualisierung
+nicht umgeschrieben; dort vorhandene `@sha256:…`-Bindungen beim bewussten Wechsel
+zusammen mit dem alten Tag ersetzen.
+
 ### Paperless-ngx: Dokumentenarchiv
 
 Die Vorlage verwendet Paperless-ngx `3.3.4`, PostgreSQL `18` und Valkey
