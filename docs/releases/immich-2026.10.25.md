@@ -40,6 +40,14 @@ kein TitanOS-Systemupdate erforderlich.
   Healthchecks, PostgreSQL 18, aktive Erweiterungen `vector`/`vchord`, Anmeldung,
   Zugriffsschutz und erhaltenes Album nach Neuerstellung sämtlicher Container.
 
+Der erfolgreiche Stacktest lief mit PostgreSQL 18.3. Die erneute Prüfung auf dem
+Hauptbranch scheiterte anschließend bereits beim Image-Download am Registry-
+Rate-Limit (`toomanyrequests`), auch mit Anmeldung und begrenzten Wiederholungen:
+[Wiederholungslauf](https://github.com/ra5on/TitanOS-Apps/actions/runs/40137022377).
+Die App-Konfiguration entspricht weiterhin dem erfolgreich gestarteten Stack;
+die späteren Codeänderungen betreffen nur Anmeldung und Downloadbehandlung der CI.
+Dieser erneute Lauf wird ausdrücklich nicht als bestandener Laufzeittest gewertet.
+
 Keine Migration einer PostgreSQL-14-Datenbank, Foto-/Videoverarbeitung, echte
 ML-Inferenz, GPU oder vorhandenen NAS-Daten getestet. Die abgeleitete Immich-
 Vorlage bleibt AGPL-3.0-only; Images behalten die Rechte ihrer jeweiligen Projekte.
