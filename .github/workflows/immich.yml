@@ -1,0 +1,21 @@
+name: Immich rolling stack smoke
+on:
+  workflow_dispatch:
+  push:
+    branches: ['**']
+    paths: ['immich/**', 'scripts/immich-smoke.mjs', '.github/workflows/immich.yml']
+  pull_request:
+    paths: ['immich/**', 'scripts/immich-smoke.mjs', '.github/workflows/immich.yml']
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Test rolling images, PostgreSQL extensions, account and album persistence
+        run: node scripts/immich-smoke.mjs

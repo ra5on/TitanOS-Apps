@@ -125,9 +125,13 @@ Werkzeuge aufrufen kann.
 
 Die Vorlage verwendet den aktuellen Immich-Kanal für Server und Machine Learning
 (`release`) sowie `latest` für Valkey. Immich veröffentlicht für Server, ML und
-sein PostgreSQL-Image keinen Tag namens `latest`. Die Datenbank bleibt deshalb
-bei `14-vectorchord0.4.3-pgvectors0.2.0`, passend zum vorhandenen PostgreSQL-14-
-Datenverzeichnis. Alle vier Images sind ohne Digest-Bindung einzeln änderbar.
+sein PostgreSQL-Image keinen Tag namens `latest`. Die Datenbank verwendet deshalb
+`ghcr.io/tensorchord/vchord-suite:pg18-latest` vom VectorChord-Hersteller:
+PostgreSQL 18 mit laufend aktualisierten Patch- und Erweiterungsversionen.
+Alle vier Dienste folgen damit einem aktuellen Kanal, ohne Digest-Bindung oder
+feste Patch-Version. Die Datenbank wird nur im privaten Stack-Netz angeboten;
+ihr Healthcheck wartet auf TCP-Verbindungen. Der Datenordner bindet das für
+PostgreSQL 18 vorgesehene `/var/lib/postgresql` ein.
 
 Beim Installieren unter **Als Compose bearbeiten** den `image`-Eintrag des
 gewünschten Dienstes ändern. Nach der Installation unter **Docker › App bearbeiten**
@@ -139,7 +143,9 @@ damit die Container neu erstellt werden. Ein bloßer Neustart ändert das Image 
 Server und ML aufeinander abstimmen; GPU-Varianten des ML-Images benötigen den
 passenden Tag und die Gerätefreigabe. Vor einem Versionswechsel Fotos und Datenbank
 konsistent sichern und die [Immich-Upgradehinweise](https://docs.immich.app/install/upgrading/)
-lesen. Ein Wechsel der PostgreSQL-Hauptversion benötigt eine Datenbankmigration.
+lesen. Vorhandene PostgreSQL-14-Installationen benötigen vor dem Wechsel auf die neue
+Datenbankvorlage einen Datenbankexport und Import in einen neuen PostgreSQL-18-
+Datenordner. Das alte Datenverzeichnis nicht direkt mit PostgreSQL 18 öffnen.
 Bereits installierte Compose-Dateien werden durch eine Katalogaktualisierung
 nicht umgeschrieben; dort vorhandene `@sha256:…`-Bindungen beim bewussten Wechsel
 zusammen mit dem alten Tag ersetzen.
@@ -410,6 +416,13 @@ Neue Vorlagen und Korrekturen können als Pull Request eingereicht werden;
 Probleme bitte mit App-Name, TitanOS-Version und Fehlermeldung melden.
 
 ## Prüfungen
+
+Der [Immich-Stacktest](.github/workflows/immich.yml) startet alle vier aktuellen
+Images mit neuen temporären Datenordnern und synthetischen Konten. Er prüft die
+Healthchecks, PostgreSQL 18 mit aktivem VectorChord/pgvector, Anmeldung, geschützte
+API-Routen und ein nach Container-Neuerstellung erhaltenes Album. Migrationen alter
+Datenbanken, Foto-/Videoverarbeitung, echte ML-Inferenz und GPUs sind damit nicht
+abgenommen.
 
 Die [Katalogprüfung](.github/workflows/catalog.yml) führt die Python-Tests aus
 und validiert sämtliche Compose-Vorlagen. Lokal mit Python 3 und Docker Compose:
