@@ -88,10 +88,10 @@ try{
  }else if(app==='palworld'){
   const api=path=>JSON.parse(compose('exec','-T',main,'curl','--fail','--silent','--max-time','10','--user',`admin:${password}`,`http://127.0.0.1:8212/v1/api/${path}`));
   const info=await waitFor(()=>api('info'),'Palworld authenticated REST API');assert.ok(info.version||info.servername||info.serverName);
-  const world=api('world');assert.ok(world);const wrong=compose('exec','-T',main,'curl','--silent','--output','/dev/null','--write-out','%{http_code}','--user','admin:wrong','http://127.0.0.1:8212/v1/api/info');assert.equal(wrong,'401');
+  const metrics=await waitFor(()=>api('metrics'),'Palworld metrics');assert.ok(metrics);const wrong=compose('exec','-T',main,'curl','--silent','--output','/dev/null','--write-out','%{http_code}','--user','admin:wrong','http://127.0.0.1:8212/v1/api/info');assert.equal(wrong,'401');
   compose('exec','-T',main,'curl','--fail','--silent','--user',`admin:${password}`,'-X','POST','http://127.0.0.1:8212/v1/api/save');
   const saveFile=await waitFor(()=>files(temp).find(p=>p.endsWith('Level.sav')),'Palworld world save');assert.ok(readFileSync(saveFile).length>100);
-  recreate();await waitFor(()=>api('info'),'Palworld after recreation');assert.deepEqual(api('world'),world);assert.ok(existsSync(saveFile));
+  recreate();await waitFor(()=>api('info'),'Palworld after recreation');assert.equal(api('info').worldguid,info.worldguid);assert.ok(existsSync(saveFile));
  }else if(app==='firefox'){
   const {chromium}=await import(process.env.PLAYWRIGHT_PATH);browser=await chromium.launch({channel:'chrome'});
   async function checkLogin(){const context=await browser.newContext({ignoreHTTPSErrors:true});const page=await context.newPage();let frames=0;page.on('websocket',ws=>ws.on('framereceived',()=>frames++));
@@ -113,6 +113,7 @@ try{
   recreate();await waitFor(async()=>(await request(base,'/_matrix/client/versions')).ok,'Matrix after recreation');assert.equal((await login(password)).status,200);response=await request(base,`/_matrix/client/v3/rooms/${encodeURIComponent(room)}/messages?dir=b`,{headers});assert.equal(response.status,200);assert.ok((await response.json()).chunk.some(e=>e.content?.body==='Synthetic persistent Matrix message'));
  }else if(app==='mattermost'){
   const base=baseFor(8065);await waitFor(async()=>(await request(base,'/api/v4/system/ping')).ok,'Mattermost API');
+  const home=await request(base,'/');assert.equal(home.status,200);assert.match(await home.text(),/mattermost/i);
   const userResponse=await post(base,'/api/v4/users',{email:'catalog@example.test',username,password});assert.equal(userResponse.status,201,await userResponse.clone().text());const user=await userResponse.json();assert.ok(user.roles.includes('system_admin'));
   assert.equal((await post(base,'/api/v4/users/login',{login_id:username,password:'wrong'})).status,401);
   let response=await post(base,'/api/v4/users/login',{login_id:username,password});assert.equal(response.status,200);const token=response.headers.get('token');assert.ok(token);const headers={Authorization:`Bearer ${token}`};

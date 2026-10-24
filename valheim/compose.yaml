@@ -13,14 +13,14 @@ x-titanos:
       Standardmäßig Steam ohne Crossplay; CROSSPLAY kann bei Bedarf aktiviert werden. Die UDP-Ports
       2456–2458 bilden eine zusammengehörige Gruppe. Bei Änderungen die gesamte Portgruppe und
       SERVER_PORT passend konfigurieren. Die Serverdateien werden beim Start von Steam
-      geladen/aktualisiert; geplante automatische Updates sind ausgeschaltet.
+      geladen/aktualisiert; automatische Update-Prüfungen laufen täglich um 05:00 Uhr ohne verbundene Spieler.
     en: Game server without a web interface. Connect from the matching game client using the NAS address and
       selected game port. Worlds and settings reside on the data volume. Remote access and router
       forwarding are not configured automatically. Back up worlds before version changes; client and
       server versions must match. The generated server password must have at least five characters. Steam
       without crossplay is the default; enable CROSSPLAY if needed. UDP ports 2456–2458 form one group.
       Changes require matching the complete port group and SERVER_PORT. Server files are
-      downloaded/updated from Steam on startup; scheduled automatic updates are disabled.
+      downloaded/updated from Steam on startup; automatic update checks run daily at 05:00 when no players are connected.
   variables:
     SERVER_NAME:
       label:
@@ -87,7 +87,7 @@ services:
       CROSSPLAY: "false"
       BACKUPS: "true"
       BACKUPS_MAX_AGE: "7"
-      UPDATE_CRON: ""
+      UPDATE_CRON: 0 5 * * *
       PUID: "1000"
       PGID: "1000"
       TZ: ""
