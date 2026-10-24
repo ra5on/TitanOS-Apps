@@ -23,6 +23,37 @@ Er wird beim Start und täglich neu geladen. Katalogänderungen benötigen kein
 neues TitanOS-Systemabbild; für neue Funktionen der TitanOS-Oberfläche ist
 weiterhin ein entsprechendes OS-Update erforderlich.
 
+## Aktuelle Kanäle und Versionswahl
+
+Alle Dienste verwenden standardmäßig `latest`, soweit der Herausgeber diesen
+Tag anbietet. Die vier überprüften Ausnahmen sind Frigate (`stable`), Immich
+Server und ML (`release`) sowie PostgreSQL/VectorChord (`pg18-latest`). Das sind
+laufend aktualisierte Kanäle ihrer jeweiligen Herausgeber; nicht vorhandene
+`latest`-Tags werden nicht eingetragen.
+
+Die Version jedes Containers lässt sich ohne TitanOS-Update über dessen
+vorhandenes **Image**-Feld unter **Docker › App bearbeiten** ändern, zum Beispiel
+`jellyfin/jellyfin:latest` zu `jellyfin/jellyfin:12.3`. Bei der Installation den
+`image:`-Eintrag in der Compose-Ansicht anpassen. Zusammengehörige Dienste wie
+Nextcloud und Nextcloud-Cron oder Synapse und seine Einrichtungsdienste auf
+kompatiblen Versionen halten. Die Auswahl gilt nur für den bearbeiteten Dienst.
+
+Die früheren Felder `NODE_RED_IMAGE_TAG`, `BAMBU_STUDIO_VERSION`,
+`NEXTCLOUD_VERSION` und `MARIADB_VERSION` wurden entfernt: Der vorhandene
+TitanOS-Installer speicherte diese als Container-Umgebung und verwendete sie
+nicht zur Auswahl des Images. Ein frei gewählter Wert hatte deshalb keine
+Wirkung. Echte Anwendungseinstellungen wie die Minecraft-Spielversion oder
+`DSH_VERSION` für das beim Start installierte npm-Paket bleiben erhalten;
+DeepSeek Harness verwendet dafür standardmäßig `latest`.
+
+`latest` kann auch eine neue Hauptversion bringen. Aktuelle PostgreSQL-Images
+verwenden PostgreSQL 18 und den Datenpfad `/var/lib/postgresql`; neue Vorlagen
+binden diesen Pfad ein. Bestehende Datenbanken aus PostgreSQL 16/17 oder älteren
+Immich-Installationen müssen vor einem Hauptversionswechsel migriert werden.
+Eine Katalogaktualisierung verändert keine installierte Compose-Datei und führt
+keine Migration aus. Vor einem bewussten Versionswechsel Daten sichern und die
+Upgradehinweise der Anwendung beachten.
+
 ## Verfügbare Apps
 
 Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
@@ -153,8 +184,7 @@ zusammen mit dem alten Tag ersetzen.
 
 ### Paperless-ngx: Dokumentenarchiv
 
-Die Vorlage verwendet Paperless-ngx `3.3.4`, PostgreSQL `18` und Valkey
-`9-alpine`. Nur der Web-Port `8000` wird veröffentlicht; Datenbank und Broker
+Die Vorlage verwendet für Paperless-ngx, PostgreSQL und Valkey jeweils `latest`. Nur der Web-Port `8000` wird veröffentlicht; Datenbank und Broker
 bleiben im Compose-Netz. Beim Installieren einen Administratornamen festlegen
 und das erzeugte Passwort aufbewahren. Weitere Konten und Dokumentrechte
 werden in Paperless verwaltet, unabhängig von TitanOS-Konten.
@@ -176,7 +206,7 @@ setzt diese Paperless-Einstellung nicht automatisch.
 
 ### Jellyfin: Medienserver
 
-Die Vorlage verwendet das offizielle Image `jellyfin/jellyfin:12.3` und
+Die Vorlage verwendet das offizielle Image `jellyfin/jellyfin:latest` und
 veröffentlicht Web-Port `8096`. Direkt nach der Installation den Assistenten
 öffnen und ein Administratorkonto mit Passwort anlegen. Weitere Personen
 und Bibliotheksrechte in Jellyfin verwalten. Die TitanOS-Anmeldung wird
@@ -196,7 +226,7 @@ oder einen separat eingerichteten HTTPS-Reverse-Proxy verwenden.
 
 Die [Thunderbird-Vorlage](thunderbird/compose.yaml) verwendet den
 [Drittanbieter-Container von jlesage](https://github.com/jlesage/docker-thunderbird)
-in Version `v26.09.1`, kein offizielles Image des Thunderbird-Projekts.
+mit dem Tag `latest`, kein offizielles Image des Thunderbird-Projekts.
 Beim Installieren einen Web-Benutzernamen festlegen und das erzeugte Passwort
 aufbewahren. Die geschützte WebUI über **Web UI** öffnen, gegebenenfalls das
 selbst signierte Zertifikat bestätigen und anschließend vorhandene Mailkonten
@@ -287,13 +317,12 @@ URL-Feld erzeugt nur den Link; es richtet keinen Proxy ein und ändert diese
 anwendungseigenen Einstellungen nicht.
 
 **Joplin Server** ist ein Synchronisationsziel für die Joplin-Apps, kein
-Notizeditor im Browser. Die Vorlage verwendet den geprüften Image-Tag `3.7.3`
-mit PostgreSQL `16`; das Datenbankpasswort wird einmal erzeugt und an beide
+Notizeditor im Browser. Joplin und PostgreSQL verwenden jeweils `latest`; das Datenbankpasswort wird einmal erzeugt und an beide
 Dienste übergeben. Die Datenbank hat keinen veröffentlichten Port. Notizen
 und Konten liegen in PostgreSQL; für ein Backup die Datenbank konsistent
 sichern. Transkription ist nicht enthalten.
 
-**Zigbee2MQTT** verwendet Version `2.14.2` mit einem privaten Mosquitto-Broker
+**Zigbee2MQTT** verwendet `latest` mit einem privaten Mosquitto-Broker
 aus dem Zweig `2`. Der Broker besitzt keine veröffentlichten Ports und darf
 ohne zusätzliche Konfiguration nicht als allgemeiner MQTT-Server ins Netz
 gestellt werden. Home Assistant benötigt entweder eine separat eingerichtete
@@ -304,14 +333,14 @@ USB- oder Host-Freigabe. Der erste Onboarding-Assistent ist noch nicht durch
 den Frontend-Schlüssel geschützt und gehört ins vertrauenswürdige Netz.
 Im regulären Frontend gilt anschließend der erzeugte Zugriffsschlüssel.
 
-**ESPHome** verwendet `2026.10.0` mit dem Device Builder. `/config` und `/cache`
+**ESPHome** verwendet `latest` mit dem Device Builder. `/config` und `/cache`
 liegen auf dem Daten-Volume und halten auch Bauartefakte und Werkzeugketten.
 Das Bridge-Netz begrenzt mDNS-Erkennung; gegebenenfalls Geräte-IP bzw.
 `use_address` festlegen. USB-Flashen am NAS erfordert eine gezielte Gerätefreigabe.
 Firmware kann alternativ heruntergeladen und auf einem anderen Rechner
 geflasht werden. Kein privilegierter Container und kein Host-Netzwerk ab Werk.
 
-**n8n** verwendet `2.44.6` mit einem benannten Daten-Volume für SQLite und
+**n8n** verwendet `latest` mit einem benannten Daten-Volume für SQLite und
 Konfiguration. Es liegt auf dem ausgewählten Docker-Daten-Volume. Den erzeugten
 `N8N_ENCRYPTION_KEY` zusammen mit den Daten sichern und nicht beiläufig ersetzen;
 sonst sind gespeicherte Zugangsdaten nicht mehr entschlüsselbar. Der direkte
@@ -320,7 +349,7 @@ bzw. hinter Tailscale. Bei HTTPS am separaten Reverse-Proxy auf `true` wechseln
 und die externen Editor-/Webhook-Adressen konfigurieren. Webhook-Erreichbarkeit
 aus dem Internet entsteht nicht durch die Installation.
 
-**Mealie** verwendet `v3.29.0`, SQLite und einen persistenten `/app/data`-Ordner.
+**Mealie** verwendet `latest`, SQLite und einen persistenten `/app/data`-Ordner.
 Registrierung ist deaktiviert. Einladungen und Passwort-Rücksetzungen per
 E-Mail benötigen eine separate SMTP-Einrichtung. **Grocy** verwendet das
 LinuxServer-Image mit persistentem `/config`, PUID/PGID und NAS-Zeitzone.
@@ -335,8 +364,7 @@ die Nutzungsbedingungen von Joplin Server und n8n eigenständig zu prüfen.
 - **Trilium Notes:** Einzelbenutzer-Wissensdatenbank mit eigener Passwort-Einrichtung.
   Für jede Person eine eigene Installation mit getrenntem Datenordner und Port
   anlegen. `./data` enthält Notizen, Anhänge, Konfiguration und Trilium-Backups;
-  zusätzlich außerhalb der App sichern. Die Vorlage verwendet die stabile Version
-  `v0.106.1`; Desktop-Clients für die Synchronisation kompatibel halten.
+  zusätzlich außerhalb der App sichern. Die Vorlage verwendet `latest`; Desktop-Clients für die Synchronisation kompatibel halten.
 - **Eclipse Mosquitto:** eigenständiger MQTT-Broker auf TCP-Port 1883 ohne WebUI.
   Ein Benutzername und ein erzeugtes Passwort sind im Formular hinterlegt; beide
   in den Clients verwenden. Anonyme Zugriffe sind gesperrt. Der vorbereitete

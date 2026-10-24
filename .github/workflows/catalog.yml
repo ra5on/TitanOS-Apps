@@ -8,6 +8,23 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - run: python3 -m unittest discover -s scripts -p 'test_*.py' -v
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Read unchanged released TitanOS form code
+        uses: actions/checkout@v7
+        with:
+          repository: ra5on/TitanOS
+          ref: v0.20.2
+          path: .titanos
+          sparse-checkout: web/src/lib
+      - name: Verify current channels and effective version editing for every service
+        env:
+          TITANOS_DIR: ${{ github.workspace }}/.titanos
+        run: |
+          npm install --prefix /tmp/catalog-yaml --ignore-scripts yaml@2.9.1
+          ln -s /tmp/catalog-yaml/node_modules .titanos/web/node_modules
+          node scripts/catalog-images.test.mjs
       - name: Validate Compose templates
         run: |
           for file in */compose.yaml; do

@@ -53,7 +53,7 @@ x-titanos:
   icon: https://raw.githubusercontent.com/mealie-recipes/mealie/mealie-next/frontend/public/icons/android-chrome-192x192.png
 services:
   mealie:
-    image: ghcr.io/mealie-recipes/mealie:v3.29.0
+    image: ghcr.io/mealie-recipes/mealie:latest
     restart: unless-stopped
     labels:
       titanos.webui: http://[host]:9925

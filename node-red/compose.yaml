@@ -21,8 +21,9 @@ x-titanos:
 
   tips:
     de: >-
-      Bei der Installation Node-RED-Version,
       Benutzernamen und Passwort festlegen.
+      Die Version über den Image-Tag im Dienst-Editor oder
+      beim Installieren in der Compose-Ansicht ändern; Standard ist latest.
       TitanOS generiert den Verschlüsselungsschlüssel
       für gespeicherte Zugangsdaten automatisch.
       Die Benutzeranmeldung wird beim ersten
@@ -39,8 +40,9 @@ x-titanos:
       Netzwerken oder über HTTPS mit zusätzlichem
       Zugriffsschutz bereitstellen.
     en: >-
-      Select the Node-RED version, username
-      and password during installation.
+      Set the username and password during installation.
+      Change the version using the service image tag in the editor
+      or in the Compose view during installation; the default is latest.
       TitanOS generates the credential
       encryption secret automatically.
       Editor authentication is configured
@@ -60,16 +62,6 @@ x-titanos:
   # ============================================
 
   variables:
-
-    # ------------------------------------------
-    # VERSION
-    # ------------------------------------------
-
-    NODE_RED_IMAGE_TAG:
-      label:
-        de: Node-RED Docker-Version
-        en: Node-RED Docker version
-      required: true
 
     # ------------------------------------------
     # BENUTZERANMELDUNG
@@ -184,7 +176,7 @@ services:
   node-red:
     labels:
       titanos.webui: "http://[host]:1880"
-    image: "nodered/node-red:${NODE_RED_IMAGE_TAG:-latest}"
+    image: "nodered/node-red:latest"
     restart: unless-stopped
 
     # ==========================================
@@ -197,10 +189,8 @@ services:
       # VERSION
       # ----------------------------------------
 
-      # Sichtbarer Wert für den TitanOS-Installer.
-      # TitanOS muss diesen zusätzlich an Compose
-      # zur Image-Auswahl übergeben.
-      NODE_RED_IMAGE_TAG: "latest"
+      # Die Image-Version wird im vorhandenen Image-Feld
+      # des Dienst-Editors oder direkt unter image gewählt.
 
       # ----------------------------------------
       # SYSTEM
