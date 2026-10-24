@@ -3,7 +3,8 @@
 # 2026-10-16: app-store metadata, linked secret, persistent bind mounts,
 # health dependencies and explicit service addresses. See adjacent LICENSE.
 # 2026-10-24: rolling application/cache tags and independently editable images;
-# keep the PostgreSQL major version compatible with existing data.
+# PostgreSQL now follows the VectorChord publisher's pg18-latest channel.
+# Existing PostgreSQL 14 installations require migration before switching.
 # https://github.com/immich-app/immich/releases/tag/v3.3.3
 x-titanos:
   icon: "https://raw.githubusercontent.com/immich-app/immich/main/design/immich-logo.svg"
@@ -14,8 +15,8 @@ x-titanos:
     de: Fotos und Videos sichern, durchsuchen und teilen. Mit Datenbank und Gesichtserkennung.
     en: Back up, search and share photos and videos. Includes the database and face recognition.
   tips:
-    de: Jeder Dienst hat ein eigenes Image-Feld im Docker-App-Editor; dort den Tag auf eine gewünschte Version setzen. Aktueller Kanal ist für Server und ML release (Immich bietet kein latest), für Valkey latest. PostgreSQL verwendet einen kompatiblen 14-VectorChord-Tag; kein latest verfügbar. Mindestens 6 GB RAM und 2 CPU-Kerne für Immich einplanen. Beim ersten Öffnen ein Administratorkonto anlegen. Datenbank und Fotos liegen getrennt auf dem Daten-Volume; beide sichern. KI-Modelle werden beim ersten Einsatz geladen. CPU-Betrieb ist voreingestellt. Eine GPU für Videoverarbeitung gezielt beim Dienst immich-server auswählen und in Immich aktivieren. Für KI-Beschleunigung benötigt der ML-Dienst zusätzlich das passende offizielle CUDA-/OpenVINO-Abbild. Versionswechsel gemeinsam für Server und ML durchführen und vorher die Immich-Upgradehinweise lesen.
-    en: Each service has its own image field in the Docker app editor; set its tag to the desired version there. The current channel is release for server and ML (Immich does not publish latest), and latest for Valkey. PostgreSQL uses a compatible 14-VectorChord tag; latest is unavailable. Allow at least 6 GB RAM and 2 CPU cores for Immich. Create an administrator account on first opening. Database and photos are stored separately on the data volume; back up both. AI models download on first use. CPU operation is the default. Select a GPU explicitly for immich-server and enable transcoding acceleration in Immich. ML acceleration additionally requires the matching official CUDA/OpenVINO image. Upgrade server and ML together after reading the Immich upgrade notes.
+    de: Jeder Dienst hat ein eigenes Image-Feld im Docker-App-Editor; dort den Tag auf eine gewünschte Version setzen. Aktueller Kanal ist für Server und ML release (Immich bietet kein latest), für Valkey latest. PostgreSQL nutzt pg18-latest vom VectorChord-Hersteller, ohne feste Patch-/Erweiterungsversion. Vorhandene PostgreSQL-14-Daten vor dem Wechsel auf PostgreSQL 18 migrieren; nicht einfach das Image austauschen. Mindestens 6 GB RAM und 2 CPU-Kerne für Immich einplanen. Beim ersten Öffnen ein Administratorkonto anlegen. Datenbank und Fotos liegen getrennt auf dem Daten-Volume; beide sichern. KI-Modelle werden beim ersten Einsatz geladen. CPU-Betrieb ist voreingestellt. Eine GPU für Videoverarbeitung gezielt beim Dienst immich-server auswählen und in Immich aktivieren. Für KI-Beschleunigung benötigt der ML-Dienst zusätzlich das passende offizielle CUDA-/OpenVINO-Abbild. Versionswechsel gemeinsam für Server und ML durchführen und vorher die Immich-Upgradehinweise lesen.
+    en: Each service has its own image field in the Docker app editor; set its tag to the desired version there. The current channel is release for server and ML (Immich does not publish latest), and latest for Valkey. PostgreSQL uses pg18-latest from the VectorChord publisher, without pinned patch/extension versions. Migrate existing PostgreSQL 14 data before switching to PostgreSQL 18; do not simply replace the image. Allow at least 6 GB RAM and 2 CPU cores for Immich. Create an administrator account on first opening. Database and photos are stored separately on the data volume; back up both. AI models download on first use. CPU operation is the default. Select a GPU explicitly for immich-server and enable transcoding acceleration in Immich. ML acceleration additionally requires the matching official CUDA/OpenVINO image. Upgrade server and ML together after reading the Immich upgrade notes.
   variables:
     DB_PASSWORD:
       label: { de: Datenbankpasswort, en: Database password }
@@ -26,7 +27,7 @@ x-titanos:
   paths:
     /data:
       label: { de: Fotos und Videos, en: Photos and videos }
-    /var/lib/postgresql/data:
+    /var/lib/postgresql:
       label: { de: PostgreSQL-Datenbank (lokales Volume), en: PostgreSQL database (local volume) }
     /cache:
       label: { de: KI-Modelle, en: AI models }
@@ -75,7 +76,7 @@ services:
       timeout: 5s
       retries: 5
   database:
-    image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0
+    image: ghcr.io/tensorchord/vchord-suite:pg18-latest
     restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: ""
@@ -83,7 +84,11 @@ services:
       POSTGRES_DB: immich
       POSTGRES_INITDB_ARGS: --data-checksums
     volumes:
-      - ./postgres:/var/lib/postgresql/data
+      - ./postgres:/var/lib/postgresql
     shm_size: 128mb
     healthcheck:
-      disable: false
+      test: [CMD, pg_isready, --host=127.0.0.1, --username=postgres, --dbname=immich]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
