@@ -126,7 +126,8 @@ Werkzeuge aufrufen kann.
 Die Vorlage verwendet den aktuellen Immich-Kanal für Server und Machine Learning
 (`release`) sowie `latest` für Valkey. Immich veröffentlicht für Server, ML und
 sein PostgreSQL-Image keinen Tag namens `latest`. Die Datenbank verwendet deshalb
-`ghcr.io/tensorchord/vchord-suite:pg18-latest` vom VectorChord-Hersteller:
+`ghcr.io/tensorchord/vchord-suite:pg18-latest` vom
+[VectorChord-Hersteller](https://github.com/tensorchord/VectorChord-images):
 PostgreSQL 18 mit laufend aktualisierten Patch- und Erweiterungsversionen.
 Alle vier Dienste folgen damit einem aktuellen Kanal, ohne Digest-Bindung oder
 feste Patch-Version. Die Datenbank wird nur im privaten Stack-Netz angeboten;
