@@ -1,0 +1,106 @@
+x-titanos:
+  name: Valheim
+  main: valheim
+  category: games
+  description:
+    de: Valheim-Server mit geschützter Spielwelt und automatischen Welt-Backups.
+    en: Valheim server with a password-protected world and automatic world backups.
+  tips:
+    de: Gameserver ohne Weboberfläche. Im passenden Spielclient mit NAS-Adresse und dem gewählten Spielport
+      verbinden. Welten und Einstellungen liegen auf dem Daten-Volume. Fernzugriff und Router-Freigaben
+      werden nicht automatisch eingerichtet. Vor Versionswechseln die Welten sichern; Spielclient und
+      Server müssen zusammenpassen. Das erzeugte Serverpasswort muss mindestens fünf Zeichen lang sein.
+      Standardmäßig Steam ohne Crossplay; CROSSPLAY kann bei Bedarf aktiviert werden. Die UDP-Ports
+      2456–2458 bilden eine zusammengehörige Gruppe. Bei Änderungen die gesamte Portgruppe und
+      SERVER_PORT passend konfigurieren. Die Serverdateien werden beim Start von Steam
+      geladen/aktualisiert; automatische Update-Prüfungen laufen täglich um 05:00 Uhr ohne verbundene Spieler.
+    en: Game server without a web interface. Connect from the matching game client using the NAS address and
+      selected game port. Worlds and settings reside on the data volume. Remote access and router
+      forwarding are not configured automatically. Back up worlds before version changes; client and
+      server versions must match. The generated server password must have at least five characters. Steam
+      without crossplay is the default; enable CROSSPLAY if needed. UDP ports 2456–2458 form one group.
+      Changes require matching the complete port group and SERVER_PORT. Server files are
+      downloaded/updated from Steam on startup; automatic update checks run daily at 05:00 when no players are connected.
+  variables:
+    SERVER_NAME:
+      label:
+        de: Servername
+        en: Server name
+    WORLD_NAME:
+      label:
+        de: Weltname
+        en: World name
+    SERVER_PASS:
+      label:
+        de: Serverpasswort
+        en: Server password
+      secret: generate
+      required: true
+    CROSSPLAY:
+      label:
+        de: Crossplay aktivieren
+        en: Enable crossplay
+    PUID:
+      label:
+        de: Benutzer-ID
+        en: User ID
+      fill: uid
+    PGID:
+      label:
+        de: Gruppen-ID
+        en: Group ID
+      fill: gid
+    TZ:
+      label:
+        de: Zeitzone
+        en: Timezone
+      fill: timezone
+  paths:
+    /config:
+      label:
+        de: Welten, Einstellungen und Backups
+        en: Worlds, settings and backups
+    /opt/valheim:
+      label:
+        de: Serverdateien und Downloadcache
+        en: Server files and download cache
+  ports:
+    2456/udp:
+      label: Valheim Spiel (UDP)
+      webui: false
+    2457/udp:
+      label: Valheim Abfrage (UDP)
+      webui: false
+    2458/udp:
+      label: Valheim Crossplay (UDP)
+      webui: false
+  icon: https://raw.githubusercontent.com/community-valheim-tools/valheim-server-docker/main/misc/Logo_valheim.png
+services:
+  valheim:
+    image: ghcr.io/community-valheim-tools/valheim-server:latest
+    restart: unless-stopped
+    environment:
+      SERVER_NAME: TitanOS Valheim
+      WORLD_NAME: TitanOS
+      SERVER_PASS: ""
+      SERVER_PUBLIC: "false"
+      CROSSPLAY: "false"
+      BACKUPS: "true"
+      BACKUPS_MAX_AGE: "7"
+      UPDATE_CRON: 0 5 * * *
+      PUID: "1000"
+      PGID: "1000"
+      TZ: ""
+    volumes:
+      - ./config:/config
+      - ./server:/opt/valheim
+    ports:
+      - 2456:2456/udp
+      - 2457:2457/udp
+      - 2458:2458/udp
+    stop_grace_period: 2m
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"

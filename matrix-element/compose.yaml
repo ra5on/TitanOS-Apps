@@ -1,0 +1,360 @@
+x-titanos:
+  name: Matrix + Element
+  main: matrix
+  category: social
+  description:
+    de: Privater Matrix-Messenger mit Element-Weboberfläche, persönlichen Konten und PostgreSQL.
+    en: Private Matrix messenger with Element Web, personal accounts and PostgreSQL.
+  tips:
+    de: Kompletter Chat-Stack aus Synapse, Element, PostgreSQL und HTTPS-Gateway. MATRIX_SERVER_NAME legt die
+      dauerhaften Konto-IDs fest und darf später nicht geändert werden. MATRIX_PUBLIC_URL muss exakt zur
+      erreichbaren HTTPS-Adresse mit dem gewählten NAS-Port passen. Beim ersten Start wird ein
+      selbstsigniertes Zertifikat erzeugt und das hier festgelegte Administratorkonto angelegt. Mit
+      diesem Konto in Element anmelden; danach Passwort und Wiederherstellungsschlüssel sicher verwalten.
+      Zusätzliche Konten über register_new_matrix_user -c /data/homeserver.yaml http://localhost:8008 in
+      der Synapse-Containerkonsole anlegen. Offene Registrierung, Föderation und Anruf-Infrastruktur sind
+      nicht aktiviert. Die TitanOS-Anmeldung wird nicht übernommen. Chats, Medien, Datenbank, Identität
+      und Schlüssel liegen auf dem Daten-Volume und müssen gemeinsam gesichert werden. Für Fernzugriff
+      eine passende HTTPS-Domain bzw. Tailscale verwenden. Matrix-Daten und TLS-Konfiguration liegen in
+      Docker-Volumes im ausgewählten Docker-Datenverzeichnis; zusammen mit dem PostgreSQL-Ordner sichern.
+      Für Medien und vollständige Browserfunktionen muss das Zertifikat als vertrauenswürdig eingerichtet
+      sein; die bloße Bestätigung der Browserwarnung reicht nicht. Das öffentliche Zertifikat ist unter
+      /titanos-matrix.crt an derselben HTTPS-Adresse abrufbar. Vor dem Vertrauen den
+      SHA-256-Fingerabdruck mit dem im Log des Matrix-init-Dienstes angezeigten Fingerabdruck
+      vergleichen. Alternativ einen HTTPS-Proxy mit vertrauenswürdigem Zertifikat verwenden. Nach
+      automatischer Erneuerung des selbstsignierten Zertifikats das Vertrauen erneut einrichten.
+    en: Complete chat stack with Synapse, Element, PostgreSQL and an HTTPS gateway. MATRIX_SERVER_NAME
+      defines permanent account IDs and cannot be changed later. MATRIX_PUBLIC_URL must exactly match the
+      reachable HTTPS address and selected NAS port. On first startup a self-signed certificate and the
+      configured administrator account are created. Sign in to Element with this account, then manage the
+      password and recovery keys securely. Create additional accounts with register_new_matrix_user -c
+      /data/homeserver.yaml http://localhost:8008 in the Synapse container console. Open registration,
+      federation and calling infrastructure are not enabled. TitanOS authentication is separate. Chats,
+      media, database, identity and keys reside on the data volume and must be backed up together. Use a
+      suitable HTTPS domain or Tailscale for remote access. Matrix data and TLS configuration use Docker
+      volumes in the selected Docker data directory; back them up together with the PostgreSQL directory.
+      Media and full browser features require a trusted certificate; merely bypassing the browser warning
+      is insufficient. Download the public certificate from /titanos-matrix.crt at the same HTTPS
+      address. Before trusting it, compare its SHA-256 fingerprint with the fingerprint displayed in the
+      Matrix init service log. Alternatively use an HTTPS proxy with a trusted certificate. Renew trust
+      after automatic renewal of the self-signed certificate.
+  variables:
+    MATRIX_SERVER_NAME:
+      label:
+        de: Dauerhafter Matrix-Servername
+        en: Permanent Matrix server name
+      required: true
+      placeholder: matrix.example.com
+    MATRIX_PUBLIC_URL:
+      label:
+        de: Erreichbare HTTPS-Adresse
+        en: Reachable HTTPS URL
+      required: true
+      placeholder: https://nas.example:8448
+    MATRIX_ADMIN_USER:
+      label:
+        de: Erstes Administratorkonto
+        en: Initial administrator account
+      required: true
+    MATRIX_ADMIN_PASSWORD:
+      label:
+        de: Erstes Administratorpasswort
+        en: Initial administrator password
+      secret: generate
+      required: true
+    MATRIX_DATABASE_PASSWORD:
+      label:
+        de: Internes Datenbankpasswort
+        en: Internal database password
+      secret: generate
+      required: true
+    MATRIX_REGISTRATION_SECRET:
+      label:
+        de: Internes Registrierungsschlüssel
+        en: Internal registration secret
+      secret: generate
+      required: true
+    MATRIX_MACAROON_SECRET:
+      label:
+        de: Interner Sitzungsschlüssel
+        en: Internal session secret
+      secret: generate
+      required: true
+    MATRIX_FORM_SECRET:
+      label:
+        de: Interner Formularschlüssel
+        en: Internal form secret
+      secret: generate
+      required: true
+    POSTGRES_PASSWORD:
+      from: MATRIX_DATABASE_PASSWORD
+    REGISTRATION_SECRET:
+      from: MATRIX_REGISTRATION_SECRET
+  paths:
+    /var/lib/postgresql/data:
+      label:
+        de: Konten und Chat-Datenbank
+        en: Accounts and chat database
+  ports:
+    "8448":
+      label: Element Web / Matrix API (HTTPS)
+      webui: true
+  icon: https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/matrix.svg
+services:
+  matrix:
+    image: nginx:stable-alpine
+    restart: unless-stopped
+    labels:
+      titanos.webui: https://[host]:8448
+    depends_on:
+      synapse:
+        condition: service_healthy
+      element:
+        condition: service_started
+    command:
+      - nginx
+      - -c
+      - /etc/matrix/nginx.conf
+      - -g
+      - daemon off;
+    ports:
+      - 8448:8448
+    volumes:
+      - matrix-generated:/etc/matrix:ro
+    stop_grace_period: 30s
+    logging: &a1
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+  init:
+    image: ghcr.io/element-hq/synapse:v1.163.2
+    user: 0:0
+    restart: no
+    entrypoint:
+      - python
+      - -c
+    command:
+      - |
+        import os, json, pathlib, datetime, ipaddress, ssl
+        from urllib.parse import urlsplit
+        from cryptography import x509
+        from cryptography.x509.oid import NameOID
+        from cryptography.hazmat.primitives import hashes, serialization
+        from cryptography.hazmat.primitives.asymmetric import rsa
+        import yaml
+
+        def private_write(path,content,uid=0,gid=0,mode=0o600):
+            path=pathlib.Path(path); tmp=path.with_suffix(path.suffix+'.new')
+            tmp.write_text(content); os.chmod(tmp,mode); os.chown(tmp,uid,gid); tmp.replace(path)
+        server=os.environ['MATRIX_SERVER_NAME'].strip()
+        public=os.environ['MATRIX_PUBLIC_URL'].strip().rstrip('/')
+        u=urlsplit(public)
+        if not server or any(c.isspace() or c in '/\\@' for c in server):
+            raise SystemExit('MATRIX_SERVER_NAME must be a hostname, optionally with a port')
+        if u.scheme!='https' or not u.hostname or u.username or u.password or u.path or u.query or u.fragment:
+            raise SystemExit('MATRIX_PUBLIC_URL must be an HTTPS origin with its reachable NAS port')
+        data=pathlib.Path('/data'); shared=pathlib.Path('/generated')
+        data.mkdir(exist_ok=True); shared.mkdir(exist_ok=True)
+        os.chown(data,991,991); os.chmod(data,0o700)
+        identity=data/'titanos-server-name'
+        if identity.exists() and identity.read_text()!=server:
+            raise SystemExit('MATRIX_SERVER_NAME is immutable for an existing installation')
+        private_write(identity,server,991,991)
+        config={
+         'server_name':server,'public_baseurl':public+'/', 'pid_file':'/data/homeserver.pid',
+         'listeners':[{'port':8008,'tls':False,'type':'http','x_forwarded':True,'bind_addresses':['0.0.0.0'],'resources':[{'names':['client'],'compress':False}]}],
+         'database':{'name':'psycopg2','args':{'user':'synapse','password':os.environ['MATRIX_DATABASE_PASSWORD'],'database':'synapse','host':'db','port':5432,'cp_min':5,'cp_max':10}},
+         'media_store_path':'/data/media_store','signing_key_path':'/data/signing.key',
+         'registration_shared_secret':os.environ['MATRIX_REGISTRATION_SECRET'],
+         'macaroon_secret_key':os.environ['MATRIX_MACAROON_SECRET'],
+         'form_secret':os.environ['MATRIX_FORM_SECRET'],
+         'enable_registration':False,'report_stats':False,'trusted_key_servers':[],
+         'federation_domain_whitelist':[], 'password_config':{'enabled':True},
+         'enable_metrics':False,'max_upload_size':'50M'
+        }
+        private_write(data/'homeserver.yaml',yaml.safe_dump(config),991,991)
+        # Generate only missing Synapse key files, retaining the identity across restarts.
+        import subprocess
+        subprocess.run(['python','-m','synapse.app.homeserver','--config-path','/data/homeserver.yaml','--generate-keys'],check=True)
+        for path in data.iterdir():
+            if path.is_file():os.chown(path,991,991)
+        cert_path=shared/'tls.crt';key_path=shared/'tls.key'
+        renew=True
+        if cert_path.exists() and key_path.exists():
+            try:
+                cert=x509.load_pem_x509_certificate(cert_path.read_bytes())
+                sans=cert.extensions.get_extension_for_class(x509.SubjectAlternativeName).value
+                try:expected=x509.IPAddress(ipaddress.ip_address(u.hostname))
+                except ValueError:expected=x509.DNSName(u.hostname)
+                renew=expected not in sans or cert.not_valid_after_utc<datetime.datetime.now(datetime.timezone.utc)+datetime.timedelta(days=7)
+            except Exception:pass
+        if renew:
+            key=rsa.generate_private_key(public_exponent=65537,key_size=2048)
+            subject=x509.Name([x509.NameAttribute(NameOID.COMMON_NAME,u.hostname)])
+            try:san=x509.IPAddress(ipaddress.ip_address(u.hostname))
+            except ValueError:san=x509.DNSName(u.hostname)
+            now=datetime.datetime.now(datetime.timezone.utc)
+            cert=(x509.CertificateBuilder().subject_name(subject).issuer_name(subject).public_key(key.public_key()).serial_number(x509.random_serial_number()).not_valid_before(now-datetime.timedelta(minutes=5)).not_valid_after(now+datetime.timedelta(days=365)).add_extension(x509.SubjectAlternativeName([san]),critical=False).sign(key,hashes.SHA256()))
+            private_write(key_path,key.private_bytes(serialization.Encoding.PEM,serialization.PrivateFormat.PKCS8,serialization.NoEncryption()).decode())
+            private_write(cert_path,cert.public_bytes(serialization.Encoding.PEM).decode(),mode=0o644)
+        element={
+         'default_server_config':{'m.homeserver':{'base_url':public,'server_name':server}},
+         'disable_custom_urls':True,'disable_guests':True,'brand':'Element',
+         'default_federate':False,'room_directory':{'servers':[server]},
+         'integrations_ui_url':'','integrations_rest_url':'','integrations_widgets_urls':[],
+         'element_call':{'disable':True},'show_labs_settings':False
+        }
+        private_write(shared/'element.json',json.dumps(element),mode=0o644)
+        private_write(shared/'well-known.json',json.dumps({'m.homeserver':{'base_url':public}}),mode=0o644)
+        nginx=r'''
+        worker_processes auto;
+        pid /tmp/nginx.pid;
+        events { worker_connections 1024; }
+        http {
+          include /etc/nginx/mime.types;
+          default_type application/octet-stream;
+          access_log /dev/stdout;
+          error_log /dev/stderr warn;
+          map $$http_upgrade $$connection_upgrade { default upgrade; '' close; }
+          server {
+            listen 8448 ssl;
+            listen [::]:8448 ssl;
+            server_name _;
+            ssl_certificate /etc/matrix/tls.crt;
+            ssl_certificate_key /etc/matrix/tls.key;
+            ssl_protocols TLSv1.2 TLSv1.3;
+            client_max_body_size 50m;
+            location = /titanos-matrix.crt { alias /etc/matrix/tls.crt; default_type application/x-x509-ca-cert; add_header Content-Disposition 'attachment; filename="titanos-matrix.crt"'; }
+            location = /config.json { alias /etc/matrix/element.json; add_header Cache-Control no-store; }
+            location = /.well-known/matrix/client { alias /etc/matrix/well-known.json; default_type application/json; add_header Access-Control-Allow-Origin *; }
+            location /_matrix/ {
+              proxy_pass http://synapse:8008;
+              proxy_set_header Host $$host;
+              proxy_set_header X-Forwarded-For $$remote_addr;
+              proxy_set_header X-Forwarded-Proto https;
+              proxy_read_timeout 600s;
+            }
+            location /_synapse/client/ {
+              proxy_pass http://synapse:8008;
+              proxy_set_header Host $$host;
+              proxy_set_header X-Forwarded-For $$remote_addr;
+              proxy_set_header X-Forwarded-Proto https;
+            }
+            location / {
+              proxy_pass http://element:80;
+              proxy_http_version 1.1;
+              proxy_set_header Host $$host;
+              proxy_set_header Upgrade $$http_upgrade;
+              proxy_set_header Connection $$connection_upgrade;
+            }
+          }
+        }
+        '''
+        private_write(shared/'nginx.conf',nginx,mode=0o644)
+        print('Matrix HTTPS certificate SHA-256 fingerprint: '+x509.load_pem_x509_certificate(cert_path.read_bytes()).fingerprint(hashes.SHA256()).hex(':'))
+        print('Matrix configuration, HTTPS certificate and Element settings prepared; existing server identity retained.')
+    environment:
+      MATRIX_SERVER_NAME: ""
+      MATRIX_PUBLIC_URL: ""
+      MATRIX_DATABASE_PASSWORD: ""
+      MATRIX_REGISTRATION_SECRET: ""
+      MATRIX_MACAROON_SECRET: ""
+      MATRIX_FORM_SECRET: ""
+    volumes:
+      - matrix-data:/data
+      - matrix-generated:/generated
+    logging: *a1
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: synapse
+      POSTGRES_DB: synapse
+      POSTGRES_PASSWORD: ${MATRIX_DATABASE_PASSWORD:-}
+      POSTGRES_INITDB_ARGS: --encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U synapse -d synapse
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    stop_grace_period: 60s
+    logging: *a1
+  synapse:
+    image: ghcr.io/element-hq/synapse:v1.163.2
+    user: 991:991
+    restart: unless-stopped
+    depends_on:
+      init:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+    entrypoint:
+      - python
+      - -m
+      - synapse.app.homeserver
+    command:
+      - --config-path
+      - /data/homeserver.yaml
+    volumes:
+      - matrix-data:/data
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://localhost:8008/health', timeout=5).read()
+      interval: 5s
+      timeout: 8s
+      start_period: 20s
+      retries: 40
+    stop_grace_period: 60s
+    logging: *a1
+  admin-init:
+    image: ghcr.io/element-hq/synapse:v1.163.2
+    restart: no
+    depends_on:
+      synapse:
+        condition: service_healthy
+    entrypoint:
+      - python
+      - -c
+    command:
+      - |
+        import os,json,hmac,hashlib,urllib.request,urllib.error
+        base='http://synapse:8008/_synapse/admin/v1/register'
+        username=os.environ['MATRIX_ADMIN_USER']
+        password=os.environ['MATRIX_ADMIN_PASSWORD']
+        if not username or not password:raise SystemExit('An initial administrator username and password are required')
+        nonce=json.load(urllib.request.urlopen(base))['nonce']
+        mac=hmac.new(os.environ['REGISTRATION_SECRET'].encode(),digestmod=hashlib.sha1)
+        for value in [nonce,username,password]:mac.update(value.encode());mac.update(bytes([0]))
+        mac.update(b'admin')
+        body=json.dumps({'nonce':nonce,'username':username,'password':password,'admin':True,'mac':mac.hexdigest()}).encode()
+        try:
+            with urllib.request.urlopen(urllib.request.Request(base,data=body,headers={'Content-Type':'application/json'})) as response:
+                response.read()
+            print('Initial Matrix administrator created.')
+        except urllib.error.HTTPError as e:
+            detail=json.load(e)
+            if detail.get('errcode')!='M_USER_IN_USE':raise
+            print('Matrix administrator already exists; password unchanged.')
+    environment:
+      MATRIX_ADMIN_USER: ""
+      MATRIX_ADMIN_PASSWORD: ""
+      REGISTRATION_SECRET: ${MATRIX_REGISTRATION_SECRET:-}
+    logging: *a1
+  element:
+    image: ghcr.io/element-hq/element-web:v1.12.32
+    restart: unless-stopped
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    logging: *a1
+volumes:
+  matrix-generated: {}
+  matrix-data: {}

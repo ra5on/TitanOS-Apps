@@ -1,0 +1,144 @@
+x-titanos:
+  name: Mattermost
+  main: mattermost
+  category: social
+  description:
+    de: Eigener Teamchat mit Kanälen, persönlichen Konten und Dateiaustausch.
+    en: Your own team chat with channels, personal accounts and file sharing.
+  tips:
+    de: Mattermost Team Edition mit eigener PostgreSQL-Datenbank. Beim ersten Öffnen das erste
+      Administratorkonto einrichten und danach weitere Personen einladen. Die TitanOS-Anmeldung wird
+      nicht übernommen. SITEURL muss exakt zur erreichbaren Adresse und zum gewählten NAS-Port passen.
+      Für Fernzugriff HTTPS am Reverse-Proxy separat einrichten. Chat, Dateien, Einstellungen und
+      Datenbank liegen auf dem Daten-Volume. E-Mail-Versand muss bei Bedarf über SMTP eingerichtet
+      werden. Diese Vorlage richtet keine Telefonie-/Video-Infrastruktur ein. Die
+      Mattermost-Verzeichnisse sind gemeinsame Docker-Volumes im ausgewählten Docker-Datenverzeichnis;
+      zusammen mit dem PostgreSQL-Ordner sichern.
+    en: Mattermost Team Edition with its own PostgreSQL database. Create the first administrator account on
+      first opening, then invite other people. TitanOS authentication is separate. SITEURL must exactly
+      match the reachable address and selected NAS port. Configure HTTPS separately at a reverse proxy
+      for remote access. Chat, files, configuration and database reside on the data volume. Configure
+      SMTP separately if needed. This template does not set up voice/video infrastructure. Mattermost
+      directories use shared Docker volumes in the selected Docker data directory; back them up together
+      with the PostgreSQL directory.
+  variables:
+    MM_SERVICESETTINGS_SITEURL:
+      label:
+        de: Erreichbare Mattermost-Adresse
+        en: Reachable Mattermost URL
+      required: true
+      placeholder: http://nas.example:8065
+    MATTERMOST_DATABASE_PASSWORD:
+      label:
+        de: Internes Datenbankpasswort
+        en: Internal database password
+      secret: generate
+      required: true
+    POSTGRES_PASSWORD:
+      from: MATTERMOST_DATABASE_PASSWORD
+    TZ:
+      label:
+        de: Zeitzone
+        en: Timezone
+      fill: timezone
+  paths:
+    /var/lib/postgresql/data:
+      label:
+        de: Datenbank
+        en: Database
+  ports:
+    "8065":
+      label: Mattermost WebUI
+      webui: true
+  icon: https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/mattermost.svg
+services:
+  mattermost:
+    image: mattermost/mattermost-team-edition:12.0.1
+    restart: unless-stopped
+    labels:
+      titanos.webui: http://[host]:8065
+    depends_on:
+      db:
+        condition: service_healthy
+      init:
+        condition: service_completed_successfully
+    environment:
+      MM_SQLSETTINGS_DRIVERNAME: postgres
+      MM_SERVICESETTINGS_SITEURL: ""
+      MM_SERVICESETTINGS_LISTENADDRESS: :8065
+      MM_LOGSETTINGS_ENABLECONSOLE: "true"
+      MM_TEAMSETTINGS_ENABLEOPENSERVER: "false"
+      MM_BLEVESETTINGS_INDEXDIR: /mattermost/bleve-indexes
+      TZ: ""
+      MM_CONFIG: /mattermost/config/config.json
+    ports:
+      - 8065:8065
+    volumes:
+      - mattermost-config:/mattermost/config
+      - mattermost-data:/mattermost/data
+      - mattermost-logs:/mattermost/logs
+      - mattermost-plugins:/mattermost/plugins
+      - mattermost-client-plugins:/mattermost/client/plugins
+      - mattermost-bleve-indexes:/mattermost/bleve-indexes
+    stop_grace_period: 60s
+    logging: &a1
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mattermost
+      POSTGRES_DB: mattermost
+      POSTGRES_PASSWORD: ${MATTERMOST_DATABASE_PASSWORD:-}
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U mattermost -d mattermost
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    stop_grace_period: 60s
+    logging: *a1
+  init:
+    image: python:3.14-alpine
+    user: 0:0
+    restart: no
+    entrypoint:
+      - python
+      - -c
+    command:
+      - |
+        import os,json,pathlib
+        from urllib.parse import quote
+        paths=['/mattermost/config','/mattermost/data','/mattermost/logs','/mattermost/plugins','/mattermost/client/plugins','/mattermost/bleve-indexes']
+        for path in paths:
+            os.chown(path,2000,2000);os.chmod(path,0o750)
+        path=pathlib.Path('/mattermost/config/config.json')
+        config=json.loads(path.read_text()) if path.exists() else {}
+        settings=config.setdefault('SqlSettings',{})
+        settings['DriverName']='postgres'
+        settings['DataSource']='postgres://mattermost:'+quote(os.environ['MATTERMOST_DATABASE_PASSWORD'],safe='')+'@db:5432/mattermost?sslmode=disable&connect_timeout=10'
+        tmp=path.with_suffix('.json.new');tmp.write_text(json.dumps(config));os.chown(tmp,2000,2000);os.chmod(tmp,0o600);tmp.replace(path)
+        print('Mattermost directories and database configuration prepared.')
+    volumes:
+      - mattermost-config:/mattermost/config
+      - mattermost-data:/mattermost/data
+      - mattermost-logs:/mattermost/logs
+      - mattermost-plugins:/mattermost/plugins
+      - mattermost-client-plugins:/mattermost/client/plugins
+      - mattermost-bleve-indexes:/mattermost/bleve-indexes
+    logging: *a1
+    environment:
+      MATTERMOST_DATABASE_PASSWORD: ""
+volumes:
+  mattermost-config: {}
+  mattermost-data: {}
+  mattermost-logs: {}
+  mattermost-plugins: {}
+  mattermost-client-plugins: {}
+  mattermost-bleve-indexes: {}

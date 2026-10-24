@@ -1,0 +1,108 @@
+x-titanos:
+  name: Palworld
+  main: palworld
+  category: games
+  description:
+    de: Palworld-Server mit eigener Welt, Spielerpasswort und automatischen Backups.
+    en: Palworld server with your own world, player password and automatic backups.
+  tips:
+    de: Gameserver ohne Weboberfläche. Im passenden Spielclient mit NAS-Adresse und dem gewählten Spielport
+      verbinden. Welten und Einstellungen liegen auf dem Daten-Volume. Fernzugriff und Router-Freigaben
+      werden nicht automatisch eingerichtet. Vor Versionswechseln die Welten sichern; Spielclient und
+      Server müssen zusammenpassen. Die Serverdateien werden beim Start von Steam geladen und
+      aktualisiert. Mindestens 16 GB RAM für den Server vorsehen, mehr für größere Welten und
+      Spielerzahlen. Community-Veröffentlichung ist ausgeschaltet. Bei Änderung des NAS-Spielports auch
+      PUBLIC_PORT anpassen. Die REST-API ist nur innerhalb des Containers erreichbar; kein WebUI-Link.
+      Automatische Backups liegen mit den Spielständen im Datenordner.
+    en: Game server without a web interface. Connect from the matching game client using the NAS address and
+      selected game port. Worlds and settings reside on the data volume. Remote access and router
+      forwarding are not configured automatically. Back up worlds before version changes; client and
+      server versions must match. Server files are downloaded and updated from Steam on startup. Allow at
+      least 16 GB RAM for the server and more for large worlds/player counts. Community listing is
+      disabled. When changing the NAS game port, also adjust PUBLIC_PORT. The REST API is available only
+      inside the container; there is no WebUI link. Automatic backups reside with the saves in the data
+      folder.
+  variables:
+    SERVER_NAME:
+      label:
+        de: Servername
+        en: Server name
+    SERVER_DESCRIPTION:
+      label:
+        de: Serverbeschreibung
+        en: Server description
+    SERVER_PASSWORD:
+      label:
+        de: Spielerpasswort
+        en: Player password
+      secret: generate
+      required: true
+    ADMIN_PASSWORD:
+      label:
+        de: Administratorpasswort
+        en: Administrator password
+      secret: generate
+      required: true
+    PLAYERS:
+      label:
+        de: Spielerlimit
+        en: Player limit
+    PUBLIC_PORT:
+      label:
+        de: Öffentlicher Spielport
+        en: Public game port
+    PUID:
+      label:
+        de: Benutzer-ID
+        en: User ID
+      fill: uid
+    PGID:
+      label:
+        de: Gruppen-ID
+        en: Group ID
+      fill: gid
+    TZ:
+      label:
+        de: Zeitzone
+        en: Timezone
+      fill: timezone
+  paths:
+    /palworld:
+      label:
+        de: Spielstände, Einstellungen, Backups und Serverdateien
+        en: Saves, settings, backups and server files
+  ports:
+    8211/udp:
+      label: Palworld Spiel (UDP)
+      webui: false
+  icon: https://raw.githubusercontent.com/thijsvanloef/palworld-server-docker/main/docusaurus/static/img/palworld.png
+services:
+  palworld:
+    image: thijsvanloef/palworld-server-docker:v2.8.1
+    restart: unless-stopped
+    environment:
+      SERVER_NAME: TitanOS Palworld
+      SERVER_DESCRIPTION: Private Palworld server
+      SERVER_PASSWORD: ""
+      ADMIN_PASSWORD: ""
+      PLAYERS: "8"
+      PORT: "8211"
+      PUBLIC_PORT: "8211"
+      COMMUNITY: "false"
+      REST_API_ENABLED: "true"
+      REST_API_PORT: "8212"
+      UPDATE_ON_BOOT: "true"
+      BACKUP_ENABLED: "true"
+      PUID: "1000"
+      PGID: "1000"
+      TZ: ""
+    ports:
+      - 8211:8211/udp
+    volumes:
+      - ./data:/palworld
+    stop_grace_period: 2m
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
