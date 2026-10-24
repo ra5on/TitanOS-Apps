@@ -1,0 +1,100 @@
+x-titanos:
+  name: Terraria / tModLoader
+  main: terraria
+  category: games
+  description:
+    de: Terraria-Server mit tModLoader, dauerhafter Welt und optionalen Workshop-Mods.
+    en: Terraria server with tModLoader, a persistent world and optional Workshop mods.
+  tips:
+    de: Gameserver ohne Weboberfläche. Im passenden Spielclient mit NAS-Adresse und dem gewählten Spielport
+      verbinden. Welten und Einstellungen liegen auf dem Daten-Volume. Fernzugriff und Router-Freigaben
+      werden nicht automatisch eingerichtet. Vor Versionswechseln die Welten sichern; Spielclient und
+      Server müssen zusammenpassen. Benötigt einen passenden tModLoader-Spielclient. Ohne konfigurierte
+      Workshop-IDs startet die Vorlage ohne zusätzliche Mods. Weltname und Größe gelten bei der ersten
+      Erzeugung. Der voreingestellte NAS-Port 7778 vermeidet einen Konflikt mit Satisfactory.
+      Serverdateien liegen mit der Welt im Datenordner.
+    en: Game server without a web interface. Connect from the matching game client using the NAS address and
+      selected game port. Worlds and settings reside on the data volume. Remote access and router
+      forwarding are not configured automatically. Back up worlds before version changes; client and
+      server versions must match. Requires a matching tModLoader game client. Without configured Workshop
+      IDs the template starts without additional mods. World name and size apply when first generating
+      the world. Default NAS port 7778 avoids a conflict with Satisfactory. Server files and the world
+      reside in the data folder.
+  variables:
+    TMOD_MOTD:
+      label:
+        de: Serverbeschreibung
+        en: Server description
+    TMOD_PASS:
+      label:
+        de: Serverpasswort
+        en: Server password
+      secret: generate
+      required: true
+    TMOD_MAXPLAYERS:
+      label:
+        de: Spielerlimit
+        en: Player limit
+    TMOD_WORLDNAME:
+      label:
+        de: Weltname
+        en: World name
+    TMOD_WORLDSIZE:
+      label:
+        de: Weltgröße (1 klein, 2 mittel, 3 groß)
+        en: World size (1 small, 2 medium, 3 large)
+    TMOD_DIFFICULTY:
+      label:
+        de: Schwierigkeit (0 normal, 1 Experte, 2 Meister)
+        en: Difficulty (0 normal, 1 expert, 2 master)
+    TMOD_AUTODOWNLOAD:
+      label:
+        de: Workshop-IDs zum Herunterladen (optional)
+        en: Workshop IDs to download (optional)
+    TMOD_ENABLEDMODS:
+      label:
+        de: Aktivierte Workshop-IDs (optional)
+        en: Enabled Workshop IDs (optional)
+    TZ:
+      label:
+        de: Zeitzone
+        en: Timezone
+      fill: timezone
+  paths:
+    /data:
+      label:
+        de: Welt, Mods und Serverdateien
+        en: World, mods and server files
+  ports:
+    "7777":
+      label: Terraria / tModLoader (TCP)
+      webui: false
+  icon: https://raw.githubusercontent.com/tModLoader/tModLoader/stable/solutions/documentation/tModLoaderIcon-Small.png
+services:
+  terraria:
+    image: jacobsmile/tmodloader1.4:latest
+    restart: unless-stopped
+    environment:
+      TMOD_MOTD: TitanOS Terraria
+      TMOD_PASS: ""
+      TMOD_MAXPLAYERS: "8"
+      TMOD_WORLDNAME: TitanOS
+      TMOD_WORLDSIZE: "1"
+      TMOD_DIFFICULTY: "0"
+      TMOD_AUTODOWNLOAD: ""
+      TMOD_ENABLEDMODS: ""
+      TMOD_AUTOSAVE_INTERVAL: "10"
+      TMOD_SHUTDOWN_MESSAGE: Server shutting down
+      TZ: ""
+    ports:
+      - 7778:7777/tcp
+    volumes:
+      - ./data:/data
+    stdin_open: true
+    tty: true
+    stop_grace_period: 2m
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"

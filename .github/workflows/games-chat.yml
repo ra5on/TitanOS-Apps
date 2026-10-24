@@ -1,0 +1,38 @@
+name: Games browser and chat smoke
+on:
+  workflow_dispatch:
+  push:
+    paths: ['minecraft-java/**', 'minecraft-bedrock/**', 'valheim/**', 'terraria/**', 'satisfactory/**', 'palworld/**', 'firefox/**', 'matrix-element/**', 'mattermost/**', 'scripts/games-chat-smoke.mjs', '.github/workflows/games-chat.yml']
+  pull_request:
+    paths: ['minecraft-java/**', 'minecraft-bedrock/**', 'valheim/**', 'terraria/**', 'satisfactory/**', 'palworld/**', 'firefox/**', 'matrix-element/**', 'mattermost/**', 'scripts/games-chat-smoke.mjs', '.github/workflows/games-chat.yml']
+permissions:
+  contents: read
+jobs:
+  smoke:
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [minecraft-java, minecraft-bedrock, valheim, terraria, satisfactory, palworld, firefox, matrix-element, mattermost]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Install browser test client
+        if: matrix.app == 'firefox' || matrix.app == 'matrix-element'
+        run: |
+          npm install --prefix /tmp/browser playwright
+          google-chrome --version
+      - name: Allow self-signed HTTPS in isolated test client
+        run: echo 'NODE_TLS_REJECT_UNAUTHORIZED=0' >> "$GITHUB_ENV"
+      - name: Test isolated app
+        env:
+          PLAYWRIGHT_PATH: /tmp/browser/node_modules/playwright/index.mjs
+        run: node scripts/games-chat-smoke.mjs '${{ matrix.app }}'
+      - uses: actions/upload-artifact@v7
+        if: always() && (matrix.app == 'firefox' || matrix.app == 'matrix-element')
+        with:
+          name: games-chat-${{ matrix.app }}
+          path: '*-catalog-smoke.png'
