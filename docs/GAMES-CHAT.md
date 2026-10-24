@@ -53,8 +53,13 @@ Matrix erstellt ein dauerhaftes Serverprofil, Synapse-Schlüssel, eine eigene
 Datenbank und das im Formular angegebene Administratorkonto. Der Servername ist
 Teil der Konto-IDs und bleibt nach dem ersten Start unveränderlich. Die öffentliche
 HTTPS-Adresse muss einschließlich NAS-Port genau stimmen. Der lokale Zugang
-verwendet ein selbstsigniertes Zertifikat; für externe Clients ein geeignetes,
-vertrauenswürdiges HTTPS-Zertifikat am Proxy einrichten. Element und Matrix-API
+verwendet ein selbstsigniertes Zertifikat. Für Element-Medien und Service Worker
+muss der Browser diesem Zertifikat vertrauen; das bloße Übergehen einer Warnung
+reicht nicht. Das öffentliche Zertifikat kann unter `/titanos-matrix.crt` geladen
+werden. Den SHA-256-Fingerabdruck vorher über die Gateway-Konsole vergleichen:
+`openssl x509 -in /etc/matrix/tls.crt -noout -fingerprint -sha256`. Beim erneuerten
+Zertifikat muss das Vertrauen erneuert werden. Alternativ einen HTTPS-Proxy mit
+vertrauenswürdigem Zertifikat einrichten; dies gilt auch für externe Clients. Element und Matrix-API
 liegen unter derselben Adresse. Das Gateway leitet die Synapse-Admin-API nicht
 weiter. Offene Registrierung und Föderation sind deaktiviert. Weitere Konten
 über `register_new_matrix_user -c /data/homeserver.yaml http://localhost:8008`
@@ -107,8 +112,12 @@ auf Wegwerf-Runnern. Keine echten Konten, NAS-Freigaben oder Produktivdaten.
 | Satisfactory | HTTPS-API, Erstbeanspruchung, Passwortanmeldung und erhaltene Serverkonfiguration |
 | Palworld | authentifizierte REST-API, falsches Passwort abgewiesen, Welt speichern und wieder laden |
 | Firefox | HTTPS, falsches Passwort abgewiesen, angemeldeter Desktop mit WebSocket-Frames, Prozess und erhaltenes Profil |
-| Matrix + Element | Administratoranlage, abgewiesene falsche Anmeldung/öffentliche Registrierung, Raum und Nachricht, Element-Browseranmeldung, erhaltene Daten nach Neuerstellung |
+| Matrix + Element | Administratoranlage, abgewiesene falsche Anmeldung/öffentliche Registrierung, Raum, Nachricht und Bild-Upload, Element-Browseranmeldung und Service Worker/Bildanzeige, erhaltene Daten nach Neuerstellung |
 | Mattermost | erster Administrator, abgewiesenes falsches Passwort, Team/Kanal/Nachricht und Datei-Upload, erhaltene Daten nach Neuerstellung |
+
+Die lokale Matrix-Browserprobe akzeptiert ausschließlich im Wegwerf-Test das
+selbstsignierte Zertifikat per Chromium-Startargument; auf dem NAS muss dafür
+echtes Zertifikatsvertrauen oder ein vertrauenswürdiger Proxy eingerichtet sein.
 
 Zusätzlich werden alle neun Vorlagen mit dem tatsächlichen TitanOS-
 Installationsparser aufgebaut: Pflichtfelder, erzeugte Geheimnisse und deren
