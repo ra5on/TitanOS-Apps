@@ -20,10 +20,9 @@ x-titanos:
       Für Medien und vollständige Browserfunktionen muss das Zertifikat als vertrauenswürdig eingerichtet
       sein; die bloße Bestätigung der Browserwarnung reicht nicht. Das öffentliche Zertifikat ist unter
       /titanos-matrix.crt an derselben HTTPS-Adresse abrufbar. Vor dem Vertrauen den
-      SHA-256-Fingerabdruck mit openssl x509 -in /etc/matrix/tls.crt -noout -fingerprint -sha256 in der
-      Matrix-Gateway-Konsole vergleichen. Alternativ einen HTTPS-Proxy mit vertrauenswürdigem Zertifikat
-      verwenden. Nach automatischer Erneuerung des selbstsignierten Zertifikats das Vertrauen erneut
-      einrichten.
+      SHA-256-Fingerabdruck mit dem im Log des Matrix-init-Dienstes angezeigten Fingerabdruck
+      vergleichen. Alternativ einen HTTPS-Proxy mit vertrauenswürdigem Zertifikat verwenden. Nach
+      automatischer Erneuerung des selbstsignierten Zertifikats das Vertrauen erneut einrichten.
     en: Complete chat stack with Synapse, Element, PostgreSQL and an HTTPS gateway. MATRIX_SERVER_NAME
       defines permanent account IDs and cannot be changed later. MATRIX_PUBLIC_URL must exactly match the
       reachable HTTPS address and selected NAS port. On first startup a self-signed certificate and the
@@ -36,10 +35,9 @@ x-titanos:
       volumes in the selected Docker data directory; back them up together with the PostgreSQL directory.
       Media and full browser features require a trusted certificate; merely bypassing the browser warning
       is insufficient. Download the public certificate from /titanos-matrix.crt at the same HTTPS
-      address. Before trusting it, compare its SHA-256 fingerprint with openssl x509 -in
-      /etc/matrix/tls.crt -noout -fingerprint -sha256 in the Matrix gateway console. Alternatively use an
-      HTTPS proxy with a trusted certificate. Renew trust after automatic renewal of the self-signed
-      certificate.
+      address. Before trusting it, compare its SHA-256 fingerprint with the fingerprint displayed in the
+      Matrix init service log. Alternatively use an HTTPS proxy with a trusted certificate. Renew trust
+      after automatic renewal of the self-signed certificate.
   variables:
     MATRIX_SERVER_NAME:
       label:
@@ -254,6 +252,7 @@ services:
         }
         '''
         private_write(shared/'nginx.conf',nginx,mode=0o644)
+        print('Matrix HTTPS certificate SHA-256 fingerprint: '+x509.load_pem_x509_certificate(cert_path.read_bytes()).fingerprint(hashes.SHA256()).hex(':'))
         print('Matrix configuration, HTTPS certificate and Element settings prepared; existing server identity retained.')
     environment:
       MATRIX_SERVER_NAME: ""
