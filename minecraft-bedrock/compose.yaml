@@ -1,0 +1,190 @@
+x-titanos:
+  name: Minecraft Bedrock
+  main: bedrock
+  category: games
+  description:
+    de: Eigener Minecraft-Bedrock-Server mit dauerhafter Welt und Xbox-Anmeldung.
+    en: Your own Minecraft Bedrock server with a persistent world and Xbox authentication.
+  tips:
+    de: "Aktuelle Bedrock-Version mit NetherNet: TCP 19132 für Verbindungsaufbau und UDP 19140–19155 für
+      Spielverbindungen. SERVER_UDP_PORTS muss die vom Spielclient erreichbare NAS-IP mit beiden
+      Bereichen enthalten, etwa 192.168.1.10:19140-19155:19140-19155. UDP-Portgruppe und angekündigten
+      Bereich gemeinsam ändern; die voreingestellten einzelnen UDP-Ports müssen frei sein. Für
+      Internetzugriff die tatsächlich erreichbare öffentliche IP und passende Routerfreigaben separat
+      einrichten. Java-Clients sind nicht kompatibel. Minecraft-EULA lesen und ausdrücklich TRUE
+      eingeben. Xbox-Anmeldung bleibt erforderlich; die zusätzliche Namens-Allowlist ist zunächst aus.
+      Bei Bedarf ALLOW_LIST und ALLOW_LIST_USERS in Compose konfigurieren. Konsolen können externe Server
+      beschränken. Welten und Einstellungen liegen auf dem Daten-Volume. VERSION=LATEST aktualisiert beim
+      Start. Kein Browser-WebUI; der TCP-Endpunkt gehört zum Spielprotokoll."
+    en: "Current Bedrock version using NetherNet: TCP 19132 for signaling and UDP 19140–19155 for gameplay.
+      SERVER_UDP_PORTS must contain the NAS IP reachable by game clients with both ranges, for example
+      192.168.1.10:19140-19155:19140-19155. Change the UDP mappings and advertised range together; the
+      default individual UDP ports must be free. Internet access requires a reachable public IP and
+      matching router forwarding configured separately. Java clients are incompatible. Read and
+      explicitly accept the Minecraft EULA with TRUE. Xbox authentication remains required; the
+      additional name allowlist is initially disabled. Configure ALLOW_LIST and ALLOW_LIST_USERS in
+      Compose if needed. Consoles may restrict external servers. Worlds and settings reside on the data
+      volume. VERSION=LATEST updates on startup. No browser WebUI; the TCP endpoint belongs to the game
+      protocol."
+  variables:
+    EULA:
+      label:
+        de: Minecraft-EULA ausdrücklich akzeptieren
+        en: Explicitly accept the Minecraft EULA
+      required: true
+      placeholder: "TRUE"
+      help:
+        de: Nur nach Lesen von https://www.minecraft.net/eula TRUE eingeben. Ohne Zustimmung startet der Server
+          nicht.
+        en: Enter TRUE only after reading https://www.minecraft.net/eula. The server will not start without
+          acceptance.
+    VERSION:
+      label:
+        de: Bedrock-Version
+        en: Bedrock version
+    SERVER_NAME:
+      label:
+        de: Servername
+        en: Server name
+    LEVEL_NAME:
+      label:
+        de: Weltname
+        en: World name
+    GAMEMODE:
+      label:
+        de: Spielmodus
+        en: Game mode
+    DIFFICULTY:
+      label:
+        de: Schwierigkeit
+        en: Difficulty
+    MAX_PLAYERS:
+      label:
+        de: Spielerlimit
+        en: Player limit
+    UID:
+      label:
+        de: Benutzer-ID
+        en: User ID
+      fill: uid
+    GID:
+      label:
+        de: Gruppen-ID
+        en: Group ID
+      fill: gid
+    TZ:
+      label:
+        de: Zeitzone
+        en: Timezone
+      fill: timezone
+    SERVER_UDP_PORTS:
+      label:
+        de: Erreichbare NAS-IP und UDP-Portbereich
+        en: Reachable NAS IP and UDP port range
+      required: true
+      placeholder: 192.168.1.10:19140-19155:19140-19155
+  paths:
+    /data:
+      label:
+        de: Bedrock-Welt und Einstellungen
+        en: Bedrock world and settings
+  ports:
+    "19132":
+      label: Bedrock NetherNet signaling (TCP)
+      webui: false
+    19140/udp:
+      label: Bedrock gameplay 1 (UDP)
+      webui: false
+    19141/udp:
+      label: Bedrock gameplay 2 (UDP)
+      webui: false
+    19142/udp:
+      label: Bedrock gameplay 3 (UDP)
+      webui: false
+    19143/udp:
+      label: Bedrock gameplay 4 (UDP)
+      webui: false
+    19144/udp:
+      label: Bedrock gameplay 5 (UDP)
+      webui: false
+    19145/udp:
+      label: Bedrock gameplay 6 (UDP)
+      webui: false
+    19146/udp:
+      label: Bedrock gameplay 7 (UDP)
+      webui: false
+    19147/udp:
+      label: Bedrock gameplay 8 (UDP)
+      webui: false
+    19148/udp:
+      label: Bedrock gameplay 9 (UDP)
+      webui: false
+    19149/udp:
+      label: Bedrock gameplay 10 (UDP)
+      webui: false
+    19150/udp:
+      label: Bedrock gameplay 11 (UDP)
+      webui: false
+    19151/udp:
+      label: Bedrock gameplay 12 (UDP)
+      webui: false
+    19152/udp:
+      label: Bedrock gameplay 13 (UDP)
+      webui: false
+    19153/udp:
+      label: Bedrock gameplay 14 (UDP)
+      webui: false
+    19154/udp:
+      label: Bedrock gameplay 15 (UDP)
+      webui: false
+    19155/udp:
+      label: Bedrock gameplay 16 (UDP)
+      webui: false
+  icon: https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/minecraft.svg
+services:
+  bedrock:
+    image: itzg/minecraft-bedrock-server:latest
+    restart: unless-stopped
+    environment:
+      EULA: ""
+      VERSION: LATEST
+      SERVER_NAME: TitanOS Bedrock
+      LEVEL_NAME: TitanOS
+      GAMEMODE: survival
+      DIFFICULTY: normal
+      MAX_PLAYERS: "10"
+      ONLINE_MODE: "true"
+      UID: "1000"
+      GID: "1000"
+      TZ: ""
+      TRANSPORT: nethernet
+      SERVER_UDP_PORTS: ""
+      ALLOW_LIST: "false"
+    ports:
+      - 19132:19132/tcp
+      - 19140:19140/udp
+      - 19141:19141/udp
+      - 19142:19142/udp
+      - 19143:19143/udp
+      - 19144:19144/udp
+      - 19145:19145/udp
+      - 19146:19146/udp
+      - 19147:19147/udp
+      - 19148:19148/udp
+      - 19149:19149/udp
+      - 19150:19150/udp
+      - 19151:19151/udp
+      - 19152:19152/udp
+      - 19153:19153/udp
+      - 19154:19154/udp
+      - 19155:19155/udp
+    volumes:
+      - ./data:/data
+    stdin_open: true
+    tty: true
+    stop_grace_period: 2m
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
