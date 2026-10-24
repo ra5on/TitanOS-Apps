@@ -51,3 +51,18 @@ Dieser erneute Lauf wird ausdrücklich nicht als bestandener Laufzeittest gewert
 Keine Migration einer PostgreSQL-14-Datenbank, Foto-/Videoverarbeitung, echte
 ML-Inferenz, GPU oder vorhandenen NAS-Daten getestet. Die abgeleitete Immich-
 Vorlage bleibt AGPL-3.0-only; Images behalten die Rechte ihrer jeweiligen Projekte.
+
+## Erfolgreiche Wiederholungsprüfung am 25. Oktober 2026
+
+Der [erneute Lauf des veröffentlichten Stacks](https://github.com/ra5on/TitanOS-Apps/actions/runs/40137745580)
+ist erfolgreich. Zusätzlich bestätigt der
+[erweiterte Funktionstest](https://github.com/ra5on/TitanOS-Apps/actions/runs/40137905257)
+Immich Server und ML 3.3.5, Valkey 9.1.2 sowie PostgreSQL 18.3 mit VectorChord
+1.1.1 und pgvector 0.8.2. Alle vier Dienste waren gesund. Ein synthetisches PNG
+wurde hochgeladen, bytegenau heruntergeladen, als Vorschaubild verarbeitet und
+über echte CPU-ML-Inferenz und Vektorsuche gefunden. Nach Neuerstellung aller
+Container waren Konto, Album, Originalbild und Suchergebnis erhalten; die geprüften
+Warteschlangen hatten keine fehlgeschlagenen Aufträge. Exakte Images und Prüfgrenzen
+stehen im [maschinenlesbaren Prüfbericht](../validation/immich-2026-10-25.json).
+Migrationen alter Datenbanken, Video-Transcoding, Gesichtserkennungsqualität und
+GPU-Beschleunigung bleiben ungeprüft.

@@ -1,0 +1,70 @@
+{
+  "images": {
+    "immich-server": {
+      "channel": "ghcr.io/immich-app/immich-server:release",
+      "imageId": "sha256:fb31598c03fbb3d68f6409548ab7b18148ee651bf7d6b40e1d907308edbf0dc2",
+      "digests": [
+        "ghcr.io/immich-app/immich-server@sha256:485d546a2e31d6a8b4db8423fcba5c109de8c218d93410af115fd1ccfc4352a6"
+      ],
+      "version": "v3.3.5"
+    },
+    "immich-machine-learning": {
+      "channel": "ghcr.io/immich-app/immich-machine-learning:release",
+      "imageId": "sha256:fc548ba30a5025dfdd4a5ada9a227b557fbadc95786b6cd52f5ad3cd3f198268",
+      "digests": [
+        "ghcr.io/immich-app/immich-machine-learning@sha256:5b28c9352c8374b8a1ed96fbdd8d6755fea6e43510ec43fdf6538aa02ea40f56"
+      ],
+      "version": "v3.3.5"
+    },
+    "redis": {
+      "channel": "docker.io/valkey/valkey:latest",
+      "imageId": "sha256:726dea3590a895d94203fe918b97ae2af8f609f04675590be0070cf64797ba88",
+      "digests": [
+        "valkey/valkey@sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd"
+      ],
+      "version": null
+    },
+    "database": {
+      "channel": "ghcr.io/tensorchord/vchord-suite:pg18-latest",
+      "imageId": "sha256:b90faebbb0a55f9982e991a4f3dd8464731345592442f39e90e30a26170075ac",
+      "digests": [
+        "ghcr.io/tensorchord/vchord-suite@sha256:c6e5e77a1180199f91b040b6e85c6d10b0ded6d49fb614dfd2e7272ffb91af08"
+      ],
+      "version": null
+    }
+  },
+  "versions": {
+    "immich": {
+      "major": 3,
+      "minor": 3,
+      "patch": 5,
+      "prerelease": null
+    },
+    "valkey": {
+      "redis_version": "7.2.4",
+      "valkey_version": "9.1.2"
+    },
+    "postgres": "18.3 (Debian 18.3-1.pgdg12+1)",
+    "extensions": "vchord:1.1.1\nvector:0.8.2"
+  },
+  "checkedAt": "2026-10-25T00:20:21+02:00",
+  "commit": "a0e7d9965ad034c52f1361ed69e36bfa0c256330",
+  "run": "https://github.com/ra5on/TitanOS-Apps/actions/runs/40137905257",
+  "result": "success",
+  "checks": [
+    "all four services healthy",
+    "authentication and access control",
+    "synthetic PNG upload and SHA-256 original download",
+    "background thumbnail generation",
+    "real CPU image/text ML inference and VectorChord search",
+    "account, album, original image and search result retained after recreating all containers",
+    "no failed thumbnail, metadata or smart-search jobs"
+  ],
+  "excluded": [
+    "PostgreSQL 14 migration",
+    "video transcoding",
+    "face-recognition quality",
+    "GPU acceleration",
+    "real NAS data"
+  ]
+}
