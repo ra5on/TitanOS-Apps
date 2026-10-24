@@ -425,11 +425,14 @@ Mehrbenutzer-Berechtigungen behaupten. Der Test verwendet Chrome auf dem
 wegwerfbaren GitHub-Runner, keine produktiven NAS-Dateien oder Host-Geräte.
 
 Der [Frigate-Starttest](.github/workflows/frigate.yml) reproduziert zunächst
-`log-prepare` ohne Capabilities und prüft danach die korrigierte Vorlage mit
-isolierten Datenordnern: Log-Eigentümer und Rechte, HTTPS, Ablehnung falscher
-Zugangsdaten, Anmeldung, erhaltene Konten nach Container-Neuerstellung und
-sauberes Beenden. Kameras, Aufnahmen und Hardwarebeschleunigung sind damit
-nicht abgenommen.
+`log-prepare` ohne Capabilities und prüft danach die aktuelle Vorlage mit
+isolierten Datenordnern sowohl ohne vorhandene Konfiguration als auch mit einer
+Minimal-Konfiguration: Log-Rechte, alle veröffentlichten Ports, HTTPS, echte
+Chromium-Anmeldung und Asset-Laden, Ablehnung falscher Zugangsdaten, erhaltene
+Konten nach Container-Neuerstellung und sauberes Beenden. Kameras, Aufnahmen,
+Hardwarebeschleunigung und die Netzwerkerreichbarkeit eines konkreten NAS sind
+damit nicht abgenommen. Der [Prüfbericht vom 24. Oktober 2026](docs/FRIGATE-WEBUI-CHECK.md)
+nennt Image-Digest, Ergebnisse und Grenzen.
 
 Die [Trilium-/MQTT-/PairDrop-Prüfung](.github/workflows/trilium-mosquitto-pairdrop.yml)
 verwendet neue temporäre Datenordner, synthetische Zugangsdaten und Inhalte.
