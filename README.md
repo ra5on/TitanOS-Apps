@@ -55,13 +55,12 @@ Tag-Variablen in der vorhandenen Compose-`.env` ergänzen und erzeugte Passwört
 beibehalten; die Datei nicht durch die Beispieldatei ersetzen.
 
 Einträge unter Container-`environment` sind von der Compose-Umgebung getrennt.
-Die früheren Felder `NODE_RED_IMAGE_TAG`, `BAMBU_STUDIO_VERSION`,
-`NEXTCLOUD_VERSION` und `MARIADB_VERSION` wurden deshalb als Container-Felder
-entfernt: Der bisherige Installer übergab sie nicht zur Image-Interpolation.
-Die neuen Tag-Variablen werden mit echtem Docker Compose auf Standardwerte und
-unterschiedliche Versionen pro Container geprüft. Echte Anwendungseinstellungen
+Tag-Variablen werden deshalb als Compose-Eingaben statt als zusätzliche
+Container-Umgebung geführt. Die CI prüft sie mit echtem Docker Compose auf
+Standardwerte und unterschiedliche Versionen pro Container. Anwendungseinstellungen
 wie die Minecraft-Spielversion oder `DSH_VERSION` für das beim Start installierte
-npm-Paket bleiben erhalten; DeepSeek Harness verwendet dafür standardmäßig `latest`.
+npm-Paket bleiben unabhängig davon wählbar; DeepSeek Harness verwendet dafür
+standardmäßig `latest`.
 
 `latest` kann auch eine neue Hauptversion bringen. Aktuelle PostgreSQL-Images
 verwenden PostgreSQL 18 und den Datenpfad `/var/lib/postgresql`; neue Vorlagen
@@ -473,6 +472,16 @@ Container müssen Konto, Album, Originalbild und KI-Suchergebnis erhalten bleibe
 die geprüften Warteschlangen dürfen keine fehlgeschlagenen Aufträge enthalten.
 Migrationen alter Datenbanken, Video-Transcoding, Qualität der Gesichtserkennung,
 GPU-Beschleunigung und reale NAS-Daten sind damit nicht abgenommen.
+
+Die [Katalogprüfung](.github/workflows/catalog.yml) prüft außerdem die Image-Tags
+aller Dienste mit dem unveränderten Installations-/Editorcode von TitanOS 0.20.2
+und echtem Docker Compose: Vorgaben ohne gesetzte Variable, unterschiedliche
+gewählte Versionen je Container und alle `.env.example`-Einträge.
+
+Der [Nextcloud-Test](.github/workflows/nextcloud.yml) richtet Nextcloud, MariaDB
+und Cron mit den aktuellen Standard-Images und neuen Datenordnern ein. Anmeldung,
+WebDAV-Upload/-Download und Daten nach Container-Neuerstellung werden geprüft;
+Migrationen vorhandener Cloud- oder Datenbankbestände bleiben gesonderte Aufgaben.
 
 Die [Katalogprüfung](.github/workflows/catalog.yml) führt die Python-Tests aus
 und validiert sämtliche Compose-Vorlagen. Lokal mit Python 3 und Docker Compose:

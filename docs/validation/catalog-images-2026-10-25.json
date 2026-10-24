@@ -1,0 +1,862 @@
+{
+  "date": "2026-10-25",
+  "apps": 50,
+  "services": 66,
+  "latestDefaults": 62,
+  "publisherChannelDefaults": 4,
+  "titanosReference": "v0.20.2 (unchanged)",
+  "catalogCheck": "https://github.com/ra5on/TitanOS-Apps/actions/runs/40139489898",
+  "checks": [
+    "all Compose templates valid",
+    "real install builder preserves every per-service image reference",
+    "actual Docker Compose uses default tags without an env file entry",
+    "actual Docker Compose uses distinct selected tags for each container from an env file",
+    "existing service editor accepts explicit image versions without modifying other fields",
+    "matching .env.example for every app"
+  ],
+  "registryNote": "n8n returned HTTP 429 during direct registry metadata checks; its latest image started successfully in the selected-app CI test.",
+  "images": [
+    {
+      "app": "adguard",
+      "service": "adguard",
+      "variable": "ADGUARD_ADGUARD_IMAGE_TAG",
+      "repository": "adguard/adguardhome",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "adguard/adguardhome:latest",
+        "status": 200,
+        "digest": "sha256:aba9e3bf0613be3ba3755e1fc311b126e2c24bec25e18b6483894a88283074f0"
+      }
+    },
+    {
+      "app": "bambu-lab",
+      "service": "bambustudio",
+      "variable": "BAMBU_LAB_BAMBUSTUDIO_IMAGE_TAG",
+      "repository": "lscr.io/linuxserver/bambustudio",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "lscr.io/linuxserver/bambustudio:latest",
+        "status": 200,
+        "digest": "sha256:857e937fe1c3451244cb178952e0e7a00241ab48c32cb1ce9ea6b27e4fd729e5"
+      }
+    },
+    {
+      "app": "cadcraft",
+      "service": "cadcraft",
+      "variable": "CADCRAFT_CADCRAFT_IMAGE_TAG",
+      "repository": "ghcr.io/ra5on/titanos-cadcraft",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/ra5on/titanos-cadcraft:latest",
+        "status": 200,
+        "digest": "sha256:5fb7a91cca3da4bab4a9a400cd586a1b17093bacdf0bc0ca60d2059f95b47e5c"
+      }
+    },
+    {
+      "app": "cloudflare-tunnel",
+      "service": "cloudflared",
+      "variable": "CLOUDFLARE_TUNNEL_CLOUDFLARED_IMAGE_TAG",
+      "repository": "cloudflare/cloudflared",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "cloudflare/cloudflared:latest",
+        "status": 200,
+        "digest": "sha256:faa8e0a1475f137c910be6025f43c8e4092fdd35461b31e19fd1390657a1ff39"
+      }
+    },
+    {
+      "app": "deckcraft",
+      "service": "deckcraft",
+      "variable": "DECKCRAFT_DECKCRAFT_IMAGE_TAG",
+      "repository": "ghcr.io/ra5on/titanos-deckcraft",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/ra5on/titanos-deckcraft:latest",
+        "status": 200,
+        "digest": "sha256:0a236751294d6b98dbf0a419b396a8eb15484b40190ea0a5756082b620dd0a72"
+      }
+    },
+    {
+      "app": "deepseek-harness",
+      "service": "dsh",
+      "variable": "DEEPSEEK_HARNESS_DSH_IMAGE_TAG",
+      "repository": "node",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "node:latest",
+        "status": 200,
+        "digest": "sha256:a98e6fda54fdbb22d4238054cca9a2a113bcd1191c09193a535aae22f400aa8e"
+      }
+    },
+    {
+      "app": "designcraft",
+      "service": "designcraft",
+      "variable": "DESIGNCRAFT_DESIGNCRAFT_IMAGE_TAG",
+      "repository": "ghcr.io/ra5on/titanos-designcraft",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/ra5on/titanos-designcraft:latest",
+        "status": 200,
+        "digest": "sha256:416cccf3ca3fc8532f543b5e8c53147d332cb895841dda7dddc63a9813349209"
+      }
+    },
+    {
+      "app": "effectcraft",
+      "service": "effectcraft",
+      "variable": "EFFECTCRAFT_EFFECTCRAFT_IMAGE_TAG",
+      "repository": "ghcr.io/ra5on/titanos-effectcraft",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/ra5on/titanos-effectcraft:latest",
+        "status": 200,
+        "digest": "sha256:7a37508a11c4fff81010cc9029fadcecc883add22b4620308bb871831095c9da"
+      }
+    },
+    {
+      "app": "esphome",
+      "service": "esphome",
+      "variable": "ESPHOME_ESPHOME_IMAGE_TAG",
+      "repository": "ghcr.io/esphome/esphome",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/esphome/esphome:latest",
+        "status": 200,
+        "digest": "sha256:1dff19a59070cdb523b76576cdc74d200f862d43c1407809088855920cf57145"
+      }
+    },
+    {
+      "app": "figcraft",
+      "service": "figcraft",
+      "variable": "FIGCRAFT_FIGCRAFT_IMAGE_TAG",
+      "repository": "ghcr.io/ra5on/titanos-figcraft",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/ra5on/titanos-figcraft:latest",
+        "status": 200,
+        "digest": "sha256:e94b53ddc585a23f9f29b87c33ca3cd7acb01bb09d9ccc0344747f9d170033aa"
+      }
+    },
+    {
+      "app": "filmcraft",
+      "service": "filmcraft",
+      "variable": "FILMCRAFT_FILMCRAFT_IMAGE_TAG",
+      "repository": "ghcr.io/ra5on/titanos-filmcraft",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/ra5on/titanos-filmcraft:latest",
+        "status": 200,
+        "digest": "sha256:f90ef51fdf331e5bc787a04bd0d97c36ea3ab3d10de75e75752b8dc5b7027f87"
+      }
+    },
+    {
+      "app": "firefox",
+      "service": "firefox",
+      "variable": "FIREFOX_FIREFOX_IMAGE_TAG",
+      "repository": "jlesage/firefox",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "jlesage/firefox:latest",
+        "status": 200,
+        "digest": "sha256:302aa068dcfa46a2d248771c998f67377383554df8940252caef42b99c13eb65"
+      }
+    },
+    {
+      "app": "frigate",
+      "service": "frigate",
+      "variable": "FRIGATE_FRIGATE_IMAGE_TAG",
+      "repository": "ghcr.io/blakeblackshear/frigate",
+      "defaultTag": "stable",
+      "registryCheck": {
+        "image": "ghcr.io/blakeblackshear/frigate:stable",
+        "status": 200,
+        "digest": "sha256:fd60f99ffd4eb6c42360ed4e14953e270586f239309ab3983e55b2e97ffac09a"
+      }
+    },
+    {
+      "app": "gridcraft",
+      "service": "gridcraft",
+      "variable": "GRIDCRAFT_GRIDCRAFT_IMAGE_TAG",
+      "repository": "ghcr.io/ra5on/titanos-gridcraft",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/ra5on/titanos-gridcraft:latest",
+        "status": 200,
+        "digest": "sha256:4cf897a4d7fd6f69d4e2044a0444d92afabffff3e4aa8873047caadfee9a0feb"
+      }
+    },
+    {
+      "app": "grocy",
+      "service": "grocy",
+      "variable": "GROCY_GROCY_IMAGE_TAG",
+      "repository": "lscr.io/linuxserver/grocy",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "lscr.io/linuxserver/grocy:latest",
+        "status": 200,
+        "digest": "sha256:d63bffe9afb2ef1a23fa7ce0749cdaeba9c169fb644b16eed270884a1b2f4ac9"
+      }
+    },
+    {
+      "app": "hermes-agent",
+      "service": "hermes",
+      "variable": "HERMES_AGENT_HERMES_IMAGE_TAG",
+      "repository": "nousresearch/hermes-agent",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "nousresearch/hermes-agent:latest",
+        "status": 200,
+        "digest": "sha256:9c5561579f3ffdf333401797094ac3a743738d6c25d40f4331c7bf77b694238d"
+      }
+    },
+    {
+      "app": "immich",
+      "service": "immich-server",
+      "variable": "IMMICH_IMMICH_SERVER_IMAGE_TAG",
+      "repository": "ghcr.io/immich-app/immich-server",
+      "defaultTag": "release",
+      "registryCheck": {
+        "image": "ghcr.io/immich-app/immich-server:release",
+        "status": 200,
+        "digest": "sha256:485d546a2e31d6a8b4db8423fcba5c109de8c218d93410af115fd1ccfc4352a6"
+      }
+    },
+    {
+      "app": "immich",
+      "service": "immich-machine-learning",
+      "variable": "IMMICH_IMMICH_MACHINE_LEARNING_IMAGE_TAG",
+      "repository": "ghcr.io/immich-app/immich-machine-learning",
+      "defaultTag": "release",
+      "registryCheck": {
+        "image": "ghcr.io/immich-app/immich-machine-learning:release",
+        "status": 200,
+        "digest": "sha256:5b28c9352c8374b8a1ed96fbdd8d6755fea6e43510ec43fdf6538aa02ea40f56"
+      }
+    },
+    {
+      "app": "immich",
+      "service": "redis",
+      "variable": "IMMICH_REDIS_IMAGE_TAG",
+      "repository": "docker.io/valkey/valkey",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "docker.io/valkey/valkey:latest",
+        "status": 200,
+        "digest": "sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd"
+      }
+    },
+    {
+      "app": "immich",
+      "service": "database",
+      "variable": "IMMICH_DATABASE_IMAGE_TAG",
+      "repository": "ghcr.io/tensorchord/vchord-suite",
+      "defaultTag": "pg18-latest",
+      "registryCheck": {
+        "image": "ghcr.io/tensorchord/vchord-suite:pg18-latest",
+        "status": 200,
+        "digest": "sha256:c6e5e77a1180199f91b040b6e85c6d10b0ded6d49fb614dfd2e7272ffb91af08"
+      }
+    },
+    {
+      "app": "jellyfin",
+      "service": "jellyfin",
+      "variable": "JELLYFIN_JELLYFIN_IMAGE_TAG",
+      "repository": "jellyfin/jellyfin",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "jellyfin/jellyfin:latest",
+        "status": 200,
+        "digest": "sha256:2038fe038ab3876a80f6e7b7e0aef6607b032c7dc0c9b3ad3296d0b2eba3bbb5"
+      }
+    },
+    {
+      "app": "joplin-server",
+      "service": "db",
+      "variable": "JOPLIN_SERVER_DB_IMAGE_TAG",
+      "repository": "postgres",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "postgres:latest",
+        "status": 200,
+        "digest": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      }
+    },
+    {
+      "app": "joplin-server",
+      "service": "joplin",
+      "variable": "JOPLIN_SERVER_JOPLIN_IMAGE_TAG",
+      "repository": "joplin/server",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "joplin/server:latest",
+        "status": 200,
+        "digest": "sha256:d951ce50b6d3d542393ebc4d08bd62d9a4fb0a6f6827abb861726c83560ecf97"
+      }
+    },
+    {
+      "app": "lightcraft",
+      "service": "lightcraft",
+      "variable": "LIGHTCRAFT_LIGHTCRAFT_IMAGE_TAG",
+      "repository": "ghcr.io/ra5on/titanos-lightcraft",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/ra5on/titanos-lightcraft:latest",
+        "status": 200,
+        "digest": "sha256:7e41e44d5a2507ff7154e09a69403890a28305422d60740b4007367570605f3d"
+      }
+    },
+    {
+      "app": "matrix-element",
+      "service": "matrix",
+      "variable": "MATRIX_ELEMENT_MATRIX_IMAGE_TAG",
+      "repository": "nginx",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "nginx:latest",
+        "status": 200,
+        "digest": "sha256:4c41e2d0a3a55b325ed572cd0200bdb72af1433c3daa2bca6ef8eea68ce504a2"
+      }
+    },
+    {
+      "app": "matrix-element",
+      "service": "init",
+      "variable": "MATRIX_ELEMENT_INIT_IMAGE_TAG",
+      "repository": "ghcr.io/element-hq/synapse",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/element-hq/synapse:latest",
+        "status": 200,
+        "digest": "sha256:390f5e67227378eb87c84627b57f0582cdb235fcc8159d89f371f37bf7cccfd7"
+      }
+    },
+    {
+      "app": "matrix-element",
+      "service": "db",
+      "variable": "MATRIX_ELEMENT_DB_IMAGE_TAG",
+      "repository": "postgres",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "postgres:latest",
+        "status": 200,
+        "digest": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      }
+    },
+    {
+      "app": "matrix-element",
+      "service": "synapse",
+      "variable": "MATRIX_ELEMENT_SYNAPSE_IMAGE_TAG",
+      "repository": "ghcr.io/element-hq/synapse",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/element-hq/synapse:latest",
+        "status": 200,
+        "digest": "sha256:390f5e67227378eb87c84627b57f0582cdb235fcc8159d89f371f37bf7cccfd7"
+      }
+    },
+    {
+      "app": "matrix-element",
+      "service": "admin-init",
+      "variable": "MATRIX_ELEMENT_ADMIN_INIT_IMAGE_TAG",
+      "repository": "ghcr.io/element-hq/synapse",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/element-hq/synapse:latest",
+        "status": 200,
+        "digest": "sha256:390f5e67227378eb87c84627b57f0582cdb235fcc8159d89f371f37bf7cccfd7"
+      }
+    },
+    {
+      "app": "matrix-element",
+      "service": "element",
+      "variable": "MATRIX_ELEMENT_ELEMENT_IMAGE_TAG",
+      "repository": "ghcr.io/element-hq/element-web",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/element-hq/element-web:latest",
+        "status": 200,
+        "digest": "sha256:f8700633d4336258af7a05b53865a4f479e0d628cf2d9ca83d28b5939314d4ce"
+      }
+    },
+    {
+      "app": "mattermost",
+      "service": "mattermost",
+      "variable": "MATTERMOST_MATTERMOST_IMAGE_TAG",
+      "repository": "mattermost/mattermost-team-edition",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "mattermost/mattermost-team-edition:latest",
+        "status": 200,
+        "digest": "sha256:8ca1050cb8a2ec1ec0be5aff90ee40aa03e134f48443f7526b7b2b18872cf31b"
+      }
+    },
+    {
+      "app": "mattermost",
+      "service": "db",
+      "variable": "MATTERMOST_DB_IMAGE_TAG",
+      "repository": "postgres",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "postgres:latest",
+        "status": 200,
+        "digest": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      }
+    },
+    {
+      "app": "mattermost",
+      "service": "init",
+      "variable": "MATTERMOST_INIT_IMAGE_TAG",
+      "repository": "python",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "python:latest",
+        "status": 200,
+        "digest": "sha256:67ee282bdbe5ece1e38ea94fa68f1420e969e6176e6c826b9acc931055011bfb"
+      }
+    },
+    {
+      "app": "mealie",
+      "service": "mealie",
+      "variable": "MEALIE_MEALIE_IMAGE_TAG",
+      "repository": "ghcr.io/mealie-recipes/mealie",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/mealie-recipes/mealie:latest",
+        "status": 200,
+        "digest": "sha256:78eb28b8776d0bad40c5e605c72b3f4f5976793e491558c7dcbdfc04c835d4bc"
+      }
+    },
+    {
+      "app": "minecraft-bedrock",
+      "service": "bedrock",
+      "variable": "MINECRAFT_BEDROCK_BEDROCK_IMAGE_TAG",
+      "repository": "itzg/minecraft-bedrock-server",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "itzg/minecraft-bedrock-server:latest",
+        "status": 200,
+        "digest": "sha256:cffda8758bd546e623cedaae33e79af6be3e0b92ab00522d5cfd139f8029d073"
+      }
+    },
+    {
+      "app": "minecraft-java",
+      "service": "minecraft",
+      "variable": "MINECRAFT_JAVA_MINECRAFT_IMAGE_TAG",
+      "repository": "itzg/minecraft-server",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "itzg/minecraft-server:latest",
+        "status": 200,
+        "digest": "sha256:6fd6f9bb6998b7cd06948ec6ab03fabfdf98ba3f2ec030c44069bec9a6bdf09d"
+      }
+    },
+    {
+      "app": "mosquitto",
+      "service": "mosquitto",
+      "variable": "MOSQUITTO_MOSQUITTO_IMAGE_TAG",
+      "repository": "eclipse-mosquitto",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "eclipse-mosquitto:latest",
+        "status": 200,
+        "digest": "sha256:860aeb5d63ce509508f6dcfb2bc8a1c1dd2bc60555b562b45ce90e52d8dabb0f"
+      }
+    },
+    {
+      "app": "n8n",
+      "service": "n8n",
+      "variable": "N8N_N8N_IMAGE_TAG",
+      "repository": "docker.n8n.io/n8nio/n8n",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "docker.n8n.io/n8nio/n8n:latest",
+        "status": 429,
+        "error": "Too Many Requests"
+      }
+    },
+    {
+      "app": "nextcloud",
+      "service": "mariadb",
+      "variable": "NEXTCLOUD_MARIADB_IMAGE_TAG",
+      "repository": "mariadb",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "mariadb:latest",
+        "status": 200,
+        "digest": "sha256:0e4bb0f339feba125d1154fbacd36c16ec8518f52e44e1f82ecec7d6771caf39"
+      }
+    },
+    {
+      "app": "nextcloud",
+      "service": "nextcloud",
+      "variable": "NEXTCLOUD_NEXTCLOUD_IMAGE_TAG",
+      "repository": "nextcloud",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "nextcloud:latest",
+        "status": 200,
+        "digest": "sha256:89af7ee7a96ff5e9668280566209268ae6b2d02327f6ef6d56f6d68228cf9431"
+      }
+    },
+    {
+      "app": "nextcloud",
+      "service": "nextcloud-cron",
+      "variable": "NEXTCLOUD_NEXTCLOUD_CRON_IMAGE_TAG",
+      "repository": "nextcloud",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "nextcloud:latest",
+        "status": 200,
+        "digest": "sha256:89af7ee7a96ff5e9668280566209268ae6b2d02327f6ef6d56f6d68228cf9431"
+      }
+    },
+    {
+      "app": "node-red",
+      "service": "node-red",
+      "variable": "NODE_RED_NODE_RED_IMAGE_TAG",
+      "repository": "nodered/node-red",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "nodered/node-red:latest",
+        "status": 200,
+        "digest": "sha256:e085d4a06591fd0aca2ea2a91364d27f1a0e31e885675f77935e10f95412a963"
+      }
+    },
+    {
+      "app": "ollama",
+      "service": "ollama",
+      "variable": "OLLAMA_OLLAMA_IMAGE_TAG",
+      "repository": "ollama/ollama",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ollama/ollama:latest",
+        "status": 200,
+        "digest": "sha256:dea72d1e22270fe095b68fdf756d2b489d615643c5a2eaebbc5f569181e322d8"
+      }
+    },
+    {
+      "app": "pairdrop",
+      "service": "pairdrop",
+      "variable": "PAIRDROP_PAIRDROP_IMAGE_TAG",
+      "repository": "lscr.io/linuxserver/pairdrop",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "lscr.io/linuxserver/pairdrop:latest",
+        "status": 200,
+        "digest": "sha256:4a87eb38032ad6fd58da193cca6c625c6215bfef9760b07cf8a8d5550dc02359"
+      }
+    },
+    {
+      "app": "palworld",
+      "service": "palworld",
+      "variable": "PALWORLD_PALWORLD_IMAGE_TAG",
+      "repository": "thijsvanloef/palworld-server-docker",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "thijsvanloef/palworld-server-docker:latest",
+        "status": 200,
+        "digest": "sha256:86fc7470949f6fcc931cb6443f61facc79bacc09e3f40d46e628d9e1ef6e56cd"
+      }
+    },
+    {
+      "app": "paperless-ngx",
+      "service": "db",
+      "variable": "PAPERLESS_NGX_DB_IMAGE_TAG",
+      "repository": "postgres",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "postgres:latest",
+        "status": 200,
+        "digest": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      }
+    },
+    {
+      "app": "paperless-ngx",
+      "service": "broker",
+      "variable": "PAPERLESS_NGX_BROKER_IMAGE_TAG",
+      "repository": "valkey/valkey",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "valkey/valkey:latest",
+        "status": 200,
+        "digest": "sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd"
+      }
+    },
+    {
+      "app": "paperless-ngx",
+      "service": "paperless",
+      "variable": "PAPERLESS_NGX_PAPERLESS_IMAGE_TAG",
+      "repository": "ghcr.io/paperless-ngx/paperless-ngx",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/paperless-ngx/paperless-ngx:latest",
+        "status": 200,
+        "digest": "sha256:9bc6e8248891bcfa6f52fffe8b81e4ea8cae75790c3ec1b9906961a7ba55c969"
+      }
+    },
+    {
+      "app": "pdfcraft",
+      "service": "pdfcraft",
+      "variable": "PDFCRAFT_PDFCRAFT_IMAGE_TAG",
+      "repository": "ghcr.io/ra5on/titanos-pdfcraft",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/ra5on/titanos-pdfcraft:latest",
+        "status": 200,
+        "digest": "sha256:b7ddfedb7d1fd814642836018dad4c2ee0bf6406d38113b0acf9b81f8fca6c6d"
+      }
+    },
+    {
+      "app": "photocraft",
+      "service": "photocraft",
+      "variable": "PHOTOCRAFT_PHOTOCRAFT_IMAGE_TAG",
+      "repository": "ghcr.io/ra5on/titanos-photocraft",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/ra5on/titanos-photocraft:latest",
+        "status": 200,
+        "digest": "sha256:ca6682c6524b02ed8f45c0d769f94ded4b25a996025086eaadf2266b669a1443"
+      }
+    },
+    {
+      "app": "pihole",
+      "service": "pihole",
+      "variable": "PIHOLE_PIHOLE_IMAGE_TAG",
+      "repository": "pihole/pihole",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "pihole/pihole:latest",
+        "status": 200,
+        "digest": "sha256:d34134716fc32038b052a8674c7c6879e0ff21f0e6d8af345166fffa2c27c113"
+      }
+    },
+    {
+      "app": "satisfactory",
+      "service": "satisfactory",
+      "variable": "SATISFACTORY_SATISFACTORY_IMAGE_TAG",
+      "repository": "robtme/satisfactory-server",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "robtme/satisfactory-server:latest",
+        "status": 200,
+        "digest": "sha256:ac252dba41653eb21c6feed94b577f98fa152f5792b1aeff2ce11fe364355137"
+      }
+    },
+    {
+      "app": "solidcraft",
+      "service": "solidcraft",
+      "variable": "SOLIDCRAFT_SOLIDCRAFT_IMAGE_TAG",
+      "repository": "ghcr.io/ra5on/titanos-solidcraft",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/ra5on/titanos-solidcraft:latest",
+        "status": 200,
+        "digest": "sha256:66d7dbe857bf6f5f30cd852c884467f5ce729904df552e0cdf88a23839089bb2"
+      }
+    },
+    {
+      "app": "soundcraft",
+      "service": "soundcraft",
+      "variable": "SOUNDCRAFT_SOUNDCRAFT_IMAGE_TAG",
+      "repository": "ghcr.io/ra5on/titanos-soundcraft",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/ra5on/titanos-soundcraft:latest",
+        "status": 200,
+        "digest": "sha256:00352c82a6d54cd03c87cedbe48a14e523fe1239659228742107d4856c5d30a4"
+      }
+    },
+    {
+      "app": "syncthing",
+      "service": "syncthing",
+      "variable": "SYNCTHING_SYNCTHING_IMAGE_TAG",
+      "repository": "syncthing/syncthing",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "syncthing/syncthing:latest",
+        "status": 200,
+        "digest": "sha256:2b71da7c0d0a91a6ae5285ad079226fecc0a365d08b27720e1f7037b018f7546"
+      }
+    },
+    {
+      "app": "terraria",
+      "service": "terraria",
+      "variable": "TERRARIA_TERRARIA_IMAGE_TAG",
+      "repository": "ghcr.io/crosis47/tmodloader",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/crosis47/tmodloader:latest",
+        "status": 200,
+        "digest": "sha256:ceeff49669fa7a7c36c75dda726ba77d9480445cdbd955a509d43fb0c787a2d8"
+      }
+    },
+    {
+      "app": "thunderbird",
+      "service": "thunderbird",
+      "variable": "THUNDERBIRD_THUNDERBIRD_IMAGE_TAG",
+      "repository": "jlesage/thunderbird",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "jlesage/thunderbird:latest",
+        "status": 200,
+        "digest": "sha256:44384545e56734339552071293269d3647a3017a2db173057f1647737c6c2d2f"
+      }
+    },
+    {
+      "app": "titanos-agent",
+      "service": "agent",
+      "variable": "TITANOS_AGENT_AGENT_IMAGE_TAG",
+      "repository": "ghcr.io/ra5on/titanos-agent",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/ra5on/titanos-agent:latest",
+        "status": 200,
+        "digest": "sha256:4ec77d61726c3f7e4b6b5cbd14604dc1ef13a467bb2c2fa688b1a151618f0f3c"
+      }
+    },
+    {
+      "app": "trilium",
+      "service": "trilium",
+      "variable": "TRILIUM_TRILIUM_IMAGE_TAG",
+      "repository": "triliumnext/trilium",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "triliumnext/trilium:latest",
+        "status": 200,
+        "digest": "sha256:d87d810fdcb549db65710a40933acaa16bc75c9426a9164c547f7ba95592941b"
+      }
+    },
+    {
+      "app": "uptime-kuma",
+      "service": "uptime-kuma",
+      "variable": "UPTIME_KUMA_UPTIME_KUMA_IMAGE_TAG",
+      "repository": "louislam/uptime-kuma",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "louislam/uptime-kuma:latest",
+        "status": 200,
+        "digest": "sha256:70233f4acb5163fd2a59a49909cf01e44415cecff13dba69e3a86647a2919f83"
+      }
+    },
+    {
+      "app": "valheim",
+      "service": "valheim",
+      "variable": "VALHEIM_VALHEIM_IMAGE_TAG",
+      "repository": "ghcr.io/community-valheim-tools/valheim-server",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/community-valheim-tools/valheim-server:latest",
+        "status": 200,
+        "digest": "sha256:f34d67ba8023e343b10ffda0144759a8c8d986f276510460315a01051bed8a6d"
+      }
+    },
+    {
+      "app": "vaultwarden",
+      "service": "vaultwarden",
+      "variable": "VAULTWARDEN_VAULTWARDEN_IMAGE_TAG",
+      "repository": "vaultwarden/server",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "vaultwarden/server:latest",
+        "status": 200,
+        "digest": "sha256:efb3cde962015fcc036b2ea625242248611943b27212ebf4392841fb30fad055"
+      }
+    },
+    {
+      "app": "vectorcraft",
+      "service": "vectorcraft",
+      "variable": "VECTORCRAFT_VECTORCRAFT_IMAGE_TAG",
+      "repository": "ghcr.io/ra5on/titanos-vectorcraft",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/ra5on/titanos-vectorcraft:latest",
+        "status": 200,
+        "digest": "sha256:1ab5579b19b249f4503f1c69fc0853b7df0669d008850f1c3ad053c6d00fe0a9"
+      }
+    },
+    {
+      "app": "wordcraft",
+      "service": "wordcraft",
+      "variable": "WORDCRAFT_WORDCRAFT_IMAGE_TAG",
+      "repository": "ghcr.io/ra5on/titanos-wordcraft",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/ra5on/titanos-wordcraft:latest",
+        "status": 200,
+        "digest": "sha256:69a1f393f273d75f29cb3660f49f095043965d4e970511d982708391cd64b609"
+      }
+    },
+    {
+      "app": "zigbee2mqtt",
+      "service": "broker",
+      "variable": "ZIGBEE2MQTT_BROKER_IMAGE_TAG",
+      "repository": "eclipse-mosquitto",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "eclipse-mosquitto:latest",
+        "status": 200,
+        "digest": "sha256:860aeb5d63ce509508f6dcfb2bc8a1c1dd2bc60555b562b45ce90e52d8dabb0f"
+      }
+    },
+    {
+      "app": "zigbee2mqtt",
+      "service": "zigbee2mqtt",
+      "variable": "ZIGBEE2MQTT_ZIGBEE2MQTT_IMAGE_TAG",
+      "repository": "ghcr.io/koenkk/zigbee2mqtt",
+      "defaultTag": "latest",
+      "registryCheck": {
+        "image": "ghcr.io/koenkk/zigbee2mqtt:latest",
+        "status": 200,
+        "digest": "sha256:addbfb08fcef2e4477de1535636118241e10d13e898fbe4d9faba8a4d7396311"
+      }
+    }
+  ],
+  "runtimeAppsChecked": 24,
+  "runtimeChecks": [
+    {
+      "suite": "Immich",
+      "url": "https://github.com/ra5on/TitanOS-Apps/actions/runs/40139489936",
+      "result": "success"
+    },
+    {
+      "suite": "Frigate",
+      "url": "https://github.com/ra5on/TitanOS-Apps/actions/runs/40139489906",
+      "result": "success"
+    },
+    {
+      "suite": "Nextcloud/MariaDB/Cron",
+      "url": "https://github.com/ra5on/TitanOS-Apps/actions/runs/40139489930",
+      "result": "success"
+    },
+    {
+      "suite": "Paperless/Jellyfin",
+      "url": "https://github.com/ra5on/TitanOS-Apps/actions/runs/40139489927",
+      "result": "success"
+    },
+    {
+      "suite": "Joplin/Zigbee2MQTT/ESPHome/n8n/Mealie/Grocy",
+      "url": "https://github.com/ra5on/TitanOS-Apps/actions/runs/40139489932",
+      "result": "success"
+    },
+    {
+      "suite": "Trilium/Mosquitto/PairDrop",
+      "url": "https://github.com/ra5on/TitanOS-Apps/actions/runs/40139899659",
+      "result": "success"
+    },
+    {
+      "suite": "Thunderbird",
+      "url": "https://github.com/ra5on/TitanOS-Apps/actions/runs/40139489916",
+      "result": "success"
+    },
+    {
+      "suite": "Spiele/Firefox/Matrix/Mattermost",
+      "url": "https://github.com/ra5on/TitanOS-Apps/actions/runs/40138837590",
+      "result": "success"
+    }
+  ],
+  "artifactWarnings": [
+    {
+      "suite": "Trilium",
+      "detail": "Screenshot compositor timed out; browser login, access control, actual note creation and persistence assertions passed.",
+      "url": "https://github.com/ra5on/TitanOS-Apps/actions/runs/40139899659"
+    }
+  ]
+}
