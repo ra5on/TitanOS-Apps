@@ -419,11 +419,15 @@ Probleme bitte mit App-Name, TitanOS-Version und Fehlermeldung melden.
 ## Prüfungen
 
 Der [Immich-Stacktest](.github/workflows/immich.yml) startet alle vier aktuellen
-Images mit neuen temporären Datenordnern und synthetischen Konten. Er prüft die
-Healthchecks, PostgreSQL 18 mit aktivem VectorChord/pgvector, Anmeldung, geschützte
-API-Routen und ein nach Container-Neuerstellung erhaltenes Album. Migrationen alter
-Datenbanken, Foto-/Videoverarbeitung, echte ML-Inferenz und GPUs sind damit nicht
-abgenommen.
+Images mit neuen temporären Datenordnern und synthetischen Konten. Er protokolliert
+die tatsächlichen Versionen und Image-Digests und prüft Healthchecks, PostgreSQL 18
+mit aktivem VectorChord/pgvector, Anmeldung und geschützte API-Routen. Ein selbst
+erzeugtes PNG wird hochgeladen, bytegenau heruntergeladen, als Vorschaubild erzeugt
+und über echte CPU-ML-Inferenz samt Vektorsuche gefunden. Nach Neuerstellung aller
+Container müssen Konto, Album, Originalbild und KI-Suchergebnis erhalten bleiben;
+die geprüften Warteschlangen dürfen keine fehlgeschlagenen Aufträge enthalten.
+Migrationen alter Datenbanken, Video-Transcoding, Qualität der Gesichtserkennung,
+GPU-Beschleunigung und reale NAS-Daten sind damit nicht abgenommen.
 
 Die [Katalogprüfung](.github/workflows/catalog.yml) führt die Python-Tests aus
 und validiert sämtliche Compose-Vorlagen. Lokal mit Python 3 und Docker Compose:
