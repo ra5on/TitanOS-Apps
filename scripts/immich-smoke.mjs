@@ -70,7 +70,17 @@ async function login() {
   return data.accessToken;
 }
 try {
-  compose('pull');
+  // Only retry registry throttling, before any container or database mutation.
+  // Serialize services so concurrent large image downloads do not amplify it.
+  for (let attempt = 0; ; attempt++) {
+    try { compose('--parallel', '1', 'pull'); break; }
+    catch (error) {
+      if (attempt >= 2 || !/toomanyrequests|too many requests|\b429\b/i.test(String(error.stderr ?? error.message))) throw error;
+      const delay = (attempt + 1) * 20000;
+      console.log(`Registry throttled image download; retrying in ${delay / 1000}s.`);
+      await pause(delay);
+    }
+  }
   compose('up', '-d');
   await ready();
   assert.equal((await request('/api/albums')).status, 401, 'Albums require authentication');
