@@ -12,7 +12,7 @@ x-titanos:
       Server müssen zusammenpassen. Benötigt einen passenden tModLoader-Spielclient. Ohne konfigurierte
       Workshop-IDs startet die Vorlage ohne zusätzliche Mods. Weltname und Größe gelten bei der ersten
       Erzeugung. Der voreingestellte NAS-Port 7778 vermeidet einen Konflikt mit Satisfactory.
-      Serverdateien liegen mit der Welt im Datenordner.
+      Welten, Mods und deren Einstellungen liegen im Datenordner; das Serverprogramm kommt aus dem Docker-Image.
     en: Game server without a web interface. Connect from the matching game client using the NAS address and
       selected game port. Worlds and settings reside on the data volume. Remote access and router
       forwarding are not configured automatically. Back up worlds before version changes; client and
