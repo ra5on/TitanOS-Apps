@@ -1,0 +1,110 @@
+x-titanos:
+  name: Minecraft Bedrock
+  main: bedrock
+  category: games
+  description:
+    de: Eigener Minecraft-Bedrock-Server mit dauerhafter Welt und Xbox-Anmeldung.
+    en: Your own Minecraft Bedrock server with a persistent world and Xbox authentication.
+  tips:
+    de: Gameserver ohne Weboberfläche. Im passenden Spielclient mit NAS-Adresse und dem gewählten Spielport
+      verbinden. Welten und Einstellungen liegen auf dem Daten-Volume. Fernzugriff und Router-Freigaben
+      werden nicht automatisch eingerichtet. Vor Versionswechseln die Welten sichern; Spielclient und
+      Server müssen zusammenpassen. Vor Installation die Minecraft-EULA lesen und selbst mit TRUE
+      akzeptieren. Für die Bedrock Edition; Java-Clients können nicht direkt beitreten. ONLINE_MODE
+      bleibt aktiv. Konsolen können eigene Beschränkungen beim Hinzufügen externer Server haben.
+      VERSION=LATEST aktualisiert beim Start.
+    en: Game server without a web interface. Connect from the matching game client using the NAS address and
+      selected game port. Worlds and settings reside on the data volume. Remote access and router
+      forwarding are not configured automatically. Back up worlds before version changes; client and
+      server versions must match. Read and explicitly accept the Minecraft EULA by entering TRUE before
+      installation. For Bedrock Edition; Java clients cannot join directly. ONLINE_MODE remains enabled.
+      Consoles may restrict adding external servers. VERSION=LATEST updates on startup.
+  variables:
+    EULA:
+      label:
+        de: Minecraft-EULA ausdrücklich akzeptieren
+        en: Explicitly accept the Minecraft EULA
+      required: true
+      placeholder: "TRUE"
+      help:
+        de: Nur nach Lesen von https://www.minecraft.net/eula TRUE eingeben. Ohne Zustimmung startet der Server
+          nicht.
+        en: Enter TRUE only after reading https://www.minecraft.net/eula. The server will not start without
+          acceptance.
+    VERSION:
+      label:
+        de: Bedrock-Version
+        en: Bedrock version
+    SERVER_NAME:
+      label:
+        de: Servername
+        en: Server name
+    LEVEL_NAME:
+      label:
+        de: Weltname
+        en: World name
+    GAMEMODE:
+      label:
+        de: Spielmodus
+        en: Game mode
+    DIFFICULTY:
+      label:
+        de: Schwierigkeit
+        en: Difficulty
+    MAX_PLAYERS:
+      label:
+        de: Spielerlimit
+        en: Player limit
+    UID:
+      label:
+        de: Benutzer-ID
+        en: User ID
+      fill: uid
+    GID:
+      label:
+        de: Gruppen-ID
+        en: Group ID
+      fill: gid
+    TZ:
+      label:
+        de: Zeitzone
+        en: Timezone
+      fill: timezone
+  paths:
+    /data:
+      label:
+        de: Bedrock-Welt und Einstellungen
+        en: Bedrock world and settings
+  ports:
+    19132/udp:
+      label: Minecraft Bedrock (UDP)
+      webui: false
+  icon: https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/minecraft.svg
+services:
+  bedrock:
+    image: itzg/minecraft-bedrock-server:latest
+    restart: unless-stopped
+    environment:
+      EULA: ""
+      VERSION: LATEST
+      SERVER_NAME: TitanOS Bedrock
+      LEVEL_NAME: TitanOS
+      GAMEMODE: survival
+      DIFFICULTY: normal
+      MAX_PLAYERS: "10"
+      ONLINE_MODE: "true"
+      UID: "1000"
+      GID: "1000"
+      TZ: ""
+    ports:
+      - 19132:19132/udp
+    volumes:
+      - ./data:/data
+    stdin_open: true
+    tty: true
+    stop_grace_period: 2m
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"

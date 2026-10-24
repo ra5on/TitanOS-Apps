@@ -1,0 +1,94 @@
+x-titanos:
+  name: Satisfactory
+  main: satisfactory
+  category: games
+  description:
+    de: Dedizierter Satisfactory-Server für eine gemeinsame Fabrik und dauerhafte Spielstände.
+    en: Dedicated Satisfactory server for a shared factory and persistent saves.
+  tips:
+    de: Gameserver ohne Weboberfläche. Im passenden Spielclient mit NAS-Adresse und dem gewählten Spielport
+      verbinden. Welten und Einstellungen liegen auf dem Daten-Volume. Fernzugriff und Router-Freigaben
+      werden nicht automatisch eingerichtet. Vor Versionswechseln die Welten sichern; Spielclient und
+      Server müssen zusammenpassen. Den Server zuerst im Server-Manager des Spiels beanspruchen und dort
+      Administrator- sowie Spielerpasswort setzen. Erst danach für weitere Personen erreichbar machen.
+      Die HTTPS-API gehört zum Spiel und ist keine Browser-WebUI. NAS- und Container-Port 7777 sowie
+      SERVERGAMEPORT müssen zusammenpassen; TCP und UDP gemeinsam ändern. Ebenso Port 8888 und
+      SERVERMESSAGINGPORT gemeinsam ändern. Das Spiel benötigt erheblich RAM; mindestens 12 GB für den
+      Server einplanen. Welt und Serverdateien liegen unter /config.
+    en: Game server without a web interface. Connect from the matching game client using the NAS address and
+      selected game port. Worlds and settings reside on the data volume. Remote access and router
+      forwarding are not configured automatically. Back up worlds before version changes; client and
+      server versions must match. First claim the server in the in-game server manager and set
+      administrator and player passwords there before making it accessible to others. The HTTPS API
+      belongs to the game and is not a browser WebUI. NAS/container port 7777 and SERVERGAMEPORT must
+      match; change TCP and UDP together. Likewise change port 8888 and SERVERMESSAGINGPORT together. The
+      game requires substantial RAM; plan at least 12 GB for the server. Saves and server files reside
+      under /config.
+  variables:
+    MAXPLAYERS:
+      label:
+        de: Spielerlimit
+        en: Player limit
+    SERVERGAMEPORT:
+      label:
+        de: Spielport (muss zur Portfreigabe passen)
+        en: Game port (must match port mapping)
+    SERVERMESSAGINGPORT:
+      label:
+        de: Nachrichtenport (muss zur Portfreigabe passen)
+        en: Messaging port (must match port mapping)
+    PUID:
+      label:
+        de: Benutzer-ID
+        en: User ID
+      fill: uid
+    PGID:
+      label:
+        de: Gruppen-ID
+        en: Group ID
+      fill: gid
+    TZ:
+      label:
+        de: Zeitzone
+        en: Timezone
+      fill: timezone
+  paths:
+    /config:
+      label:
+        de: Spielstände, Einstellungen und Serverdateien
+        en: Saves, settings and server files
+  ports:
+    "7777":
+      label: Satisfactory Spiel / API (TCP)
+      webui: false
+    "8888":
+      label: Satisfactory Messaging (TCP)
+      webui: false
+    7777/udp:
+      label: Satisfactory Spiel (UDP)
+      webui: false
+  icon: https://raw.githubusercontent.com/robtme/satisfactory-server/main/.github/logo.png
+services:
+  satisfactory:
+    image: robtme/satisfactory-server:latest
+    restart: unless-stopped
+    environment:
+      MAXPLAYERS: "4"
+      SERVERGAMEPORT: "7777"
+      SERVERMESSAGINGPORT: "8888"
+      STEAMBETA: "false"
+      PUID: "1000"
+      PGID: "1000"
+      TZ: ""
+    ports:
+      - 7777:7777/tcp
+      - 7777:7777/udp
+      - 8888:8888/tcp
+    volumes:
+      - ./config:/config
+    stop_grace_period: 2m
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"

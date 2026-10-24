@@ -33,14 +33,15 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [Bambu Studio](bambu-lab/compose.yaml) | 3D-Modelle im Browser vorbereiten und slicen |
 | [CADCraft](cadcraft/compose.yaml) | Technische Zeichnungen und CAD-Entwürfe erstellen |
 | [Cloudflare Tunnel](cloudflare-tunnel/compose.yaml) | Dienste über eigene Domains erreichbar machen |
-| [DeepSeek Harness](deepseek-harness/compose.yaml) | KI-Agent für Dateien und Befehle in einem Arbeitsordner |
 | [DeckCraft](deckcraft/compose.yaml) | Präsentationen erstellen und bearbeiten |
+| [DeepSeek Harness](deepseek-harness/compose.yaml) | KI-Agent für Dateien und Befehle in einem Arbeitsordner |
 | [DesignCraft](designcraft/compose.yaml) | Seiten und Layouts gestalten |
-| [EffectCraft](effectcraft/compose.yaml) | Animationen und Effekte gestalten |
 | [Eclipse Mosquitto](mosquitto/compose.yaml) | Passwortgeschützter MQTT-Broker für Geräte und Automationen |
+| [EffectCraft](effectcraft/compose.yaml) | Animationen und Effekte gestalten |
 | [ESPHome](esphome/compose.yaml) | Gerätekonfiguration und Firmware mit ESPHome Device Builder erstellen |
 | [FigCraft](figcraft/compose.yaml) | Oberflächen und Prototypen entwerfen |
 | [FilmCraft](filmcraft/compose.yaml) | Videos bearbeiten |
+| [Firefox](firefox/compose.yaml) | Firefox auf dem NAS mit geschütztem Browserzugang und dauerhaftem Profil |
 | [Frigate NVR](frigate/compose.yaml) | Videoüberwachung mit Objekterkennung |
 | [GridCraft](gridcraft/compose.yaml) | Tabellen und Berechnungen bearbeiten |
 | [Grocy](grocy/compose.yaml) | Vorräte, Einkäufe und Haushaltsaufgaben verwalten |
@@ -49,23 +50,31 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [Jellyfin](jellyfin/compose.yaml) | Filme, Serien und Musik an Browser, Fernseher und Mobilgeräte streamen |
 | [Joplin Server](joplin-server/compose.yaml) | Notizen zwischen Joplin-Apps synchronisieren |
 | [LightCraft](lightcraft/compose.yaml) | Fotos entwickeln |
+| [Matrix + Element](matrix-element/compose.yaml) | Privater Matrix-Messenger mit Element-Weboberfläche, persönlichen Konten und PostgreSQL |
+| [Mattermost](mattermost/compose.yaml) | Eigener Teamchat mit Kanälen, persönlichen Konten und Dateiaustausch |
 | [Mealie](mealie/compose.yaml) | Rezepte, Essenspläne und Einkaufslisten verwalten |
+| [Minecraft Bedrock](minecraft-bedrock/compose.yaml) | Eigener Minecraft-Bedrock-Server mit dauerhafter Welt und Xbox-Anmeldung |
+| [Minecraft Java](minecraft-java/compose.yaml) | Eigener Minecraft-Java-Server mit dauerhafter Welt und optionalen Mods oder Plugins |
 | [n8n](n8n/compose.yaml) | Workflows zwischen Apps und APIs automatisieren |
 | [Nextcloud + MariaDB](nextcloud/compose.yaml) | Private Cloud für Dateien und Zusammenarbeit |
 | [Node-RED](node-red/compose.yaml) | Abläufe und Geräte visuell automatisieren |
 | [Ollama](ollama/compose.yaml) | Lokale KI-Modelle über eine API ausführen |
 | [PairDrop](pairdrop/compose.yaml) | Dateien und Text zwischen Browsern übertragen |
+| [Palworld](palworld/compose.yaml) | Palworld-Server mit eigener Welt, Spielerpasswort und automatischen Backups |
 | [Paperless-ngx](paperless-ngx/compose.yaml) | Dokumente mit OCR archivieren und durchsuchen |
 | [PdfCraft](pdfcraft/compose.yaml) | PDFs bearbeiten |
 | [PhotoCraft](photocraft/compose.yaml) | Bilder bearbeiten |
 | [Pi-hole](pihole/compose.yaml) | DNS-Werbeblocker mit Dashboard |
+| [Satisfactory](satisfactory/compose.yaml) | Dedizierter Satisfactory-Server für eine gemeinsame Fabrik und dauerhafte Spielstände |
 | [SolidCraft](solidcraft/compose.yaml) | 3D-CAD-Modelle im Browser erstellen und bearbeiten |
 | [SoundCraft](soundcraft/compose.yaml) | Audio aufnehmen und bearbeiten |
 | [Syncthing](syncthing/compose.yaml) | Ordner zwischen Geräten synchronisieren |
+| [Terraria / tModLoader](terraria/compose.yaml) | Terraria-Server mit tModLoader, dauerhafter Welt und optionalen Workshop-Mods |
 | [Thunderbird](thunderbird/compose.yaml) | Vorhandene E-Mail-Konten, Kontakte und Kalender im Browser nutzen |
 | [TitanOS-Agent](titanos-agent/compose.yaml) | Mit einem lokalen Ollama-Modell über den Zustand des NAS chatten |
 | [Trilium Notes](trilium/compose.yaml) | Persönliche Wissensdatenbank mit Browsereditor |
 | [Uptime Kuma](uptime-kuma/compose.yaml) | Erreichbarkeit von Diensten überwachen |
+| [Valheim](valheim/compose.yaml) | Valheim-Server mit geschützter Spielwelt und automatischen Welt-Backups |
 | [Vaultwarden](vaultwarden/compose.yaml) | Passwortmanager für Bitwarden-Clients |
 | [VectorCraft](vectorcraft/compose.yaml) | Vektorgrafiken bearbeiten |
 | [WordCraft](wordcraft/compose.yaml) | Textdokumente erstellen und bearbeiten |
@@ -456,3 +465,11 @@ Die abgeleitete Immich-Vorlage steht unter [AGPL-3.0-only](immich/LICENSE).
 Die Craft-Paketierung übernimmt die Original-Lizenztexte und Quellverweise
 der jeweiligen Version. Die Fair-Source-Lizenz des TitanOS-Betriebssystems
 ist keine pauschale Lizenz für diese Anwendungen oder ihre Vorlagen.
+
+## Spiele, Firefox und Teamchat
+
+Die sechs Spiele-Vorlagen betreiben dedizierte Server; gespielt wird mit dem passenden Spiel auf PC, Konsole oder Mobilgerät. Java und Bedrock sind getrennte Minecraft-Editionen. Die Terraria-Vorlage verwendet tModLoader und benötigt einen passenden tModLoader-Client. Beide Minecraft-Vorlagen verlangen eine ausdrückliche EULA-Eingabe bei der Installation. Welten, Serverdateien und Einstellungen liegen auf dem Daten-Volume. Die großen Steam-Server brauchen beim ersten Start Zeit und mehrere Gigabyte freien Speicher; Palworld und Satisfactory brauchen entsprechend viel RAM. Die Hinweise jeder Vorlage nennen Ports und Besonderheiten.
+
+Firefox läuft als Browserdesktop hinter HTTPS mit eigener Anmeldung. Jede Installation hat ein gemeinsames Browserprofil. Für getrennte Personen und gespeicherte Anmeldungen jeweils eine eigene Instanz anlegen. Matrix + Element startet Synapse, Element, PostgreSQL und ein HTTPS-Gateway gemeinsam. Der dauerhafte Matrix-Servername, die erreichbare HTTPS-Adresse sowie das erste Administratorkonto werden bei der Installation angegeben. Weitere Konten können in der Synapse-Konsole angelegt werden; offene Registrierung und Föderation bleiben aus. Mattermost Team Edition startet mit eigener PostgreSQL-Datenbank; das erste Administratorkonto wird in der Weboberfläche eingerichtet. Beide Chats verwenden eigene Konten. E-Mail-Versand und Anruf-Infrastruktur sind gesondert einzurichten.
+
+Der Workflow `Games browser and chat smoke` startet die neun tatsächlichen Images mit ausschließlich synthetischen Daten auf isolierten CI-Runnern. Er prüft Protokoll-/API-Antworten, Anmeldung und dauerhaften Zustand nach dem Neuerstellen der Container. Firefox und Element werden zusätzlich in Chromium geöffnet. Vollständige Spielrunden, Mods, Konsolenverbindungen, Internetfreigaben, E-Mail-Zustellung und Leistung auf NAS-Hardware gehören nicht zu dieser Prüfung. Prüfdetails stehen in [docs/GAMES-CHAT.md](docs/GAMES-CHAT.md).

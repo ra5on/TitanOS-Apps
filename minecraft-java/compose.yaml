@@ -1,0 +1,114 @@
+x-titanos:
+  name: Minecraft Java
+  main: minecraft
+  category: games
+  description:
+    de: Eigener Minecraft-Java-Server mit dauerhafter Welt und optionalen Mods oder Plugins.
+    en: Your own Minecraft Java server with a persistent world and optional mods or plugins.
+  tips:
+    de: Gameserver ohne Weboberfläche. Im passenden Spielclient mit NAS-Adresse und dem gewählten Spielport
+      verbinden. Welten und Einstellungen liegen auf dem Daten-Volume. Fernzugriff und Router-Freigaben
+      werden nicht automatisch eingerichtet. Vor Versionswechseln die Welten sichern; Spielclient und
+      Server müssen zusammenpassen. Vor Installation die Minecraft-EULA lesen und selbst mit TRUE
+      akzeptieren. ONLINE_MODE bleibt aktiv. RCON ist nur intern erreichbar. VERSION legt die
+      Spielversion fest; LATEST aktualisiert beim Start auf die aktuelle stabile Version. Für Modpacks
+      auch die passende Java-/Servervariante wählen.
+    en: Game server without a web interface. Connect from the matching game client using the NAS address and
+      selected game port. Worlds and settings reside on the data volume. Remote access and router
+      forwarding are not configured automatically. Back up worlds before version changes; client and
+      server versions must match. Read and explicitly accept the Minecraft EULA by entering TRUE before
+      installation. ONLINE_MODE remains enabled. RCON is internal only. VERSION selects the game version;
+      LATEST updates to the current stable version on startup. Modpacks also require a compatible
+      Java/server variant.
+  variables:
+    EULA:
+      label:
+        de: Minecraft-EULA ausdrücklich akzeptieren
+        en: Explicitly accept the Minecraft EULA
+      required: true
+      placeholder: "TRUE"
+      help:
+        de: Nur nach Lesen von https://www.minecraft.net/eula TRUE eingeben. Ohne Zustimmung startet der Server
+          nicht.
+        en: Enter TRUE only after reading https://www.minecraft.net/eula. The server will not start without
+          acceptance.
+    VERSION:
+      label:
+        de: Minecraft-Version
+        en: Minecraft version
+    TYPE:
+      label:
+        de: Servertyp
+        en: Server type
+    MEMORY:
+      label:
+        de: Java-Arbeitsspeicher
+        en: Java memory
+    MOTD:
+      label:
+        de: Serverbeschreibung
+        en: Server description
+    MAX_PLAYERS:
+      label:
+        de: Spielerlimit
+        en: Player limit
+    RCON_PASSWORD:
+      label:
+        de: Internes RCON-Passwort
+        en: Internal RCON password
+      secret: generate
+      required: true
+    UID:
+      label:
+        de: Benutzer-ID
+        en: User ID
+      fill: uid
+    GID:
+      label:
+        de: Gruppen-ID
+        en: Group ID
+      fill: gid
+    TZ:
+      label:
+        de: Zeitzone
+        en: Timezone
+      fill: timezone
+  paths:
+    /data:
+      label:
+        de: Welt, Server und Einstellungen
+        en: World, server and settings
+  ports:
+    "25565":
+      label: Minecraft Java (TCP)
+      webui: false
+  icon: https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/minecraft.svg
+services:
+  minecraft:
+    image: itzg/minecraft-server:2026.10.0-java25
+    restart: unless-stopped
+    environment:
+      EULA: ""
+      VERSION: LATEST
+      TYPE: VANILLA
+      MEMORY: 2G
+      MOTD: TitanOS Minecraft
+      MAX_PLAYERS: "10"
+      ONLINE_MODE: "true"
+      ENABLE_RCON: "true"
+      RCON_PASSWORD: ""
+      UID: "1000"
+      GID: "1000"
+      TZ: ""
+    ports:
+      - 25565:25565/tcp
+    volumes:
+      - ./data:/data
+    stdin_open: true
+    tty: true
+    stop_grace_period: 2m
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
