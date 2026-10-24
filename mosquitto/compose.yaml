@@ -48,7 +48,7 @@ x-titanos:
   icon: https://raw.githubusercontent.com/eclipse-mosquitto/mosquitto/master/logo/mosquitto-logo-min.svg
 services:
   mosquitto:
-    image: eclipse-mosquitto:2.1.2-alpine
+    image: eclipse-mosquitto:latest
     restart: unless-stopped
     environment:
       MQTT_USERNAME: mqtt

@@ -24,7 +24,10 @@ x-titanos:
 
   tips:
     de: >-
-      Nextcloud- und MariaDB-Version auswählen.
+      Nextcloud und MariaDB verwenden standardmäßig latest.
+      Versionen über die Image-Tags im Dienst-Editor oder
+      beim Installieren in der Compose-Ansicht wählen.
+      Nextcloud und den Cron-Dienst auf dieselbe Version setzen.
       Anschließend Administrator-Benutzername,
       Passwort und Server-IP oder Domain eingeben.
       Die Datenbankpasswörter werden automatisch
@@ -38,7 +41,10 @@ x-titanos:
       Vor Versionswechseln Backups erstellen.
       Für öffentlichen Zugriff HTTPS verwenden.
     en: >-
-      Select Nextcloud and MariaDB versions.
+      Nextcloud and MariaDB default to latest.
+      Select versions using service image tags in the editor
+      or in the Compose view during installation.
+      Keep Nextcloud and the cron service on the same version.
       Enter administrator username, password
       and server IP address or domain.
       Database passwords are generated and
@@ -56,22 +62,6 @@ x-titanos:
   # ============================================
 
   variables:
-
-    # ------------------------------------------
-    # VERSIONEN
-    # ------------------------------------------
-
-    NEXTCLOUD_VERSION:
-      label:
-        de: Nextcloud-Version
-        en: Nextcloud version
-      required: true
-
-    MARIADB_VERSION:
-      label:
-        de: MariaDB-Version
-        en: MariaDB version
-      required: true
 
     # ------------------------------------------
     # NEXTCLOUD ADMINISTRATOR
@@ -170,7 +160,7 @@ services:
   # ============================================
 
   mariadb:
-    image: "mariadb:${MARIADB_VERSION:-11.8}"
+    image: "mariadb:latest"
     restart: unless-stopped
 
     # ==========================================
@@ -257,7 +247,7 @@ services:
   nextcloud:
     labels:
       titanos.webui: "http://[host]:8080"
-    image: "nextcloud:${NEXTCLOUD_VERSION:-35.0.2-apache}"
+    image: "nextcloud:latest"
     restart: unless-stopped
 
     # ==========================================
@@ -273,16 +263,9 @@ services:
       TZ: "Europe/Berlin"
 
       # ----------------------------------------
-      # VERSIONEN - TITANOS AUSWAHL
       # ----------------------------------------
 
-      # Diese Felder sind für die TitanOS-
-      # Installationsoberfläche vorgesehen.
-      # Die tatsächlichen Image-Versionen
-      # werden über Compose-Interpolation gesetzt.
 
-      NEXTCLOUD_VERSION: "35.0.2-apache"
-      MARIADB_VERSION: "11.8"
 
       # ----------------------------------------
       # ADMINISTRATOR
@@ -392,8 +375,7 @@ services:
   nextcloud-cron:
 
     # Verwendet dieselbe Version wie Nextcloud
-    image: "nextcloud:${NEXTCLOUD_VERSION:-35.0.2-apache}"
-
+    image: "nextcloud:latest"
     restart: unless-stopped
 
     # ==========================================

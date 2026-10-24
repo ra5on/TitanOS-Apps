@@ -45,7 +45,7 @@ x-titanos:
         en: Timezone
       fill: timezone
   paths:
-    /var/lib/postgresql/data:
+    /var/lib/postgresql:
       label:
         de: Datenbank und synchronisierte Notizen
         en: Database and synchronized notes
@@ -56,14 +56,14 @@ x-titanos:
   icon: https://raw.githubusercontent.com/laurent22/joplin/dev/Assets/JoplinIcon.svg
 services:
   db:
-    image: postgres:16
+    image: postgres:latest
     restart: unless-stopped
     environment:
       POSTGRES_DB: joplin
       POSTGRES_USER: joplin
       POSTGRES_PASSWORD: ${JOPLIN_DBPASS:-}
     volumes:
-      - ./postgres:/var/lib/postgresql/data
+      - ./postgres:/var/lib/postgresql
     healthcheck:
       test:
         - CMD
@@ -82,7 +82,7 @@ services:
         max-size: 10m
         max-file: "3"
   joplin:
-    image: joplin/server:3.7.3
+    image: joplin/server:latest
     restart: unless-stopped
     labels:
       titanos.webui: http://[host]:22300

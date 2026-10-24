@@ -51,7 +51,7 @@ x-titanos:
 
 services:
   jellyfin:
-    image: jellyfin/jellyfin:12.3
+    image: jellyfin/jellyfin:latest
     restart: unless-stopped
     labels:
       titanos.webui: "http://[host]:8096"

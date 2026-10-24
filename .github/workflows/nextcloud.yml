@@ -1,0 +1,20 @@
+name: Nextcloud latest stack smoke
+on:
+  workflow_dispatch:
+  push:
+    paths: ['nextcloud/**', 'scripts/nextcloud-smoke.mjs', '.github/workflows/nextcloud.yml']
+  pull_request:
+    paths: ['nextcloud/**', 'scripts/nextcloud-smoke.mjs', '.github/workflows/nextcloud.yml']
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Test latest Nextcloud, MariaDB and cron with synthetic WebDAV data
+        run: node scripts/nextcloud-smoke.mjs

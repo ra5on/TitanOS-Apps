@@ -70,7 +70,7 @@ x-titanos:
       webui: true
 services:
   firefox:
-    image: jlesage/firefox:v26.09.1
+    image: jlesage/firefox:latest
     restart: unless-stopped
     labels:
       titanos.webui: https://[host]:5801

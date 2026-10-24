@@ -104,14 +104,14 @@ services:
   dsh:
     labels:
       titanos.webui: "http://[host]:3080"
-    image: "node:24-bookworm-slim"
+    image: "node:latest"
     restart: unless-stopped
     environment:
       TZ: ""
       PUID: ""
       PGID: ""
       DSH_NAS_HOST: ""
-      DSH_VERSION: "0.2.1-rc.2"
+      DSH_VERSION: "latest"
       HOME: /data
       NPM_CONFIG_UPDATE_NOTIFIER: "false"
     working_dir: /workspace

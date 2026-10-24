@@ -69,16 +69,6 @@ x-titanos:
   variables:
 
     # ------------------------------------------
-    # VERSION
-    # ------------------------------------------
-
-    BAMBU_STUDIO_VERSION:
-      label:
-        de: Bambu Studio Docker-Version
-        en: Bambu Studio Docker version
-      required: true
-
-    # ------------------------------------------
     # BENUTZERANMELDUNG
     # ------------------------------------------
 
@@ -180,7 +170,7 @@ x-titanos:
 services:
 
   bambustudio:
-    image: "lscr.io/linuxserver/bambustudio:${BAMBU_STUDIO_VERSION:-latest}"
+    image: "lscr.io/linuxserver/bambustudio:latest"
     restart: unless-stopped
 
     # ==========================================
@@ -193,12 +183,8 @@ services:
     environment:
 
       # ----------------------------------------
-      # VERSION - TITANOS AUSWAHL
       # ----------------------------------------
 
-      # TitanOS muss diesen Wert auch für die
-      # Image-Version übernehmen.
-      BAMBU_STUDIO_VERSION: "latest"
 
       # ----------------------------------------
       # BENUTZER UND BERECHTIGUNGEN
