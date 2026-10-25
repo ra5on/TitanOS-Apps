@@ -94,8 +94,40 @@ for (const app of readdirSync(root, { withFileTypes: true }).filter(entry => ent
   });
 }
 test('the complete catalog and multi-service stacks were covered', () => {
-  assert.equal(apps, 50);
-  assert.equal(services, 66);
+  assert.equal(apps, 53);
+  assert.equal(services, 69);
   assert.ok(stacks >= 7);
   console.log(`Checked ${apps} apps, ${services} services and ${stacks} stacks using released TitanOS helpers and real Compose.`);
+});
+
+test('new apps retain secrets, share permissions, editable tags and network requirements', () => {
+  const shares = [{ name: 'Music', path: '/mnt/Test/Music' }];
+  for (const app of ['convertx', 'jdownloader-2', 'music-assistant']) {
+    const compose = readFileSync(resolve(root, app, 'compose.yaml'), 'utf8');
+    const template = { compose, timezone: 'Europe/Berlin', uid: 1000, gid: 100, appdata: '/mnt/Test/appdata', listening: [], missingDevices: [] };
+    const form = readTemplate(template, app, shares, new Map([['3010/tcp', 'occupied'], ['5810/tcp', 'occupied']]));
+    for (const field of form.vars) if (field.name === 'WEB_AUTHENTICATION_USERNAME') field.value = 'catalog-user';
+    const built = build(template, form);
+    const doc = parse(built.compose);
+    const service = Object.values(doc.services)[0];
+    assert.ok(service.labels['titanos.icon'].startsWith('https://'));
+    for (const path of form.paths) assert.ok(path.host.startsWith('/mnt/Test/'));
+    for (const port of form.ports) assert.ok(!['3010', '5810'].includes(port.host), 'occupied mapped ports are reassigned');
+    if (app === 'music-assistant') {
+      assert.ok(form.risks.includes('hostNetwork'));
+      assert.equal(service.network_mode, 'host');
+      assert.equal(form.ports.length, 0);
+      assert.equal(service.labels['titanos.webui'], 'http://[host]:8095');
+      assert.ok(service.volumes.includes('/mnt/Test/Music:/media:ro'));
+      assert.ok(!service.cap_add && !service.privileged && !service.devices);
+    } else {
+      const secretName = app === 'convertx' ? 'JWT_SECRET' : 'WEB_AUTHENTICATION_PASSWORD';
+      assert.ok(built.env[secretName].length >= 24);
+      assert.equal(service.environment[secretName], '${' + secretName + '}');
+      assert.ok(!built.compose.includes(built.env[secretName]));
+      const reloaded = readTemplate({ ...template, compose: built.compose }, app, shares, new Map(), built.env);
+      assert.equal(reloaded.vars.find(field => field.name === secretName).value, built.env[secretName]);
+      if (app === 'jdownloader-2') assert.ok(service.volumes.includes('/mnt/Test/Music:/output'));
+    }
+  }
 });

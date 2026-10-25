@@ -48,7 +48,7 @@ services:
 
 Den Tag eines Dienstes ändern; die übrigen Dienste behalten ihre Auswahl.
 Formular und Compose-Ansicht verwenden dieselben Werte. Die
-[vollständige Tabelle](docs/IMAGE-TAGS.md) listet alle 66 Dienste und Vorgaben.
+[vollständige Tabelle](docs/IMAGE-TAGS.md) listet alle 69 Dienste und Vorgaben.
 Zusammengehörige Dienste wie Immich Server/ML, Nextcloud/Cron oder
 Synapse/Einrichtungsdienste müssen auf kompatiblen Versionen bleiben.
 
@@ -78,6 +78,7 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [Bambu Studio](bambu-lab/compose.yaml) | 3D-Modelle im Browser vorbereiten und slicen |
 | [CADCraft](cadcraft/compose.yaml) | Technische Zeichnungen und CAD-Entwürfe erstellen |
 | [Cloudflare Tunnel](cloudflare-tunnel/compose.yaml) | Dienste über eigene Domains erreichbar machen |
+| [ConvertX](convertx/compose.yaml) | Dateien im Browser zwischen vielen Formaten umwandeln |
 | [DeckCraft](deckcraft/compose.yaml) | Präsentationen erstellen und bearbeiten |
 | [DeepSeek Harness](deepseek-harness/compose.yaml) | KI-Agent für Dateien und Befehle in einem Arbeitsordner |
 | [DesignCraft](designcraft/compose.yaml) | Seiten und Layouts gestalten |
@@ -92,6 +93,7 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [Grocy](grocy/compose.yaml) | Vorräte, Einkäufe und Haushaltsaufgaben verwalten |
 | [Hermes Agent](hermes-agent/compose.yaml) | KI-Agent mit Web-Dashboard |
 | [Immich](immich/compose.yaml) | Fotos und Videos verwalten und sichern |
+| [JDownloader 2](jdownloader-2/compose.yaml) | Downloads mit geschützter Browseroberfläche verwalten |
 | [Jellyfin](jellyfin/compose.yaml) | Filme, Serien und Musik an Browser, Fernseher und Mobilgeräte streamen |
 | [Joplin Server](joplin-server/compose.yaml) | Notizen zwischen Joplin-Apps synchronisieren |
 | [LightCraft](lightcraft/compose.yaml) | Fotos entwickeln |
@@ -100,6 +102,7 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [Mealie](mealie/compose.yaml) | Rezepte, Essenspläne und Einkaufslisten verwalten |
 | [Minecraft Bedrock](minecraft-bedrock/compose.yaml) | Eigener Minecraft-Bedrock-Server mit dauerhafter Welt und Xbox-Anmeldung |
 | [Minecraft Java](minecraft-java/compose.yaml) | Eigener Minecraft-Java-Server mit dauerhafter Welt und optionalen Mods oder Plugins |
+| [Music Assistant](music-assistant/compose.yaml) | Musikquellen und vernetzte Lautsprecher zusammenführen |
 | [n8n](n8n/compose.yaml) | Workflows zwischen Apps und APIs automatisieren |
 | [Nextcloud + MariaDB](nextcloud/compose.yaml) | Private Cloud für Dateien und Zusammenarbeit |
 | [Node-RED](node-red/compose.yaml) | Abläufe und Geräte visuell automatisieren |
@@ -124,6 +127,53 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [VectorCraft](vectorcraft/compose.yaml) | Vektorgrafiken bearbeiten |
 | [WordCraft](wordcraft/compose.yaml) | Textdokumente erstellen und bearbeiten |
 | [Zigbee2MQTT](zigbee2mqtt/compose.yaml) | Zigbee-Geräte mit einem privaten MQTT-Broker verbinden |
+
+## Dateikonvertierung, Downloads und Musikwiedergabe
+
+| App | Standard-Web-Port | Dauerhafte Daten |
+| --- | --- | --- |
+| ConvertX | HTTP `3010` | `data` mit Konten, Uploads und Ergebnissen |
+| JDownloader 2 | HTTPS `5810` | `config` mit Einstellungen und Listen, `downloads` als `/output` |
+| Music Assistant | HTTP `8095`, Host-Netzwerk | `data` mit Datenbank, Einstellungen und Cache, Musik nur lesend unter `/media` |
+
+ConvertX wird beim ersten Öffnen mit einem eigenen Konto eingerichtet. Weitere
+Registrierung und anonyme Nutzung sind aus; TitanOS erzeugt einen dauerhaften
+Sitzungsschlüssel. HTTP ist für den lokalen Zugriff aktiviert. Für Fernzugriff
+HTTPS an einem Reverse-Proxy einrichten. Dateien über den Browser hochladen;
+ConvertX liest keine NAS-Freigaben automatisch. Zwei gleichzeitige Konvertierungen
+sind voreingestellt. Die automatische Bereinigung läuft im 24-Stunden-Intervall;
+wichtige Ergebnisse vorher herunterladen.
+
+JDownloader 2 verwendet den Drittanbieter-Container von jlesage mit geschütztem
+HTTPS-Zugang wie Thunderbird. Den gewählten Web-Benutzernamen und das erzeugte
+Passwort aufbewahren, gegebenenfalls das selbst signierte Zertifikat bestätigen.
+Alle Personen einer Instanz teilen ihre Downloadliste und gespeicherten Konten.
+Downloads nach `/output` schreiben; im Installationsformular kann dafür eine
+vorhandene Freigabe gewählt werden. VNC, Browserterminal und der optionale
+MyJDownloader-Direktport 3129 werden nicht freigegeben. MyJDownloader-Konten und
+Hoster-Zugänge bei Bedarf innerhalb der Anwendung einrichten. Beim ersten Start
+werden zusätzliche Programmdateien und Updates geladen.
+
+Music Assistant benötigt Host-Netzwerk für die Lautsprechersuche und Wiedergabe
+im selben lokalen Netz. Der Installationsdialog zeigt das vorhandene Recht an.
+Port 8095 muss frei sein und lässt sich dabei nicht automatisch umlegen.
+Audiostreams verwenden 8097 oder den nächsten freien Port; zusätzliche
+Protokolle können weitere Ports benötigen. Zuerst das Administratorkonto
+anlegen, danach Musikquellen und Lautsprecher einrichten. Für lokale Dateien
+den Anbieter mit `/media` verbinden. Der Musikordner ist nur lesend eingebunden;
+für SMB-/NFS-Mounts im Container werden keine zusätzlichen Rechte vergeben.
+Home Assistant ist optional und wird separat verbunden; vorhandene
+TitanOS-Anmeldungen und Integrationsdaten werden nicht übernommen. Mindestens
+2 GiB RAM für Music Assistant einplanen. Datenbank und Musik getrennt sichern.
+
+Der [zugehörige CI-Workflow](.github/workflows/conversion-download-music.yml)
+prüft die drei echten Images auf Wegwerf-Runnern. ConvertX wird mit Kontoeinrichtung,
+einer synthetischen SVG-zu-PNG-Konvertierung und authentifiziertem Download
+geprüft. JDownloader wird mit HTTPS-Anmeldung, laufendem Programm und Desktop
+geprüft. Music Assistant wird mit Host-Netzwerk, Kontoeinrichtung, geschützter API
+und nur lesendem Musikordner geprüft. Alle drei müssen ihre Daten und Konten
+nach Container-Neuerstellung behalten. Grenzen und veröffentlichter Prüfstand
+stehen in [den Release-Notizen](docs/releases/apps-2026.10.25.md).
 
 ## Speicherpfade und Dokumente
 

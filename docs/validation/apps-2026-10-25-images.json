@@ -1,0 +1,25 @@
+{
+  "checkedAt": "2026-10-25T10:19:28.040989+00:00",
+  "services": 3,
+  "uniqueImages": 3,
+  "checks": [
+    {
+      "image": "ghcr.io/c4illin/convertx:latest",
+      "status": 200,
+      "digest": "sha256:8590a21a16adb8514a8be55b74ad0112bf58ba772328a53f7b40528fcf8fa013",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/music-assistant/server:latest",
+      "status": 200,
+      "digest": "sha256:661e88bea76a9e79f38feca791f6c7373376ab60766ee01f56b66418ca243b68",
+      "linuxAmd64": true
+    },
+    {
+      "image": "jlesage/jdownloader-2:latest",
+      "status": 200,
+      "digest": "sha256:bd6cd2fdc72818f30207e677b33cd7f1b425048c4e7132624e541e99f992be4c",
+      "linuxAmd64": true
+    }
+  ]
+}

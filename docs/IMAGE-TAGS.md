@@ -1,6 +1,6 @@
 # Image-Tags je Container
 
-Alle 50 Apps und 66 Dienste verwenden wörtliche Image-Referenzen. In TitanOS
+Alle 53 Apps und 69 Dienste verwenden wörtliche Image-Referenzen. In TitanOS
 0.21.0 ist das **Image-Tag**-Feld für jeden Dienst direkt bearbeitbar, beim
 Installieren und im bestehenden Diensteditor. Formular und Compose-Ansicht
 halten dieselbe Auswahl; nach erneutem Öffnen bleiben die Tags erhalten.
@@ -29,6 +29,7 @@ vollständige Funktionsabnahme jeder Anwendung.
 | bambu-lab | bambustudio | `lscr.io/linuxserver/bambustudio:latest` |
 | cadcraft | cadcraft | `ghcr.io/ra5on/titanos-cadcraft:latest` |
 | cloudflare-tunnel | cloudflared | `cloudflare/cloudflared:latest` |
+| convertx | convertx | `ghcr.io/c4illin/convertx:latest` |
 | deckcraft | deckcraft | `ghcr.io/ra5on/titanos-deckcraft:latest` |
 | deepseek-harness | dsh | `node:latest` |
 | designcraft | designcraft | `ghcr.io/ra5on/titanos-designcraft:latest` |
@@ -45,6 +46,7 @@ vollständige Funktionsabnahme jeder Anwendung.
 | immich | immich-machine-learning | `ghcr.io/immich-app/immich-machine-learning:release` |
 | immich | redis | `docker.io/valkey/valkey:latest` |
 | immich | database | `ghcr.io/tensorchord/vchord-suite:pg18-latest` |
+| jdownloader-2 | jdownloader | `jlesage/jdownloader-2:latest` |
 | jellyfin | jellyfin | `jellyfin/jellyfin:latest` |
 | joplin-server | db | `postgres:latest` |
 | joplin-server | joplin | `joplin/server:latest` |
@@ -62,6 +64,7 @@ vollständige Funktionsabnahme jeder Anwendung.
 | minecraft-bedrock | bedrock | `itzg/minecraft-bedrock-server:latest` |
 | minecraft-java | minecraft | `itzg/minecraft-server:latest` |
 | mosquitto | mosquitto | `eclipse-mosquitto:latest` |
+| music-assistant | music-assistant | `ghcr.io/music-assistant/server:latest` |
 | n8n | n8n | `docker.n8n.io/n8nio/n8n:latest` |
 | nextcloud | mariadb | `mariadb:latest` |
 | nextcloud | nextcloud | `nextcloud:latest` |

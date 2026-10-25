@@ -1,0 +1,89 @@
+x-titanos:
+  name: JDownloader 2
+  main: jdownloader
+  category: network
+  icon: https://raw.githubusercontent.com/jlesage/docker-templates/master/jlesage/images/jdownloader-2-icon.png
+  description:
+    de: Downloads auf dem NAS verwalten, fortsetzen und entpacken, mit geschützter Browseroberfläche.
+    en: Manage, resume and extract downloads on your NAS through a protected browser interface.
+  tips:
+    de: >-
+      Drittanbieter-Container von jlesage. Den Browserzugang über HTTPS öffnen und
+      gegebenenfalls das selbst signierte Zertifikat bestätigen. Mit dem hier gewählten
+      Web-Benutzernamen und erzeugten Passwort anmelden. Alle Besucher einer Instanz
+      bedienen denselben JDownloader und dessen gespeicherte Konten. Konfiguration und
+      Downloadliste liegen unter /config, heruntergeladene Dateien unter /output auf dem
+      gewählten Daten-Volume. Als Downloadziel in JDownloader /output verwenden; eine
+      vorhandene Freigabe kann im Pfadfeld ausgewählt werden. MyJDownloader ist optional
+      und kann in JDownloader eingerichtet werden; seine Direktverbindung auf Port 3129
+      ist nicht veröffentlicht. Kein direkter VNC-Zugang. Beim ersten Start werden
+      JDownloader-Dateien und Updates heruntergeladen. Fernzugriff bevorzugt über Tailscale.
+    en: >-
+      Third-party container by jlesage. Open the browser interface over HTTPS and accept
+      the self-signed certificate if prompted. Sign in with the web username and generated
+      password configured here. Everyone accessing an instance shares its JDownloader
+      and stored accounts. Configuration and download lists live in /config, downloaded
+      files in /output on the selected data volume. Use /output as the download destination
+      in JDownloader; select an existing share in the path field if desired. MyJDownloader
+      is optional and can be configured inside JDownloader; its direct connection port
+      3129 is not published. No direct VNC access. The first startup downloads JDownloader
+      files and updates. Prefer Tailscale for remote access.
+  variables:
+    WEB_AUTHENTICATION_USERNAME:
+      label: { de: Benutzername für den Browserzugang, en: Browser access username }
+      required: true
+    WEB_AUTHENTICATION_PASSWORD:
+      label: { de: Passwort für den Browserzugang, en: Browser access password }
+      secret: generate
+      required: true
+    USER_ID:
+      label: { de: Benutzer-ID, en: User ID }
+      fill: uid
+    GROUP_ID:
+      label: { de: Gruppen-ID, en: Group ID }
+      fill: gid
+    TZ:
+      label: { de: Zeitzone, en: Timezone }
+      fill: timezone
+    JDOWNLOADER_MAX_MEM:
+      label: { de: Maximaler Java-Arbeitsspeicher, en: Maximum Java heap memory }
+      help: { de: 'Zum Beispiel 512M oder 1G. Die Browseroberfläche benötigt zusätzlich RAM.', en: 'For example 512M or 1G. The browser desktop needs additional RAM.' }
+  paths:
+    /config:
+      label: { de: Konfiguration und Downloadliste, en: Configuration and download list }
+    /output:
+      label: { de: Heruntergeladene Dateien, en: Downloaded files }
+      suggest: share
+  ports:
+    "5800":
+      label: Web UI (HTTPS)
+      webui: true
+services:
+  jdownloader:
+    image: jlesage/jdownloader-2:latest
+    restart: unless-stopped
+    labels:
+      titanos.webui: https://[host]:5810
+    environment:
+      USER_ID: ""
+      GROUP_ID: ""
+      TZ: ""
+      UMASK: "0022"
+      JDOWNLOADER_MAX_MEM: "512M"
+      SECURE_CONNECTION: "1"
+      WEB_AUTHENTICATION: "1"
+      WEB_AUTHENTICATION_USERNAME: ""
+      WEB_AUTHENTICATION_PASSWORD: ""
+      VNC_LISTENING_PORT: "-1"
+      WEB_FILE_MANAGER: "1"
+      WEB_FILE_MANAGER_ALLOWED_PATHS: /output
+      WEB_TERMINAL: "0"
+    ports:
+      - "5810:5800"
+    volumes:
+      - ./config:/config
+      - ./downloads:/output
+    shm_size: 256mb
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
