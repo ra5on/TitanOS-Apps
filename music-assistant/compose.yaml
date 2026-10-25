@@ -1,0 +1,61 @@
+x-titanos:
+  name: Music Assistant
+  main: music-assistant
+  category: media
+  icon: https://raw.githubusercontent.com/music-assistant/server/dev/music_assistant/logo.png
+  description:
+    de: Eigene Musik und Streamingdienste auf vernetzten Lautsprechern zusammenführen und abspielen.
+    en: Bring together your music library and streaming services for playback on networked speakers.
+  tips:
+    de: >-
+      Beim ersten Öffnen auf Port 8095 das Administratorkonto erstellen. Anmeldung,
+      Musikdienste und Home-Assistant-Anbindung anschließend in Music Assistant einrichten;
+      TitanOS-Konten und dessen Home-Assistant-Einstellungen werden nicht übernommen.
+      Host-Netzwerk ist für die Suche und Wiedergabe über AirPlay, Chromecast, DLNA und
+      Sonos erforderlich. NAS und Lautsprecher müssen im selben lokalen Netz sein.
+      Port 8095 muss frei sein; TitanOS kann ihn bei Host-Netzwerk nicht automatisch
+      umlegen. Der Audiostream verwendet standardmäßig 8097 oder den nächsten freien
+      Port. Mehrere Instanzen benötigen getrennte Ports in Music Assistant.
+      Lokale Musik ist unter /media nur lesend verfügbar; diesen Pfad im Anbieter
+      für lokale Dateien auswählen. Datenbank, Einstellungen und Cache liegen unter
+      /data. Keine zusätzlichen Rechte für SMB-/NFS-Mounts im Container; vorhandene
+      NAS-Musikordner über das Pfadfeld einbinden. Mindestens 2 GiB RAM für die Anwendung
+      einplanen. Echte Lautsprecher und externe Musikdienste separat einrichten.
+    en: >-
+      Create the administrator account on first opening port 8095. Configure sign-in,
+      music services and the Home Assistant integration inside Music Assistant; TitanOS
+      accounts and its Home Assistant settings are not imported. Host networking is
+      required for discovery and playback through AirPlay, Chromecast, DLNA and Sonos.
+      The NAS and speakers must be on the same local network. Port 8095 must be free;
+      TitanOS cannot automatically remap it with host networking. Audio streaming uses
+      port 8097 or the next available port. Multiple instances need separate ports in
+      Music Assistant. Local music is available read-only at /media; select this path
+      in the local files provider. The database, settings and cache live in /data.
+      No extra privileges for SMB/NFS mounts inside the container; bind existing NAS
+      music folders using the path field. Allow at least 2 GiB of RAM for the application.
+      Set up physical speakers and external music services separately.
+  variables:
+    TZ:
+      label: { de: Zeitzone, en: Timezone }
+      fill: timezone
+  paths:
+    /data:
+      label: { de: Datenbank, Einstellungen und Cache, en: Database, settings and cache }
+    /media:
+      label: { de: Lokale Musiksammlung (nur lesen), en: Local music library (read-only) }
+      suggest: media
+services:
+  music-assistant:
+    image: ghcr.io/music-assistant/server:latest
+    restart: unless-stopped
+    network_mode: host
+    labels:
+      titanos.webui: http://[host]:8095
+    environment:
+      TZ: ""
+    volumes:
+      - ./data:/data
+      - ./music:/media:ro
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }

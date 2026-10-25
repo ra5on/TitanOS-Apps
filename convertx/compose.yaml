@@ -1,0 +1,76 @@
+x-titanos:
+  name: ConvertX
+  main: convertx
+  category: productivity
+  icon: https://raw.githubusercontent.com/C4illin/ConvertX/main/public/favicon.svg
+  description:
+    de: Dateien im Browser zwischen Bild-, Dokument-, Audio-, Video- und weiteren Formaten umwandeln.
+    en: Convert files between image, document, audio, video and other formats in your browser.
+  tips:
+    de: >-
+      Beim ersten Öffnen sofort ein eigenes Konto erstellen. Weitere Registrierung und
+      anonyme Nutzung sind deaktiviert. Die Anmeldung ist unabhängig von TitanOS.
+      HTTP ist für den lokalen NAS-Zugang aktiviert; für Fernzugriff HTTPS über einen
+      separat eingerichteten Reverse-Proxy verwenden. Datenbank, Uploads und Ergebnisse
+      liegen im gewählten Datenordner. ConvertX räumt alte Konvertierungsdateien nach
+      seinem 24-Stunden-Intervall auf; wichtige Ergebnisse rechtzeitig herunterladen.
+      Dateien werden über den Browser hochgeladen, nicht automatisch aus Freigaben gelesen.
+      Zwei gleichzeitige Konvertierungen sind voreingestellt; große Dateien brauchen
+      zusätzlichen freien Platz und RAM. Nicht jedes Format unterstützt jeden Zieltyp.
+    en: >-
+      Create your own account immediately on first opening. Further registration and
+      anonymous use are disabled. Sign-in is independent of TitanOS. HTTP is enabled
+      for local NAS access; use HTTPS through a separately configured reverse proxy for
+      remote access. The database, uploads and results live in the selected data folder.
+      ConvertX cleans old conversion files on its 24-hour interval; download important
+      results in time. Files are uploaded through the browser, not automatically read
+      from shares. Two simultaneous conversions are configured; large files need extra
+      free disk space and RAM. Not every format supports every output type.
+  variables:
+    JWT_SECRET:
+      label: { de: Sitzungsschlüssel, en: Session signing secret }
+      secret: generate
+      required: true
+    PUID:
+      label: { de: Benutzer-ID, en: User ID }
+      fill: uid
+    PGID:
+      label: { de: Gruppen-ID, en: Group ID }
+      fill: gid
+    TZ:
+      label: { de: Zeitzone, en: Timezone }
+      fill: timezone
+    MAX_CONVERT_PROCESS:
+      label: { de: Gleichzeitige Konvertierungen, en: Simultaneous conversions }
+      help: { de: '0 bedeutet unbegrenzt; Standard 2 begrenzt die CPU- und RAM-Last.', en: '0 means unlimited; the default of 2 limits CPU and RAM load.' }
+  paths:
+    /app/data:
+      label: { de: Konten, Uploads und Konvertierungsergebnisse, en: Accounts, uploads and conversion results }
+  ports:
+    "3000":
+      label: Web UI
+      webui: true
+services:
+  convertx:
+    image: ghcr.io/c4illin/convertx:latest
+    restart: unless-stopped
+    labels:
+      titanos.webui: http://[host]:3010
+    environment:
+      PUID: ""
+      PGID: ""
+      TZ: ""
+      JWT_SECRET: ""
+      UMASK: "0077"
+      HTTP_ALLOWED: "true"
+      ACCOUNT_REGISTRATION: "false"
+      ALLOW_UNAUTHENTICATED: "false"
+      AUTO_DELETE_EVERY_N_HOURS: "24"
+      MAX_CONVERT_PROCESS: "2"
+    ports:
+      - "3010:3000"
+    volumes:
+      - ./data:/app/data
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }

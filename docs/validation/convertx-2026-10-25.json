@@ -1,0 +1,17 @@
+{
+  "app": "convertx",
+  "checkedAt": "2026-10-25T10:35:51.793Z",
+  "image": "ghcr.io/c4illin/convertx:latest",
+  "digests": [
+    "ghcr.io/c4illin/convertx@sha256:8590a21a16adb8514a8be55b74ad0112bf58ba772328a53f7b40528fcf8fa013"
+  ],
+  "passed": true,
+  "checks": [
+    "account setup",
+    "SVG to PNG conversion (16x16)",
+    "authenticated byte-identical download after recreation",
+    "anonymous download rejection",
+    "invalid login rejection"
+  ],
+  "limits": "One synthetic format pair; no full converter matrix or GPU tests."
+}
