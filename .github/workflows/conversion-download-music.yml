@@ -1,0 +1,35 @@
+name: ConvertX, JDownloader and Music Assistant smoke
+on:
+  workflow_dispatch:
+  push:
+    paths: ['convertx/**', 'jdownloader-2/**', 'music-assistant/**', 'scripts/conversion-download-music-smoke.mjs', '.github/workflows/conversion-download-music.yml']
+  pull_request:
+    paths: ['convertx/**', 'jdownloader-2/**', 'music-assistant/**', 'scripts/conversion-download-music-smoke.mjs', '.github/workflows/conversion-download-music.yml']
+permissions:
+  contents: read
+jobs:
+  smoke:
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [convertx, jdownloader-2, music-assistant]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Install browser test client
+        run: npm install --prefix /tmp/catalog-browser --ignore-scripts playwright
+      - name: Test isolated app, authentication and persistent data
+        env:
+          PLAYWRIGHT_PATH: /tmp/catalog-browser/node_modules/playwright/index.mjs
+        run: node scripts/conversion-download-music-smoke.mjs '${{ matrix.app }}'
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: smoke-${{ matrix.app }}
+          path: |
+            *-smoke.png
+            *-smoke-report.json
