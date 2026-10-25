@@ -218,7 +218,7 @@ x-titanos:
 services:
 
   ollama:
-    image: ollama/ollama:${OLLAMA_OLLAMA_IMAGE_TAG:-latest}
+    image: ollama/ollama:latest
     restart: unless-stopped
 
     environment:

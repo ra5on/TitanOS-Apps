@@ -1,0 +1,409 @@
+{
+  "checkedAt": "2026-10-25T01:31:44.813880+00:00",
+  "services": 66,
+  "uniqueImages": 59,
+  "checks": [
+    {
+      "image": "adguard/adguardhome:latest",
+      "status": 200,
+      "digest": "sha256:aba9e3bf0613be3ba3755e1fc311b126e2c24bec25e18b6483894a88283074f0",
+      "linuxAmd64": true
+    },
+    {
+      "image": "cloudflare/cloudflared:latest",
+      "status": 200,
+      "digest": "sha256:faa8e0a1475f137c910be6025f43c8e4092fdd35461b31e19fd1390657a1ff39",
+      "linuxAmd64": true
+    },
+    {
+      "image": "docker.io/valkey/valkey:latest",
+      "status": 200,
+      "digest": "sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd",
+      "linuxAmd64": true
+    },
+    {
+      "image": "docker.n8n.io/n8nio/n8n:latest",
+      "status": 429,
+      "error": "Too Many Requests"
+    },
+    {
+      "image": "eclipse-mosquitto:latest",
+      "status": 200,
+      "digest": "sha256:860aeb5d63ce509508f6dcfb2bc8a1c1dd2bc60555b562b45ce90e52d8dabb0f",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/blakeblackshear/frigate:stable",
+      "status": 200,
+      "digest": "sha256:fd60f99ffd4eb6c42360ed4e14953e270586f239309ab3983e55b2e97ffac09a",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/community-valheim-tools/valheim-server:latest",
+      "status": 200,
+      "digest": "sha256:f34d67ba8023e343b10ffda0144759a8c8d986f276510460315a01051bed8a6d",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/crosis47/tmodloader:latest",
+      "status": 200,
+      "digest": "sha256:ceeff49669fa7a7c36c75dda726ba77d9480445cdbd955a509d43fb0c787a2d8",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/element-hq/element-web:latest",
+      "status": 200,
+      "digest": "sha256:f8700633d4336258af7a05b53865a4f479e0d628cf2d9ca83d28b5939314d4ce",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/element-hq/synapse:latest",
+      "status": 200,
+      "digest": "sha256:390f5e67227378eb87c84627b57f0582cdb235fcc8159d89f371f37bf7cccfd7",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/esphome/esphome:latest",
+      "status": 200,
+      "digest": "sha256:1dff19a59070cdb523b76576cdc74d200f862d43c1407809088855920cf57145",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/immich-app/immich-machine-learning:release",
+      "status": 200,
+      "digest": "sha256:5b28c9352c8374b8a1ed96fbdd8d6755fea6e43510ec43fdf6538aa02ea40f56",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/immich-app/immich-server:release",
+      "status": 200,
+      "digest": "sha256:485d546a2e31d6a8b4db8423fcba5c109de8c218d93410af115fd1ccfc4352a6",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/koenkk/zigbee2mqtt:latest",
+      "status": 200,
+      "digest": "sha256:addbfb08fcef2e4477de1535636118241e10d13e898fbe4d9faba8a4d7396311",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/mealie-recipes/mealie:latest",
+      "status": 200,
+      "digest": "sha256:78eb28b8776d0bad40c5e605c72b3f4f5976793e491558c7dcbdfc04c835d4bc",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/paperless-ngx/paperless-ngx:latest",
+      "status": 200,
+      "digest": "sha256:9bc6e8248891bcfa6f52fffe8b81e4ea8cae75790c3ec1b9906961a7ba55c969",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/ra5on/titanos-agent:latest",
+      "status": 200,
+      "digest": "sha256:4ec77d61726c3f7e4b6b5cbd14604dc1ef13a467bb2c2fa688b1a151618f0f3c",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/ra5on/titanos-cadcraft:latest",
+      "status": 200,
+      "digest": "sha256:dd21d7be9fc4228851f5d23b8b9c197a960cccdff3ee87c66d0b7c9b6d6dd30c",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/ra5on/titanos-deckcraft:latest",
+      "status": 200,
+      "digest": "sha256:69de4b424fd434ecf5ffec94b9d81a4160d82e54fa4144dd66ceb5c31bb80bab",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/ra5on/titanos-designcraft:latest",
+      "status": 200,
+      "digest": "sha256:1f55c6cc99d3ec1d1303f109ca7d65f12939b7056b0e3c725ab302187fe840fd",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/ra5on/titanos-effectcraft:latest",
+      "status": 200,
+      "digest": "sha256:78739e186f14d8cf0f1f9415abcd5408a87e64f96f97d828bbd79185b590ef13",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/ra5on/titanos-figcraft:latest",
+      "status": 200,
+      "digest": "sha256:d5eba4a8171b7e52c0233f5fbe6309c3d95db551c41110d4283b596c6cde5235",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/ra5on/titanos-filmcraft:latest",
+      "status": 200,
+      "digest": "sha256:afbef7ddf8f25c0245efb48c56579451e09977bdc18e1f533021ffc4b05e4534",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/ra5on/titanos-gridcraft:latest",
+      "status": 200,
+      "digest": "sha256:1b7e21877710dd6a4f613a7a7ac32b5f5171d13e9226a02d4796334747f4b89f",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/ra5on/titanos-lightcraft:latest",
+      "status": 200,
+      "digest": "sha256:bbcbe0a3252de61c40977cab3c4f1a864431223f5ae2c8c70943ef6652e1e474",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/ra5on/titanos-pdfcraft:latest",
+      "status": 200,
+      "digest": "sha256:97d4a4041d1de66cdeb82575ff6a066e209f337e9f46c82cd257e30c865f6596",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/ra5on/titanos-photocraft:latest",
+      "status": 200,
+      "digest": "sha256:3977380f7290081827884cd83c8283a2603f1032a046861edcc5170c77256b43",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/ra5on/titanos-solidcraft:latest",
+      "status": 200,
+      "digest": "sha256:6859c589234d6b9edca7717ebb189ffd1250ca500126518c0be262f66bc874a4",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/ra5on/titanos-soundcraft:latest",
+      "status": 200,
+      "digest": "sha256:a1fd1f9f95dee252772777db9ec27289823186c3d3f17878c1f89c65f4abf7f3",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/ra5on/titanos-vectorcraft:latest",
+      "status": 200,
+      "digest": "sha256:25a2afa9477268c02223ec4521e7b7c96a9ba5cc84bd1412115e1cb48ae29763",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/ra5on/titanos-wordcraft:latest",
+      "status": 200,
+      "digest": "sha256:a7225be4b658f3e93ad0081d0452bc9e981cffd14bdb43610a58b748a4a833e2",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/tensorchord/vchord-suite:pg18-latest",
+      "status": 200,
+      "digest": "sha256:c6e5e77a1180199f91b040b6e85c6d10b0ded6d49fb614dfd2e7272ffb91af08",
+      "linuxAmd64": true
+    },
+    {
+      "image": "itzg/minecraft-bedrock-server:latest",
+      "status": 200,
+      "digest": "sha256:cffda8758bd546e623cedaae33e79af6be3e0b92ab00522d5cfd139f8029d073",
+      "linuxAmd64": true
+    },
+    {
+      "image": "itzg/minecraft-server:latest",
+      "status": 200,
+      "digest": "sha256:6fd6f9bb6998b7cd06948ec6ab03fabfdf98ba3f2ec030c44069bec9a6bdf09d",
+      "linuxAmd64": true
+    },
+    {
+      "image": "jellyfin/jellyfin:latest",
+      "status": 200,
+      "digest": "sha256:2038fe038ab3876a80f6e7b7e0aef6607b032c7dc0c9b3ad3296d0b2eba3bbb5",
+      "linuxAmd64": true
+    },
+    {
+      "image": "jlesage/firefox:latest",
+      "status": 200,
+      "digest": "sha256:302aa068dcfa46a2d248771c998f67377383554df8940252caef42b99c13eb65",
+      "linuxAmd64": true
+    },
+    {
+      "image": "jlesage/thunderbird:latest",
+      "status": 200,
+      "digest": "sha256:44384545e56734339552071293269d3647a3017a2db173057f1647737c6c2d2f",
+      "linuxAmd64": true
+    },
+    {
+      "image": "joplin/server:latest",
+      "status": 200,
+      "digest": "sha256:d951ce50b6d3d542393ebc4d08bd62d9a4fb0a6f6827abb861726c83560ecf97",
+      "linuxAmd64": true
+    },
+    {
+      "image": "louislam/uptime-kuma:latest",
+      "status": 200,
+      "digest": "sha256:70233f4acb5163fd2a59a49909cf01e44415cecff13dba69e3a86647a2919f83",
+      "linuxAmd64": true
+    },
+    {
+      "image": "lscr.io/linuxserver/bambustudio:latest",
+      "status": 200,
+      "digest": "sha256:857e937fe1c3451244cb178952e0e7a00241ab48c32cb1ce9ea6b27e4fd729e5",
+      "linuxAmd64": true
+    },
+    {
+      "image": "lscr.io/linuxserver/grocy:latest",
+      "status": 200,
+      "digest": "sha256:d63bffe9afb2ef1a23fa7ce0749cdaeba9c169fb644b16eed270884a1b2f4ac9",
+      "linuxAmd64": true
+    },
+    {
+      "image": "lscr.io/linuxserver/pairdrop:latest",
+      "status": 200,
+      "digest": "sha256:4a87eb38032ad6fd58da193cca6c625c6215bfef9760b07cf8a8d5550dc02359",
+      "linuxAmd64": true
+    },
+    {
+      "image": "mariadb:latest",
+      "status": 200,
+      "digest": "sha256:0e4bb0f339feba125d1154fbacd36c16ec8518f52e44e1f82ecec7d6771caf39",
+      "linuxAmd64": true
+    },
+    {
+      "image": "mattermost/mattermost-team-edition:latest",
+      "status": 200,
+      "digest": "sha256:8ca1050cb8a2ec1ec0be5aff90ee40aa03e134f48443f7526b7b2b18872cf31b",
+      "linuxAmd64": true
+    },
+    {
+      "image": "nextcloud:latest",
+      "status": 200,
+      "digest": "sha256:89af7ee7a96ff5e9668280566209268ae6b2d02327f6ef6d56f6d68228cf9431",
+      "linuxAmd64": true
+    },
+    {
+      "image": "nginx:latest",
+      "status": 200,
+      "digest": "sha256:4c41e2d0a3a55b325ed572cd0200bdb72af1433c3daa2bca6ef8eea68ce504a2",
+      "linuxAmd64": true
+    },
+    {
+      "image": "node:latest",
+      "status": 200,
+      "digest": "sha256:a98e6fda54fdbb22d4238054cca9a2a113bcd1191c09193a535aae22f400aa8e",
+      "linuxAmd64": true
+    },
+    {
+      "image": "nodered/node-red:latest",
+      "status": 200,
+      "digest": "sha256:e085d4a06591fd0aca2ea2a91364d27f1a0e31e885675f77935e10f95412a963",
+      "linuxAmd64": true
+    },
+    {
+      "image": "nousresearch/hermes-agent:latest",
+      "status": 200,
+      "digest": "sha256:9c5561579f3ffdf333401797094ac3a743738d6c25d40f4331c7bf77b694238d",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ollama/ollama:latest",
+      "status": 200,
+      "digest": "sha256:dea72d1e22270fe095b68fdf756d2b489d615643c5a2eaebbc5f569181e322d8",
+      "linuxAmd64": true
+    },
+    {
+      "image": "pihole/pihole:latest",
+      "status": 200,
+      "digest": "sha256:d34134716fc32038b052a8674c7c6879e0ff21f0e6d8af345166fffa2c27c113",
+      "linuxAmd64": true
+    },
+    {
+      "image": "postgres:latest",
+      "status": 200,
+      "digest": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+      "linuxAmd64": true
+    },
+    {
+      "image": "python:latest",
+      "status": 200,
+      "digest": "sha256:67ee282bdbe5ece1e38ea94fa68f1420e969e6176e6c826b9acc931055011bfb",
+      "linuxAmd64": true
+    },
+    {
+      "image": "robtme/satisfactory-server:latest",
+      "status": 200,
+      "digest": "sha256:ac252dba41653eb21c6feed94b577f98fa152f5792b1aeff2ce11fe364355137",
+      "linuxAmd64": true
+    },
+    {
+      "image": "syncthing/syncthing:latest",
+      "status": 200,
+      "digest": "sha256:2b71da7c0d0a91a6ae5285ad079226fecc0a365d08b27720e1f7037b018f7546",
+      "linuxAmd64": true
+    },
+    {
+      "image": "thijsvanloef/palworld-server-docker:latest",
+      "status": 200,
+      "digest": "sha256:86fc7470949f6fcc931cb6443f61facc79bacc09e3f40d46e628d9e1ef6e56cd",
+      "linuxAmd64": true
+    },
+    {
+      "image": "triliumnext/trilium:latest",
+      "status": 200,
+      "digest": "sha256:d87d810fdcb549db65710a40933acaa16bc75c9426a9164c547f7ba95592941b",
+      "linuxAmd64": true
+    },
+    {
+      "image": "valkey/valkey:latest",
+      "status": 200,
+      "digest": "sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd",
+      "linuxAmd64": true
+    },
+    {
+      "image": "vaultwarden/server:latest",
+      "status": 200,
+      "digest": "sha256:efb3cde962015fcc036b2ea625242248611943b27212ebf4392841fb30fad055",
+      "linuxAmd64": true
+    }
+  ],
+  "catalogBase": "afaf650",
+  "titanosReference": "v0.21.0",
+  "literalTags": {
+    "apps": 50,
+    "services": 66,
+    "stacks": 7,
+    "latest": 62,
+    "publisherChannels": 4
+  },
+  "missingLatestChecks": [
+    {
+      "image": "ghcr.io/blakeblackshear/frigate:latest",
+      "status": 404,
+      "error": "Not Found"
+    },
+    {
+      "image": "ghcr.io/blakeblackshear/frigate:stable",
+      "status": 200,
+      "digest": "sha256:fd60f99ffd4eb6c42360ed4e14953e270586f239309ab3983e55b2e97ffac09a",
+      "linuxAmd64": true
+    },
+    {
+      "image": "ghcr.io/immich-app/immich-machine-learning:latest",
+      "status": 404,
+      "error": "Not Found"
+    },
+    {
+      "image": "ghcr.io/immich-app/immich-server:latest",
+      "status": 404,
+      "error": "Not Found"
+    },
+    {
+      "image": "ghcr.io/tensorchord/vchord-suite:latest",
+      "status": 404,
+      "error": "Not Found"
+    }
+  ],
+  "validation": {
+    "python": "11 passed",
+    "catalogInstallAndEditor": "51 passed, all 50 apps / 66 services / 7 stacks",
+    "registry": "58 of 59 distinct images support linux/amd64; n8n HTTP 429 remains unverified by metadata",
+    "browser": "PASS: all 50 actual catalog templates / 66 enabled tag fields, independent selections, YAML/form round trip; Nextcloud desktop and 390px mobile checked"
+  },
+  "limits": [
+    "Metadata requests download no image layers and do not test running containers.",
+    "Four publisher images do not publish latest; their current supported channels remain defaults.",
+    "n8n metadata returned HTTP 429; the dedicated selected-app runtime workflow tests its actual download/start.",
+    "No existing NAS installation or saved Compose/env file was modified."
+  ]
+}

@@ -30,7 +30,7 @@ x-titanos:
       webui: true
 services:
   pdfcraft:
-    image: ghcr.io/ra5on/titanos-pdfcraft:${PDFCRAFT_PDFCRAFT_IMAGE_TAG:-latest}
+    image: ghcr.io/ra5on/titanos-pdfcraft:latest
     restart: unless-stopped
     labels:
       titanos.webui: "http://[host]:8091"

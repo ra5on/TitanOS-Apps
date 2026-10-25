@@ -48,7 +48,7 @@ x-titanos:
   icon: https://raw.githubusercontent.com/schlagmichdoch/PairDrop/master/public/images/android-chrome-512x512.png
 services:
   pairdrop:
-    image: lscr.io/linuxserver/pairdrop:${PAIRDROP_PAIRDROP_IMAGE_TAG:-latest}
+    image: lscr.io/linuxserver/pairdrop:latest
     restart: unless-stopped
     labels:
       titanos.webui: http://[host]:3000
