@@ -30,7 +30,7 @@ x-titanos:
       webui: true
 services:
   photocraft:
-    image: ghcr.io/ra5on/titanos-photocraft:${PHOTOCRAFT_PHOTOCRAFT_IMAGE_TAG:-latest}
+    image: ghcr.io/ra5on/titanos-photocraft:latest
     restart: unless-stopped
     labels:
       titanos.webui: "http://[host]:8090"

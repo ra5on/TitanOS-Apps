@@ -86,7 +86,6 @@ jobs:
           path: |
             ${{ matrix.app }}/compose.yaml
             ${{ matrix.app }}/release.json
-            ${{ matrix.app }}/.env.example
   catalog:
     if: github.event_name != 'pull_request'
     needs: build
@@ -107,11 +106,10 @@ jobs:
             app=${dir##*/catalog-}
             mkdir -p "$app"
             cp "$dir/compose.yaml" "$dir/release.json" "$app/"
-            cp "$dir/.env.example" "$app/.env.example"
           done
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- '*craft/compose.yaml' '*craft/release.json' '*craft/.env.example'
+          git add -- '*craft/compose.yaml' '*craft/release.json'
           git diff --cached --quiet && exit 0
           git commit -m 'Update checked Storytold web releases'
           git pull --rebase origin main

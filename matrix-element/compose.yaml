@@ -102,7 +102,7 @@ x-titanos:
   icon: https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/matrix.svg
 services:
   matrix:
-    image: nginx:${MATRIX_ELEMENT_MATRIX_IMAGE_TAG:-latest}
+    image: nginx:latest
     restart: unless-stopped
     labels:
       titanos.webui: https://[host]:8448
@@ -128,7 +128,7 @@ services:
         max-size: 10m
         max-file: "3"
   init:
-    image: ghcr.io/element-hq/synapse:${MATRIX_ELEMENT_INIT_IMAGE_TAG:-latest}
+    image: ghcr.io/element-hq/synapse:latest
     user: 0:0
     restart: no
     entrypoint:
@@ -266,7 +266,7 @@ services:
       - matrix-generated:/generated
     logging: *a1
   db:
-    image: postgres:${MATRIX_ELEMENT_DB_IMAGE_TAG:-latest}
+    image: postgres:latest
     restart: unless-stopped
     environment:
       POSTGRES_USER: synapse
@@ -285,7 +285,7 @@ services:
     stop_grace_period: 60s
     logging: *a1
   synapse:
-    image: ghcr.io/element-hq/synapse:${MATRIX_ELEMENT_SYNAPSE_IMAGE_TAG:-latest}
+    image: ghcr.io/element-hq/synapse:latest
     user: 991:991
     restart: unless-stopped
     depends_on:
@@ -315,7 +315,7 @@ services:
     stop_grace_period: 60s
     logging: *a1
   admin-init:
-    image: ghcr.io/element-hq/synapse:${MATRIX_ELEMENT_ADMIN_INIT_IMAGE_TAG:-latest}
+    image: ghcr.io/element-hq/synapse:latest
     restart: no
     depends_on:
       synapse:
@@ -349,7 +349,7 @@ services:
       REGISTRATION_SECRET: ${MATRIX_REGISTRATION_SECRET:-}
     logging: *a1
   element:
-    image: ghcr.io/element-hq/element-web:${MATRIX_ELEMENT_ELEMENT_IMAGE_TAG:-latest}
+    image: ghcr.io/element-hq/element-web:latest
     restart: unless-stopped
     depends_on:
       init:

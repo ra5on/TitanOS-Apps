@@ -56,7 +56,7 @@ x-titanos:
   icon: https://raw.githubusercontent.com/laurent22/joplin/dev/Assets/JoplinIcon.svg
 services:
   db:
-    image: postgres:${JOPLIN_SERVER_DB_IMAGE_TAG:-latest}
+    image: postgres:latest
     restart: unless-stopped
     environment:
       POSTGRES_DB: joplin
@@ -82,7 +82,7 @@ services:
         max-size: 10m
         max-file: "3"
   joplin:
-    image: joplin/server:${JOPLIN_SERVER_JOPLIN_IMAGE_TAG:-latest}
+    image: joplin/server:latest
     restart: unless-stopped
     labels:
       titanos.webui: http://[host]:22300

@@ -15,10 +15,10 @@ jobs:
         uses: actions/checkout@v7
         with:
           repository: ra5on/TitanOS
-          ref: v0.20.2
+          ref: v0.21.0
           path: .titanos
           sparse-checkout: web/src/lib
-      - name: Verify current channels and effective version editing for every service
+      - name: Verify current channels and direct per-service tag editing
         env:
           TITANOS_DIR: ${{ github.workspace }}/.titanos
         run: |
@@ -32,3 +32,45 @@ jobs:
           done
       - name: Check Frigate image availability
         run: docker manifest inspect ghcr.io/blakeblackshear/frigate:stable > /dev/null
+  ui:
+    name: Catalog tags in TitanOS WebUI
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: ra5on/TitanOS
+          ref: v0.21.0
+          path: .titanos
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Build unchanged released TitanOS UI and load browser client
+        run: |
+          npm --prefix .titanos/web ci
+          npm --prefix .titanos/web run build
+          npm install --prefix /tmp/catalog-browser --ignore-scripts playwright
+          google-chrome --version
+      - name: Test all catalog images, stacks and mobile tag inputs
+        env:
+          TITANOS_DIR: ${{ github.workspace }}/.titanos
+          PLAYWRIGHT_PATH: /tmp/catalog-browser/node_modules/playwright/index.mjs
+          BROWSER_EXECUTABLE: /usr/bin/google-chrome
+          UI_OUTPUT: /tmp/catalog-ui
+        run: |
+          npm --prefix .titanos/web run preview -- --host 127.0.0.1 --port 5291 --strictPort > /tmp/catalog-preview.log 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid" || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:5291/apps > /dev/null; then break; fi
+            sleep 1
+          done
+          node scripts/catalog-ui-smoke.mjs
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: catalog-tags-ui
+          path: |
+            /tmp/catalog-ui/
+            /tmp/catalog-preview.log

@@ -61,7 +61,7 @@ x-titanos:
   icon: https://raw.githubusercontent.com/n8n-io/n8n/master/assets/n8n-logo.png
 services:
   n8n:
-    image: docker.n8n.io/n8nio/n8n:${N8N_N8N_IMAGE_TAG:-latest}
+    image: docker.n8n.io/n8nio/n8n:latest
     restart: unless-stopped
     labels:
       titanos.webui: http://[host]:5678

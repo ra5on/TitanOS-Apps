@@ -39,7 +39,7 @@ services:
   immich-server:
     labels:
       titanos.webui: "http://[host]:2283"
-    image: ghcr.io/immich-app/immich-server:${IMMICH_IMMICH_SERVER_IMAGE_TAG:-release}
+    image: ghcr.io/immich-app/immich-server:release
     restart: unless-stopped
     environment:
       TZ: ""
@@ -59,7 +59,7 @@ services:
     healthcheck:
       disable: false
   immich-machine-learning:
-    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_IMMICH_MACHINE_LEARNING_IMAGE_TAG:-release}
+    image: ghcr.io/immich-app/immich-machine-learning:release
     restart: unless-stopped
     environment:
       TZ: ""
@@ -68,7 +68,7 @@ services:
     healthcheck:
       disable: false
   redis:
-    image: docker.io/valkey/valkey:${IMMICH_REDIS_IMAGE_TAG:-latest}
+    image: docker.io/valkey/valkey:latest
     restart: unless-stopped
     healthcheck:
       test: [CMD-SHELL, "redis-cli ping | grep -q PONG"]
@@ -76,7 +76,7 @@ services:
       timeout: 5s
       retries: 5
   database:
-    image: ghcr.io/tensorchord/vchord-suite:${IMMICH_DATABASE_IMAGE_TAG:-pg18-latest}
+    image: ghcr.io/tensorchord/vchord-suite:pg18-latest
     restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: ""

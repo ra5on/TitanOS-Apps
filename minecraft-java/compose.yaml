@@ -85,7 +85,7 @@ x-titanos:
   icon: https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/minecraft.svg
 services:
   minecraft:
-    image: itzg/minecraft-server:${MINECRAFT_JAVA_MINECRAFT_IMAGE_TAG:-latest}
+    image: itzg/minecraft-server:latest
     restart: unless-stopped
     environment:
       EULA: ""

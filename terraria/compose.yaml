@@ -74,7 +74,7 @@ x-titanos:
   icon: https://raw.githubusercontent.com/tModLoader/tModLoader/stable/solutions/documentation/tModLoaderIcon-Small.png
 services:
   terraria:
-    image: ghcr.io/crosis47/tmodloader:${TERRARIA_TERRARIA_IMAGE_TAG:-latest}
+    image: ghcr.io/crosis47/tmodloader:latest
     restart: unless-stopped
     environment:
       TMOD_MOTD: TitanOS Terraria
