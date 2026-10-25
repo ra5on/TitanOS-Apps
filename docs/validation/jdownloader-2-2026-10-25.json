@@ -1,0 +1,17 @@
+{
+  "app": "jdownloader-2",
+  "checkedAt": "2026-10-25T10:36:24.458Z",
+  "image": "jlesage/jdownloader-2:latest",
+  "digests": [
+    "jlesage/jdownloader-2@sha256:bd6cd2fdc72818f30207e677b33cd7f1b425048c4e7132624e541e99f992be4c"
+  ],
+  "passed": true,
+  "checks": [
+    "HTTPS login",
+    "invalid login rejection",
+    "browser desktop",
+    "running JDownloader with completed main GUI initialization",
+    "persistent appdata after recreation"
+  ],
+  "limits": "No external hoster accounts, MyJDownloader or complete download/extraction tested."
+}

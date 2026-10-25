@@ -1,0 +1,18 @@
+{
+  "app": "music-assistant",
+  "checkedAt": "2026-10-25T10:35:23.972Z",
+  "image": "ghcr.io/music-assistant/server:latest",
+  "digests": [
+    "ghcr.io/music-assistant/server@sha256:661e88bea76a9e79f38feca791f6c7373376ab60766ee01f56b66418ca243b68"
+  ],
+  "passed": true,
+  "checks": [
+    "host network startup",
+    "owner setup",
+    "invalid login rejection",
+    "authenticated configuration API",
+    "read-only music mount",
+    "account persistence after recreation"
+  ],
+  "limits": "No physical speakers, multicast discovery, playback or external music service accounts tested."
+}
