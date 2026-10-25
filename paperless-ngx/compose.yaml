@@ -93,7 +93,7 @@ x-titanos:
 
 services:
   db:
-    image: postgres:${PAPERLESS_NGX_DB_IMAGE_TAG:-latest}
+    image: postgres:latest
     restart: unless-stopped
     environment:
       POSTGRES_DB: paperless
@@ -111,7 +111,7 @@ services:
       driver: json-file
       options: { max-size: "10m", max-file: "3" }
   broker:
-    image: valkey/valkey:${PAPERLESS_NGX_BROKER_IMAGE_TAG:-latest}
+    image: valkey/valkey:latest
     restart: unless-stopped
     volumes:
       - "./broker:/data"
@@ -124,7 +124,7 @@ services:
       driver: json-file
       options: { max-size: "10m", max-file: "3" }
   paperless:
-    image: ghcr.io/paperless-ngx/paperless-ngx:${PAPERLESS_NGX_PAPERLESS_IMAGE_TAG:-latest}
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
     depends_on:
       db: { condition: service_healthy }

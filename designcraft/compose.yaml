@@ -30,7 +30,7 @@ x-titanos:
       webui: true
 services:
   designcraft:
-    image: ghcr.io/ra5on/titanos-designcraft:${DESIGNCRAFT_DESIGNCRAFT_IMAGE_TAG:-latest}
+    image: ghcr.io/ra5on/titanos-designcraft:latest
     restart: unless-stopped
     labels:
       titanos.webui: "http://[host]:8095"

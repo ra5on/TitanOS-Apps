@@ -104,7 +104,7 @@ services:
   dsh:
     labels:
       titanos.webui: "http://[host]:3080"
-    image: "node:${DEEPSEEK_HARNESS_DSH_IMAGE_TAG:-latest}"
+    image: "node:latest"
     restart: unless-stopped
     environment:
       TZ: ""

@@ -70,7 +70,7 @@ x-titanos:
   icon: https://raw.githubusercontent.com/robtme/satisfactory-server/main/.github/logo.png
 services:
   satisfactory:
-    image: robtme/satisfactory-server:${SATISFACTORY_SATISFACTORY_IMAGE_TAG:-latest}
+    image: robtme/satisfactory-server:latest
     restart: unless-stopped
     environment:
       MAXPLAYERS: "4"

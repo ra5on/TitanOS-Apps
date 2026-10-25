@@ -75,7 +75,7 @@ x-titanos:
 
 services:
   agent:
-    image: ghcr.io/ra5on/titanos-agent:${TITANOS_AGENT_AGENT_IMAGE_TAG:-latest}
+    image: ghcr.io/ra5on/titanos-agent:latest
     restart: unless-stopped
     environment:
       TITANOS_URL: "https://host.docker.internal"

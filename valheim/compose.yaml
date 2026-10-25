@@ -77,7 +77,7 @@ x-titanos:
   icon: https://raw.githubusercontent.com/community-valheim-tools/valheim-server-docker/main/misc/Logo_valheim.png
 services:
   valheim:
-    image: ghcr.io/community-valheim-tools/valheim-server:${VALHEIM_VALHEIM_IMAGE_TAG:-latest}
+    image: ghcr.io/community-valheim-tools/valheim-server:latest
     restart: unless-stopped
     environment:
       SERVER_NAME: TitanOS Valheim

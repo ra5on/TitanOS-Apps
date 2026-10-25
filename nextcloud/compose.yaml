@@ -160,7 +160,7 @@ services:
   # ============================================
 
   mariadb:
-    image: "mariadb:${NEXTCLOUD_MARIADB_IMAGE_TAG:-latest}"
+    image: "mariadb:latest"
     restart: unless-stopped
 
     # ==========================================
@@ -247,7 +247,7 @@ services:
   nextcloud:
     labels:
       titanos.webui: "http://[host]:8080"
-    image: "nextcloud:${NEXTCLOUD_NEXTCLOUD_IMAGE_TAG:-latest}"
+    image: "nextcloud:latest"
     restart: unless-stopped
 
     # ==========================================
@@ -375,7 +375,7 @@ services:
   nextcloud-cron:
 
     # Verwendet dieselbe Version wie Nextcloud
-    image: "nextcloud:${NEXTCLOUD_NEXTCLOUD_CRON_IMAGE_TAG:-latest}"
+    image: "nextcloud:latest"
     restart: unless-stopped
 
     # ==========================================
