@@ -34,7 +34,9 @@ class Catalog(unittest.TestCase):
    module.catalog('cadcraft',record)
    expected=(repo/'cadcraft'/'compose.yaml').read_text()
    self.assertEqual((Path(d)/'cadcraft'/'compose.yaml').read_text(),expected)
-   self.assertEqual((Path(d)/'cadcraft'/'.env.example').read_text(),(repo/'cadcraft'/'.env.example').read_text())
+   self.assertNotIn('${',expected)
+   self.assertIn('image: ghcr.io/ra5on/titanos-cadcraft:latest',expected)
+   self.assertFalse((Path(d)/'cadcraft'/'.env.example').exists())
 class UpstreamRegressions(unittest.TestCase):
  def release(self,tag):
   return {'tag_name':tag,'draft':False,'prerelease':False,'assets':[{'name':'deckcraft-web-'+tag[1:]+'.zip','digest':'sha256:'+'a'*64,'size':10,'browser_download_url':'https://github.com/storytold/deckcraft/releases/download/'+tag+'/web.zip'}]}

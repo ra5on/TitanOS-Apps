@@ -43,7 +43,7 @@ x-titanos:
   icon: https://raw.githubusercontent.com/grocy/grocy/master/public/img/icon.svg
 services:
   grocy:
-    image: lscr.io/linuxserver/grocy:${GROCY_GROCY_IMAGE_TAG:-latest}
+    image: lscr.io/linuxserver/grocy:latest
     restart: unless-stopped
     labels:
       titanos.webui: http://[host]:9283

@@ -1,99 +1,93 @@
 # Image-Tags je Container
 
-Alle 50 Apps und 66 Dienste verwenden eigene Compose-Variablen. Ohne gesetzte
-Variable gilt die Vorgabe in der Tabelle. Jede App enthält die passenden Einträge
-in `.env.example`. Diese Datei dient als Vorlage und wird nicht automatisch vom
-TitanOS-App-Store installiert.
-
-Beispiel für gemeinsam festgelegte Immich-Server-/ML-Versionen in der
-Compose-Umgebung (`.env`):
-
-```dotenv
-IMMICH_IMMICH_SERVER_IMAGE_TAG=v3.3.5
-IMMICH_IMMICH_MACHINE_LEARNING_IMAGE_TAG=v3.3.5
-```
-
-Vorhandene `.env`-Dateien ergänzen und generierte Datenbankpasswörter beibehalten.
-Ein gleichnamiger Wert unter `services.<dienst>.environment` ersetzt die
-Compose-Umgebung nicht. Ohne `.env` lässt sich der Wert hinter `:-` im Image-Feld
-oder in der Compose-Ansicht ändern. Ein wörtliches versioniertes Image im
-vorhandenen Dienst-Editor hat weiterhin Vorrang vor einer Variablenreferenz.
+Alle 50 Apps und 66 Dienste verwenden wörtliche Image-Referenzen. In TitanOS
+0.21.0 ist das **Image-Tag**-Feld für jeden Dienst direkt bearbeitbar, beim
+Installieren und im bestehenden Diensteditor. Formular und Compose-Ansicht
+halten dieselbe Auswahl; nach erneutem Öffnen bleiben die Tags erhalten.
+Zusätzliche Compose-Variablen oder Beispieldateien sind nicht nötig.
 
 `latest` ist der Standard, wo der Herausgeber ihn anbietet. Frigate nennt den
 aktuellen Kanal `stable`, Immich Server/ML `release` und das VectorChord-Image
-`pg18-latest`. Für diese Images wurde `latest` mit HTTP 404 beantwortet.
-PostgreSQL-Hauptversionswechsel erfordern eine Datenmigration; Katalogänderungen
-schreiben keine bestehenden Installationen um.
+`pg18-latest`. Die aktuellen Registry-Abfragen für `latest` dieser vier Images
+liefern HTTP 404. Zusammengehörige Dienste auf kompatiblen Versionen halten.
+PostgreSQL-Hauptversionswechsel benötigen eine Datenmigration.
 
-Die Katalog-CI prüft alle Vorgaben und unterschiedliche gesetzte Tags für jeden
-Container mit dem echten Docker-Compose-Parser und unverändertem TitanOS 0.20.2.
-Dies ist keine vollständige Funktionsabnahme aller Anwendungen.
+Bestehende Compose-Dateien und `.env`-Geheimnisse werden durch Katalogänderungen
+nicht verändert. Alte Tag-Variablen bleiben in vorhandenen Installationen gültig;
+diese lassen sich weiterhin im vollständigen Image-Feld oder in YAML bearbeiten.
 
-| App | Dienst | Compose-Variable | Vorgabe |
-| --- | --- | --- | --- |
-| adguard | adguard | `ADGUARD_ADGUARD_IMAGE_TAG` | `latest` |
-| bambu-lab | bambustudio | `BAMBU_LAB_BAMBUSTUDIO_IMAGE_TAG` | `latest` |
-| cadcraft | cadcraft | `CADCRAFT_CADCRAFT_IMAGE_TAG` | `latest` |
-| cloudflare-tunnel | cloudflared | `CLOUDFLARE_TUNNEL_CLOUDFLARED_IMAGE_TAG` | `latest` |
-| deckcraft | deckcraft | `DECKCRAFT_DECKCRAFT_IMAGE_TAG` | `latest` |
-| deepseek-harness | dsh | `DEEPSEEK_HARNESS_DSH_IMAGE_TAG` | `latest` |
-| designcraft | designcraft | `DESIGNCRAFT_DESIGNCRAFT_IMAGE_TAG` | `latest` |
-| effectcraft | effectcraft | `EFFECTCRAFT_EFFECTCRAFT_IMAGE_TAG` | `latest` |
-| esphome | esphome | `ESPHOME_ESPHOME_IMAGE_TAG` | `latest` |
-| figcraft | figcraft | `FIGCRAFT_FIGCRAFT_IMAGE_TAG` | `latest` |
-| filmcraft | filmcraft | `FILMCRAFT_FILMCRAFT_IMAGE_TAG` | `latest` |
-| firefox | firefox | `FIREFOX_FIREFOX_IMAGE_TAG` | `latest` |
-| frigate | frigate | `FRIGATE_FRIGATE_IMAGE_TAG` | `stable` |
-| gridcraft | gridcraft | `GRIDCRAFT_GRIDCRAFT_IMAGE_TAG` | `latest` |
-| grocy | grocy | `GROCY_GROCY_IMAGE_TAG` | `latest` |
-| hermes-agent | hermes | `HERMES_AGENT_HERMES_IMAGE_TAG` | `latest` |
-| immich | immich-server | `IMMICH_IMMICH_SERVER_IMAGE_TAG` | `release` |
-| immich | immich-machine-learning | `IMMICH_IMMICH_MACHINE_LEARNING_IMAGE_TAG` | `release` |
-| immich | redis | `IMMICH_REDIS_IMAGE_TAG` | `latest` |
-| immich | database | `IMMICH_DATABASE_IMAGE_TAG` | `pg18-latest` |
-| jellyfin | jellyfin | `JELLYFIN_JELLYFIN_IMAGE_TAG` | `latest` |
-| joplin-server | db | `JOPLIN_SERVER_DB_IMAGE_TAG` | `latest` |
-| joplin-server | joplin | `JOPLIN_SERVER_JOPLIN_IMAGE_TAG` | `latest` |
-| lightcraft | lightcraft | `LIGHTCRAFT_LIGHTCRAFT_IMAGE_TAG` | `latest` |
-| matrix-element | matrix | `MATRIX_ELEMENT_MATRIX_IMAGE_TAG` | `latest` |
-| matrix-element | init | `MATRIX_ELEMENT_INIT_IMAGE_TAG` | `latest` |
-| matrix-element | db | `MATRIX_ELEMENT_DB_IMAGE_TAG` | `latest` |
-| matrix-element | synapse | `MATRIX_ELEMENT_SYNAPSE_IMAGE_TAG` | `latest` |
-| matrix-element | admin-init | `MATRIX_ELEMENT_ADMIN_INIT_IMAGE_TAG` | `latest` |
-| matrix-element | element | `MATRIX_ELEMENT_ELEMENT_IMAGE_TAG` | `latest` |
-| mattermost | mattermost | `MATTERMOST_MATTERMOST_IMAGE_TAG` | `latest` |
-| mattermost | db | `MATTERMOST_DB_IMAGE_TAG` | `latest` |
-| mattermost | init | `MATTERMOST_INIT_IMAGE_TAG` | `latest` |
-| mealie | mealie | `MEALIE_MEALIE_IMAGE_TAG` | `latest` |
-| minecraft-bedrock | bedrock | `MINECRAFT_BEDROCK_BEDROCK_IMAGE_TAG` | `latest` |
-| minecraft-java | minecraft | `MINECRAFT_JAVA_MINECRAFT_IMAGE_TAG` | `latest` |
-| mosquitto | mosquitto | `MOSQUITTO_MOSQUITTO_IMAGE_TAG` | `latest` |
-| n8n | n8n | `N8N_N8N_IMAGE_TAG` | `latest` |
-| nextcloud | mariadb | `NEXTCLOUD_MARIADB_IMAGE_TAG` | `latest` |
-| nextcloud | nextcloud | `NEXTCLOUD_NEXTCLOUD_IMAGE_TAG` | `latest` |
-| nextcloud | nextcloud-cron | `NEXTCLOUD_NEXTCLOUD_CRON_IMAGE_TAG` | `latest` |
-| node-red | node-red | `NODE_RED_NODE_RED_IMAGE_TAG` | `latest` |
-| ollama | ollama | `OLLAMA_OLLAMA_IMAGE_TAG` | `latest` |
-| pairdrop | pairdrop | `PAIRDROP_PAIRDROP_IMAGE_TAG` | `latest` |
-| palworld | palworld | `PALWORLD_PALWORLD_IMAGE_TAG` | `latest` |
-| paperless-ngx | db | `PAPERLESS_NGX_DB_IMAGE_TAG` | `latest` |
-| paperless-ngx | broker | `PAPERLESS_NGX_BROKER_IMAGE_TAG` | `latest` |
-| paperless-ngx | paperless | `PAPERLESS_NGX_PAPERLESS_IMAGE_TAG` | `latest` |
-| pdfcraft | pdfcraft | `PDFCRAFT_PDFCRAFT_IMAGE_TAG` | `latest` |
-| photocraft | photocraft | `PHOTOCRAFT_PHOTOCRAFT_IMAGE_TAG` | `latest` |
-| pihole | pihole | `PIHOLE_PIHOLE_IMAGE_TAG` | `latest` |
-| satisfactory | satisfactory | `SATISFACTORY_SATISFACTORY_IMAGE_TAG` | `latest` |
-| solidcraft | solidcraft | `SOLIDCRAFT_SOLIDCRAFT_IMAGE_TAG` | `latest` |
-| soundcraft | soundcraft | `SOUNDCRAFT_SOUNDCRAFT_IMAGE_TAG` | `latest` |
-| syncthing | syncthing | `SYNCTHING_SYNCTHING_IMAGE_TAG` | `latest` |
-| terraria | terraria | `TERRARIA_TERRARIA_IMAGE_TAG` | `latest` |
-| thunderbird | thunderbird | `THUNDERBIRD_THUNDERBIRD_IMAGE_TAG` | `latest` |
-| titanos-agent | agent | `TITANOS_AGENT_AGENT_IMAGE_TAG` | `latest` |
-| trilium | trilium | `TRILIUM_TRILIUM_IMAGE_TAG` | `latest` |
-| uptime-kuma | uptime-kuma | `UPTIME_KUMA_UPTIME_KUMA_IMAGE_TAG` | `latest` |
-| valheim | valheim | `VALHEIM_VALHEIM_IMAGE_TAG` | `latest` |
-| vaultwarden | vaultwarden | `VAULTWARDEN_VAULTWARDEN_IMAGE_TAG` | `latest` |
-| vectorcraft | vectorcraft | `VECTORCRAFT_VECTORCRAFT_IMAGE_TAG` | `latest` |
-| wordcraft | wordcraft | `WORDCRAFT_WORDCRAFT_IMAGE_TAG` | `latest` |
-| zigbee2mqtt | broker | `ZIGBEE2MQTT_BROKER_IMAGE_TAG` | `latest` |
-| zigbee2mqtt | zigbee2mqtt | `ZIGBEE2MQTT_ZIGBEE2MQTT_IMAGE_TAG` | `latest` |
+Die Katalog-CI verwendet die unveränderten Installations-/Editorfunktionen aus
+TitanOS v0.21.0 und echtes Docker Compose. Sie prüft Vorgaben, unabhängige Tags
+je Dienst, unterschiedliche Tags innerhalb aller Stacks, erneutes Öffnen und
+unveränderte Pfade/Geheimnisse. Registry-Prüfungen und Laufzeittests werden
+separat mit Datum und Grenzen dokumentiert. Eine Compose-Prüfung ersetzt keine
+vollständige Funktionsabnahme jeder Anwendung.
+
+| App | Dienst | Image-Vorgabe |
+| --- | --- | --- |
+| adguard | adguard | `adguard/adguardhome:latest` |
+| bambu-lab | bambustudio | `lscr.io/linuxserver/bambustudio:latest` |
+| cadcraft | cadcraft | `ghcr.io/ra5on/titanos-cadcraft:latest` |
+| cloudflare-tunnel | cloudflared | `cloudflare/cloudflared:latest` |
+| deckcraft | deckcraft | `ghcr.io/ra5on/titanos-deckcraft:latest` |
+| deepseek-harness | dsh | `node:latest` |
+| designcraft | designcraft | `ghcr.io/ra5on/titanos-designcraft:latest` |
+| effectcraft | effectcraft | `ghcr.io/ra5on/titanos-effectcraft:latest` |
+| esphome | esphome | `ghcr.io/esphome/esphome:latest` |
+| figcraft | figcraft | `ghcr.io/ra5on/titanos-figcraft:latest` |
+| filmcraft | filmcraft | `ghcr.io/ra5on/titanos-filmcraft:latest` |
+| firefox | firefox | `jlesage/firefox:latest` |
+| frigate | frigate | `ghcr.io/blakeblackshear/frigate:stable` |
+| gridcraft | gridcraft | `ghcr.io/ra5on/titanos-gridcraft:latest` |
+| grocy | grocy | `lscr.io/linuxserver/grocy:latest` |
+| hermes-agent | hermes | `nousresearch/hermes-agent:latest` |
+| immich | immich-server | `ghcr.io/immich-app/immich-server:release` |
+| immich | immich-machine-learning | `ghcr.io/immich-app/immich-machine-learning:release` |
+| immich | redis | `docker.io/valkey/valkey:latest` |
+| immich | database | `ghcr.io/tensorchord/vchord-suite:pg18-latest` |
+| jellyfin | jellyfin | `jellyfin/jellyfin:latest` |
+| joplin-server | db | `postgres:latest` |
+| joplin-server | joplin | `joplin/server:latest` |
+| lightcraft | lightcraft | `ghcr.io/ra5on/titanos-lightcraft:latest` |
+| matrix-element | matrix | `nginx:latest` |
+| matrix-element | init | `ghcr.io/element-hq/synapse:latest` |
+| matrix-element | db | `postgres:latest` |
+| matrix-element | synapse | `ghcr.io/element-hq/synapse:latest` |
+| matrix-element | admin-init | `ghcr.io/element-hq/synapse:latest` |
+| matrix-element | element | `ghcr.io/element-hq/element-web:latest` |
+| mattermost | mattermost | `mattermost/mattermost-team-edition:latest` |
+| mattermost | db | `postgres:latest` |
+| mattermost | init | `python:latest` |
+| mealie | mealie | `ghcr.io/mealie-recipes/mealie:latest` |
+| minecraft-bedrock | bedrock | `itzg/minecraft-bedrock-server:latest` |
+| minecraft-java | minecraft | `itzg/minecraft-server:latest` |
+| mosquitto | mosquitto | `eclipse-mosquitto:latest` |
+| n8n | n8n | `docker.n8n.io/n8nio/n8n:latest` |
+| nextcloud | mariadb | `mariadb:latest` |
+| nextcloud | nextcloud | `nextcloud:latest` |
+| nextcloud | nextcloud-cron | `nextcloud:latest` |
+| node-red | node-red | `nodered/node-red:latest` |
+| ollama | ollama | `ollama/ollama:latest` |
+| pairdrop | pairdrop | `lscr.io/linuxserver/pairdrop:latest` |
+| palworld | palworld | `thijsvanloef/palworld-server-docker:latest` |
+| paperless-ngx | db | `postgres:latest` |
+| paperless-ngx | broker | `valkey/valkey:latest` |
+| paperless-ngx | paperless | `ghcr.io/paperless-ngx/paperless-ngx:latest` |
+| pdfcraft | pdfcraft | `ghcr.io/ra5on/titanos-pdfcraft:latest` |
+| photocraft | photocraft | `ghcr.io/ra5on/titanos-photocraft:latest` |
+| pihole | pihole | `pihole/pihole:latest` |
+| satisfactory | satisfactory | `robtme/satisfactory-server:latest` |
+| solidcraft | solidcraft | `ghcr.io/ra5on/titanos-solidcraft:latest` |
+| soundcraft | soundcraft | `ghcr.io/ra5on/titanos-soundcraft:latest` |
+| syncthing | syncthing | `syncthing/syncthing:latest` |
+| terraria | terraria | `ghcr.io/crosis47/tmodloader:latest` |
+| thunderbird | thunderbird | `jlesage/thunderbird:latest` |
+| titanos-agent | agent | `ghcr.io/ra5on/titanos-agent:latest` |
+| trilium | trilium | `triliumnext/trilium:latest` |
+| uptime-kuma | uptime-kuma | `louislam/uptime-kuma:latest` |
+| valheim | valheim | `ghcr.io/community-valheim-tools/valheim-server:latest` |
+| vaultwarden | vaultwarden | `vaultwarden/server:latest` |
+| vectorcraft | vectorcraft | `ghcr.io/ra5on/titanos-vectorcraft:latest` |
+| wordcraft | wordcraft | `ghcr.io/ra5on/titanos-wordcraft:latest` |
+| zigbee2mqtt | broker | `eclipse-mosquitto:latest` |
+| zigbee2mqtt | zigbee2mqtt | `ghcr.io/koenkk/zigbee2mqtt:latest` |

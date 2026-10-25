@@ -30,7 +30,7 @@ x-titanos:
       webui: true
 services:
   wordcraft:
-    image: ghcr.io/ra5on/titanos-wordcraft:${WORDCRAFT_WORDCRAFT_IMAGE_TAG:-latest}
+    image: ghcr.io/ra5on/titanos-wordcraft:latest
     restart: unless-stopped
     labels:
       titanos.webui: "http://[host]:8098"

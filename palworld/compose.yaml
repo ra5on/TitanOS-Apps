@@ -78,7 +78,7 @@ x-titanos:
   icon: https://raw.githubusercontent.com/thijsvanloef/palworld-server-docker/main/docusaurus/static/img/palworld.png
 services:
   palworld:
-    image: thijsvanloef/palworld-server-docker:${PALWORLD_PALWORLD_IMAGE_TAG:-latest}
+    image: thijsvanloef/palworld-server-docker:latest
     restart: unless-stopped
     environment:
       SERVER_NAME: TitanOS Palworld

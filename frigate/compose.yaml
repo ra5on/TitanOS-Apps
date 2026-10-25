@@ -111,7 +111,7 @@ services:
   frigate:
     labels:
       titanos.webui: "https://[host]:8971"
-    image: "ghcr.io/blakeblackshear/frigate:${FRIGATE_FRIGATE_IMAGE_TAG:-stable}"
+    image: "ghcr.io/blakeblackshear/frigate:stable"
     restart: unless-stopped
     stop_grace_period: 30s
 

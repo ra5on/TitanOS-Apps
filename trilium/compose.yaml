@@ -48,7 +48,7 @@ x-titanos:
   icon: https://raw.githubusercontent.com/TriliumNext/Trilium/v0.106.1/apps/client/src/assets/icon-color.svg
 services:
   trilium:
-    image: triliumnext/trilium:${TRILIUM_TRILIUM_IMAGE_TAG:-latest}
+    image: triliumnext/trilium:latest
     restart: unless-stopped
     labels:
       titanos.webui: http://[host]:8080

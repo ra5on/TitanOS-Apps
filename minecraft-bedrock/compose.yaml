@@ -143,7 +143,7 @@ x-titanos:
   icon: https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/minecraft.svg
 services:
   bedrock:
-    image: itzg/minecraft-bedrock-server:${MINECRAFT_BEDROCK_BEDROCK_IMAGE_TAG:-latest}
+    image: itzg/minecraft-bedrock-server:latest
     restart: unless-stopped
     environment:
       EULA: ""

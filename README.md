@@ -31,36 +31,34 @@ Server und ML (`release`) sowie PostgreSQL/VectorChord (`pg18-latest`). Das sind
 laufend aktualisierte Kanäle ihrer jeweiligen Herausgeber; nicht vorhandene
 `latest`-Tags werden nicht eingetragen.
 
-Jeder Container besitzt eine eigene Compose-Variable für seinen Image-Tag,
-zum Beispiel in Immich:
+Seit TitanOS **0.21.0** zeigt das Installationspanel für jeden Dienst dessen
+Dienstname, vollständiges Image und ein direkt editierbares **Image-Tag**-Feld.
+Dieselbe Auswahl gibt es unter **Docker › App bearbeiten** pro Dienst.
+Die Vorlagen verwenden deshalb wörtliche Image-Referenzen, zum Beispiel:
 
 ```yaml
-image: ghcr.io/immich-app/immich-server:${IMMICH_IMMICH_SERVER_IMAGE_TAG:-release}
+services:
+  nextcloud:
+    image: nextcloud:latest
+  nextcloud-cron:
+    image: nextcloud:latest
+  mariadb:
+    image: mariadb:latest
 ```
 
-Jeder App-Ordner enthält eine `.env.example` mit sämtlichen Tag-Variablen und
-Vorgaben; die [vollständige Tabelle](docs/IMAGE-TAGS.md) listet alle 66 Dienste. In der Compose-Umgebung kann zum Beispiel
-`IMMICH_IMMICH_SERVER_IMAGE_TAG=v3.3.5` gesetzt werden. Compose übernimmt diesen
-Wert beim Auflösen des Images; bleibt die Variable ungesetzt, greift der Wert
-hinter `:-`. Jeder Dienst kann unabhängig gewählt werden. Zusammengehörige
-Dienste wie Immich Server/ML, Nextcloud/Cron oder Synapse/Einrichtungsdienste
-müssen dabei auf kompatiblen Versionen bleiben.
+Den Tag eines Dienstes ändern; die übrigen Dienste behalten ihre Auswahl.
+Formular und Compose-Ansicht verwenden dieselben Werte. Die
+[vollständige Tabelle](docs/IMAGE-TAGS.md) listet alle 66 Dienste und Vorgaben.
+Zusammengehörige Dienste wie Immich Server/ML, Nextcloud/Cron oder
+Synapse/Einrichtungsdienste müssen auf kompatiblen Versionen bleiben.
 
-Ohne zusätzliche `.env`-Einträge lässt sich beim Installieren in der Compose-
-Ansicht oder später im vorhandenen **Image**-Feld unter **Docker › App bearbeiten**
-die Vorgabe hinter `:-` ändern oder ein vollständiges versioniertes Image setzen.
-Das benötigt keine Änderung an TitanOS. Eine `.env.example` dient als Vorlage,
-sie wird vom App-Store nicht automatisch installiert. Bei installierten Apps
-Tag-Variablen in der vorhandenen Compose-`.env` ergänzen und erzeugte Passwörter
-beibehalten; die Datei nicht durch die Beispieldatei ersetzen.
-
-Einträge unter Container-`environment` sind von der Compose-Umgebung getrennt.
-Tag-Variablen werden deshalb als Compose-Eingaben statt als zusätzliche
-Container-Umgebung geführt. Die CI prüft sie mit echtem Docker Compose auf
-Standardwerte und unterschiedliche Versionen pro Container. Anwendungseinstellungen
-wie die Minecraft-Spielversion oder `DSH_VERSION` für das beim Start installierte
-npm-Paket bleiben unabhängig davon wählbar; DeepSeek Harness verwendet dafür
-standardmäßig `latest`.
+Zusätzliche Tag-Variablen oder eine `.env.example` sind für neue Installationen
+nicht erforderlich. Geheimnisse bleiben in der von TitanOS verwalteten `.env`.
+Bestehende Installationen einschließlich ihrer bisherigen Compose-Variablen und
+Zugangsdaten bleiben unverändert; der Katalog schreibt diese Dateien nicht um.
+Anwendungseinstellungen wie die Minecraft-Spielversion oder `DSH_VERSION`
+für das beim Start installierte npm-Paket bleiben unabhängig davon wählbar.
+DeepSeek Harness verwendet für das npm-Paket standardmäßig `latest`.
 
 `latest` kann auch eine neue Hauptversion bringen. Aktuelle PostgreSQL-Images
 verwenden PostgreSQL 18 und den Datenpfad `/var/lib/postgresql`; neue Vorlagen
@@ -474,9 +472,15 @@ Migrationen alter Datenbanken, Video-Transcoding, Qualität der Gesichtserkennun
 GPU-Beschleunigung und reale NAS-Daten sind damit nicht abgenommen.
 
 Die [Katalogprüfung](.github/workflows/catalog.yml) prüft außerdem die Image-Tags
-aller Dienste mit dem unveränderten Installations-/Editorcode von TitanOS 0.20.2
-und echtem Docker Compose: Vorgaben ohne gesetzte Variable, unterschiedliche
-gewählte Versionen je Container und alle `.env.example`-Einträge.
+aller Dienste mit dem unveränderten Installations-/Editorcode von TitanOS 0.21.0
+und echtem Docker Compose: direkt editierbare Tags, unabhängige Änderungen in
+Installation und Diensteditor, unterschiedliche Versionen im selben Stack sowie
+Ansichtswechsel und erneutes Öffnen. `scripts/check-registry-images.py` prüft
+zusätzlich die echten Registry-Manifeste und Linux-amd64-Unterstützung ohne
+Image-Layer herunterzuladen. HTTP-Fehler bleiben als Fehler sichtbar. Der isolierte [Katalog-Browsertest](scripts/catalog-ui-smoke.mjs)
+öffnet alle 50 Vorlagen und prüft sämtliche 66 Tag-Felder einschließlich Stacks
+und mobiler Darstellung. Der [Prüfbericht](docs/validation/catalog-direct-tags-2026-10-25.json)
+trennt Registry-Metadaten, Formularprüfungen und Laufzeittests.
 
 Der [Nextcloud-Test](.github/workflows/nextcloud.yml) richtet Nextcloud, MariaDB
 und Cron mit den aktuellen Standard-Images und neuen Datenordnern ein. Anmeldung,
