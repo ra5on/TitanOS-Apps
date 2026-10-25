@@ -105,9 +105,9 @@ async function jdownloaderLogin() {
   await page.waitForURL(url => !url.pathname.includes('/login'), { timeout: 30000 });
   await page.locator('canvas').first().waitFor({ state: 'visible', timeout: 90000 });
   await waitFor(() => {
-    compose('exec', '-T', main, 'sh', '-c', 'pgrep -f "[J]Downloader.jar" && test -s /config/cfg/org.jdownloader.settings.GeneralSettings.json');
+    compose('exec', '-T', main, 'sh', '-c', 'pgrep -f "[J]Downloader.jar" && test -s /config/Core.jar && test -s /config/cfg/org.jdownloader.settings.GeneralSettings.json && grep -q "GUIDONE->" /config/logs/output.log');
     return true;
-  }, 'JDownloader running with initialized settings', 480000);
+  }, 'JDownloader main GUI initialization (not just its updater)', 480000);
 }
 try {
   compose('up', '-d');
@@ -196,10 +196,10 @@ try {
   assert.equal(compose('exec', '-T', main, 'cat', `${dataPath}/.catalog-check`).trim(), 'persistent');
   await page.screenshot({ path: `${app}-recreated-smoke.png` });
   const image = JSON.parse(docker('image', 'inspect', service.image))[0];
-  writeFileSync(`${app}-smoke-report.json`, JSON.stringify({ app, checkedAt: new Date().toISOString(), image: service.image, digests: image.RepoDigests, passed: true, checks: app === 'convertx' ? ['account setup', 'SVG to PNG conversion (16x16)', 'authenticated byte-identical download after recreation', 'anonymous download rejection', 'invalid login rejection'] : app === 'jdownloader-2' ? ['HTTPS login', 'invalid login rejection', 'browser desktop', 'running JDownloader and initialized settings', 'persistent appdata after recreation'] : ['host network startup', 'owner setup', 'invalid login rejection', 'authenticated configuration API', 'read-only music mount', 'account persistence after recreation'], limits: app === 'convertx' ? 'One synthetic format pair; no full converter matrix or GPU tests.' : app === 'jdownloader-2' ? 'No external hoster accounts, MyJDownloader or complete download/extraction tested.' : 'No physical speakers, multicast discovery, playback or external music service accounts tested.' }, null, 2) + '\n');
+  writeFileSync(`${app}-smoke-report.json`, JSON.stringify({ app, checkedAt: new Date().toISOString(), image: service.image, digests: image.RepoDigests, passed: true, checks: app === 'convertx' ? ['account setup', 'SVG to PNG conversion (16x16)', 'authenticated byte-identical download after recreation', 'anonymous download rejection', 'invalid login rejection'] : app === 'jdownloader-2' ? ['HTTPS login', 'invalid login rejection', 'browser desktop', 'running JDownloader with completed main GUI initialization', 'persistent appdata after recreation'] : ['host network startup', 'owner setup', 'invalid login rejection', 'authenticated configuration API', 'read-only music mount', 'account persistence after recreation'], limits: app === 'convertx' ? 'One synthetic format pair; no full converter matrix or GPU tests.' : app === 'jdownloader-2' ? 'No external hoster accounts, MyJDownloader or complete download/extraction tested.' : 'No physical speakers, multicast discovery, playback or external music service accounts tested.' }, null, 2) + '\n');
   console.log(`${app}: runtime, authentication and recreation/persistence checks passed`);
 } catch (error) {
-  try { let logs = compose('logs', '--no-color', '--tail', '90'); for (const secret of secrets) logs = logs.replaceAll(secret, '[test secret]'); console.error(logs); } catch {}
+  try { let logs = compose('logs', '--no-color', '--tail', '90'); if (app === 'jdownloader-2') logs += compose('exec', '-T', main, 'tail', '-80', '/config/logs/output.log'); for (const secret of secrets) logs = logs.replaceAll(secret, '[test secret]'); console.error(logs); } catch {}
   throw error;
 } finally {
   await browser?.close();
