@@ -33,9 +33,9 @@ services:
     image: ghcr.io/ra5on/titanos-effectcraft:latest
     restart: unless-stopped
     labels:
-      titanos.webui: "http://[host]:8096"
+      titanos.webui: "http://[host]:8196"
     ports:
-      - "8096:8080"
+      - "8196:8080"
     read_only: true
     tmpfs:
       - /tmp:size=32m,mode=1777

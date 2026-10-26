@@ -30,16 +30,26 @@ class Catalog(unittest.TestCase):
  def test_ports_avoid_host_network_apps_and_stay_stable(self):
   ports={app:module.host_port(app) for app in module.APPS}
   self.assertEqual(len(set(ports.values())),len(ports))
-  self.assertFalse(set(ports.values())&module.HOST_NETWORK_PORTS)
+  self.assertFalse(set(ports.values())&module.taken_ports())
   self.assertEqual((ports['designcraft'],ports['figcraft']),(8195,8197))
   for app,port in ports.items():
-   if app not in ('designcraft','figcraft'):self.assertEqual(port,8090+list(module.APPS).index(app))
+   if app not in ('designcraft','figcraft','effectcraft'):self.assertEqual(port,8090+list(module.APPS).index(app))
   # Every catalog app on the host network has its fixed ports reserved.
   repo=Path(__file__).resolve().parents[1]
   for compose in repo.glob('*/compose.yaml'):
    text=compose.read_text()
    if 'network_mode: host' in text:
     for port in __import__('re').findall(r'titanos\.webui:\s*"?http://\[host\]:(\d+)',text):self.assertIn(int(port),module.HOST_NETWORK_PORTS,compose)
+ def test_catalog_default_ports_do_not_meet(self):
+  # Two apps of the catalog never share a default host port. DNS must be on
+  # 53, so the DNS filters are the one exception.
+  repo=Path(__file__).resolve().parents[1]
+  owners={}
+  for compose in sorted(repo.glob('*/compose.yaml')):
+   for port in set(__import__('re').findall(r'^\s+- "?(\d+):',compose.read_text(),__import__('re').M)):
+    owners.setdefault(int(port),[]).append(compose.parent.name)
+  clashes={port:apps for port,apps in owners.items() if len(apps)>1 and port!=53}
+  self.assertEqual(clashes,{})
  def test_relocated_catalogs_match_the_generator(self):
   repo=Path(__file__).resolve().parents[1]
   for app in ('designcraft','figcraft'):

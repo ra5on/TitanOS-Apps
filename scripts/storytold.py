@@ -48,11 +48,23 @@ TIPS = {'solidcraft': ('''
 # music-assistant: 8095 web UI, 8097 audio streams.
 HOST_NETWORK_PORTS = {8095, 8097}
 
+def taken_ports():
+ # Fixed host-network ports plus the default host ports of the other catalog
+ # apps: TitanOS moves a taken port at install, but two defaults of the
+ # catalog should not meet in the first place.
+ ports=set(HOST_NETWORK_PORTS)
+ for compose in Path(__file__).resolve().parents[1].glob('*/compose.yaml'):
+  if compose.parent.name not in APPS:
+   ports.update(int(port) for port in re.findall(r'^\s+- "?(\d+):', compose.read_text(), re.M))
+ return ports
+
 def host_port(app):
- # 8090+position keeps every existing app on its port; only a clash with a
- # host-network app moves to the same position in the 8190 range.
- port=8090+list(APPS).index(app)
- return port+100 if port in HOST_NETWORK_PORTS else port
+ # 8090+position keeps every existing app on its port; only a clash moves
+ # to the same position in the next free hundred.
+ port, taken=8090+list(APPS).index(app), taken_ports()
+ while port in taken:
+  port+=100
+ return port
 
 def owner(app):
  return OWNERS.get(app, 'storytold')

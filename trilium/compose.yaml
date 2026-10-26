@@ -51,13 +51,13 @@ services:
     image: triliumnext/trilium:latest
     restart: unless-stopped
     labels:
-      titanos.webui: http://[host]:8080
+      titanos.webui: http://[host]:8083
     environment:
       USER_UID: "1000"
       USER_GID: "1000"
       TZ: ""
     ports:
-      - "8080:8080"
+      - "8083:8080"
     volumes:
       - ./data:/home/node/trilium-data
     stop_grace_period: 60s

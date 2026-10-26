@@ -178,7 +178,7 @@ services:
     # ==========================================
 
     labels:
-      titanos.webui: "https://[host]:3001"
+      titanos.webui: "https://[host]:3003"
 
     environment:
 
@@ -250,7 +250,7 @@ services:
     ports:
 
       # Browserzugriff über HTTPS
-      - "3001:3001"
+      - "3003:3001"
 
     # ==========================================
     # PERSISTENTE DATEN

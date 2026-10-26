@@ -51,7 +51,7 @@ services:
     image: lscr.io/linuxserver/pairdrop:latest
     restart: unless-stopped
     labels:
-      titanos.webui: http://[host]:3000
+      titanos.webui: http://[host]:3002
     environment:
       PUID: "1000"
       PGID: "1000"
@@ -59,7 +59,7 @@ services:
       WS_FALLBACK: "false"
       DEBUG_MODE: "false"
     ports:
-      - "3000:3000"
+      - "3002:3000"
     logging:
       driver: json-file
       options:
