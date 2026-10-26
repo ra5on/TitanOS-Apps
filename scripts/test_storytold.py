@@ -27,6 +27,34 @@ class Catalog(unittest.TestCase):
   self.assertEqual(8090+list(module.APPS).index('solidcraft'), 8103)
   self.assertEqual(module.owner('solidcraft'), 'tangency-labs')
   self.assertEqual(module.owner('cadcraft'), 'storytold')
+ def test_ports_avoid_host_network_apps_and_stay_stable(self):
+  ports={app:module.host_port(app) for app in module.APPS}
+  self.assertEqual(len(set(ports.values())),len(ports))
+  self.assertFalse(set(ports.values())&module.HOST_NETWORK_PORTS)
+  self.assertEqual((ports['designcraft'],ports['figcraft']),(8195,8197))
+  for app,port in ports.items():
+   if app not in ('designcraft','figcraft'):self.assertEqual(port,8090+list(module.APPS).index(app))
+  # Every catalog app on the host network has its fixed ports reserved.
+  repo=Path(__file__).resolve().parents[1]
+  for compose in repo.glob('*/compose.yaml'):
+   text=compose.read_text()
+   if 'network_mode: host' in text:
+    for port in __import__('re').findall(r'titanos\.webui:\s*"?http://\[host\]:(\d+)',text):self.assertIn(int(port),module.HOST_NETWORK_PORTS,compose)
+ def test_relocated_catalogs_match_the_generator(self):
+  repo=Path(__file__).resolve().parents[1]
+  for app in ('designcraft','figcraft'):
+   record=__import__('json').loads((repo/app/'release.json').read_text())
+   with tempfile.TemporaryDirectory() as d, patch.object(module,'ROOT',Path(d)):
+    module.catalog(app,record)
+    self.assertEqual((Path(d)/app/'compose.yaml').read_text(),(repo/app/'compose.yaml').read_text())
+ def test_icons_json_matches_every_compose_icon(self):
+  repo=Path(__file__).resolve().parents[1]
+  with tempfile.TemporaryDirectory() as d:
+   for compose in repo.glob('*/compose.yaml'):
+    (Path(d)/compose.parent.name).mkdir();(Path(d)/compose.parent.name/'compose.yaml').write_text(compose.read_text())
+   module.sync_icons(Path(d))
+   self.assertEqual((Path(d)/'icons.json').read_text(),(repo/'icons.json').read_text())
+   self.assertEqual(len(__import__('json').loads((repo/'icons.json').read_text())),len(list(repo.glob('*/compose.yaml'))))
  def test_storytold_catalog_is_unchanged(self):
   repo=Path(__file__).resolve().parents[1]
   record=__import__('json').loads((repo/'cadcraft'/'release.json').read_text())

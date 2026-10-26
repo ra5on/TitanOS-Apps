@@ -137,31 +137,9 @@ x-titanos:
     NVIDIA_DRIVER_CAPABILITIES:
       label: { de: NVIDIA-Treiberfunktionen, en: NVIDIA driver capabilities }
 
-    CUDA_VISIBLE_DEVICES:
-      label: { de: Sichtbare CUDA-Geräte, en: Visible CUDA devices }
-
-    # ==========================================
-    # AMD
-    # ==========================================
-
-    HIP_VISIBLE_DEVICES:
-      label: { de: Sichtbare AMD HIP-Geräte, en: Visible AMD HIP devices }
-
-    ROCR_VISIBLE_DEVICES:
-      label: { de: Sichtbare ROCm-Geräte, en: Visible ROCm devices }
-
-    GPU_DEVICE_ORDINAL:
-      label: { de: AMD-GPU-Auswahl, en: AMD GPU selection }
-
-    HSA_OVERRIDE_GFX_VERSION:
-      label: { de: AMD-GFX-Version überschreiben, en: Override AMD GFX version }
-
-    # ==========================================
-    # VULKAN
-    # ==========================================
-
-    GGML_VK_VISIBLE_DEVICES:
-      label: { de: Sichtbare Vulkan-Geräte, en: Visible Vulkan devices }
+    # CUDA/HIP/ROCm/Vulkan device filters and HSA_OVERRIDE_GFX_VERSION are not
+    # form fields: set but empty they hide every GPU (CUDA, HIP, ROCR,
+    # GGML_VK) or fail AMD topology discovery (HSA). See the comments below.
 
     # ==========================================
     # DEBUG UND WARTUNG
@@ -250,7 +228,7 @@ services:
       OLLAMA_CONTEXT_LENGTH: "8192"
 
       # Modell nach 5 Minuten entladen
-      OLLAMA_KEEP_ALIVE: "-1"
+      OLLAMA_KEEP_ALIVE: "5m"
 
       # Zeitlimit beim Laden
       OLLAMA_LOAD_TIMEOUT: "5m"
@@ -267,8 +245,8 @@ services:
       # Parallele Safetensors-Transfers
       OLLAMA_MAX_TRANSFER_STREAMS: "4"
 
-      # Modelfile-Templates
-      #OLLAMA_GO_TEMPLATE: "true"
+      # Modelfile-Templates; leer = Ollama-Standard (aktiv)
+      OLLAMA_GO_TEMPLATE: ""
 
       # ========================================
       # PERFORMANCE UND SPEICHER

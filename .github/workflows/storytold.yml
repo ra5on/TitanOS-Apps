@@ -10,6 +10,9 @@ on:
     paths: ['scripts/storytold.py', 'scripts/web-smoke.mjs', 'packaging/**', '.github/workflows/storytold.yml']
 permissions:
   contents: read
+env:
+  # Same version as the local TitanOS dev setup; bump deliberately.
+  PLAYWRIGHT_VERSION: 1.56.1
 concurrency:
   group: storytold-images
   cancel-in-progress: false
@@ -55,7 +58,7 @@ jobs:
         run: |
           docker build --label "org.opencontainers.image.source=https://github.com/ra5on/TitanOS-Apps" -t "test-$APP" image-context
           docker run -d --name web-test --read-only --tmpfs /tmp:rw,size=32m,mode=1777 --cap-drop ALL --security-opt no-new-privileges:true -p 127.0.0.1:8099:8080 "test-$APP"
-          npm install --prefix /tmp/browser playwright
+          npm install --prefix /tmp/browser "playwright@$PLAYWRIGHT_VERSION"
           /tmp/browser/node_modules/.bin/playwright install --with-deps chromium
           PLAYWRIGHT_PATH=/tmp/browser/node_modules/playwright/index.mjs node scripts/web-smoke.mjs http://127.0.0.1:8099 "$APP"
       - uses: actions/upload-artifact@v7
@@ -69,9 +72,10 @@ jobs:
           APP: ${{ matrix.app }}
           RECORD: ${{ matrix.record }}
           GH_TOKEN: ${{ github.token }}
+          ACTOR: ${{ github.actor }}
         run: |
           version=$(echo "$RECORD" | jq -r .tag)
-          echo "$GH_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          echo "$GH_TOKEN" | docker login ghcr.io -u "$ACTOR" --password-stdin
           image="ghcr.io/ra5on/titanos-$APP"
           docker tag "test-$APP" "$image:$version"
           docker tag "test-$APP" "$image:latest"
@@ -87,7 +91,9 @@ jobs:
             ${{ matrix.app }}/compose.yaml
             ${{ matrix.app }}/release.json
   catalog:
-    if: github.event_name != 'pull_request'
+    # One failed app must not hold back the others (and make them rebuild
+    # forever): only legs that passed their checks uploaded a catalog artifact.
+    if: ${{ !cancelled() && github.event_name != 'pull_request' && needs.build.result != 'skipped' }}
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -102,14 +108,16 @@ jobs:
           path: /tmp/catalog
       - name: Update only successfully tested catalog entries
         run: |
+          shopt -s nullglob
           for dir in /tmp/catalog/catalog-*; do
             app=${dir##*/catalog-}
             mkdir -p "$app"
             cp "$dir/compose.yaml" "$dir/release.json" "$app/"
           done
+          python3 scripts/storytold.py icons
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- '*craft/compose.yaml' '*craft/release.json'
+          git add -- '*craft/compose.yaml' '*craft/release.json' icons.json
           git diff --cached --quiet && exit 0
           git commit -m 'Update checked Storytold web releases'
           git pull --rebase origin main

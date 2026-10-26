@@ -6,6 +6,7 @@ x-titanos:
   name: TitanOS-Agent
   main: agent
   category: productivity
+  icon: "https://raw.githubusercontent.com/ra5on/TitanOS/main/web/static/favicon.svg"
 
   description:
     de: >-

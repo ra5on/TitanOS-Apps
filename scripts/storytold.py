@@ -43,6 +43,17 @@ TIPS = {'solidcraft': ('''
       No document directory or NAS GPU passthrough is required.
       Guide: https://docs.solidcraft.io/guide/getting-started.html''')}
 
+# Fixed host ports of catalog apps that run with network_mode: host. TitanOS
+# cannot move those, so a Storytold app must never publish on them.
+# music-assistant: 8095 web UI, 8097 audio streams.
+HOST_NETWORK_PORTS = {8095, 8097}
+
+def host_port(app):
+ # 8090+position keeps every existing app on its port; only a clash with a
+ # host-network app moves to the same position in the 8190 range.
+ port=8090+list(APPS).index(app)
+ return port+100 if port in HOST_NETWORK_PORTS else port
+
 def owner(app):
  return OWNERS.get(app, 'storytold')
 
@@ -129,7 +140,7 @@ def prepare(app, record, destination):
 def catalog(app,record):
  title,category,de,en=APPS[app];folder=ROOT/app;folder.mkdir(exist_ok=True)
  image=f'ghcr.io/ra5on/titanos-{app}:latest'
- port=8090+list(APPS).index(app)
+ port=host_port(app)
  icon_path=ICONS.get(app, f'assets/app-icon/hicolor/128x128/apps/ai.storyteller.{app}.png')
  icon=f'https://raw.githubusercontent.com/{owner(app)}/{app}/{record["tag"]}/{icon_path}'
  tips_de,tips_en=TIPS.get(app,('''
@@ -183,9 +194,18 @@ services:
  (folder/'compose.yaml').write_text(compose)
  (folder/'release.json').write_text(json.dumps(record,indent=2)+'\n')
 
+def sync_icons(root=None):
+ # icons.json documents every catalog icon; Storytold icons move with each release tag.
+ root=root or ROOT;icons={}
+ for compose in sorted(root.glob('*/compose.yaml')):
+  match=re.search(r'^  icon:\s*"?([^"\n]+?)"?\s*$',compose.read_text(),re.M)
+  if match:icons[compose.parent.name]=match.group(1)
+ (root/'icons.json').write_text(json.dumps(icons,indent=2,ensure_ascii=False)+'\n')
+
 if __name__=='__main__':
- parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['discover','prepare','catalog']);parser.add_argument('--app',choices=APPS);parser.add_argument('--record');parser.add_argument('--out',default='image-context');args=parser.parse_args()
- if args.mode=='discover':
+ parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['discover','prepare','catalog','icons']);parser.add_argument('--app',choices=APPS);parser.add_argument('--record');parser.add_argument('--out',default='image-context');args=parser.parse_args()
+ if args.mode=='icons':sync_icons()
+ elif args.mode=='discover':
   matrix=[]
   for app in APPS:
    try:
@@ -196,4 +216,4 @@ if __name__=='__main__':
  else:
   record=json.loads(args.record) if args.record else latest(args.app)
   if args.mode=='prepare':prepare(args.app,record,Path(args.out))
-  else:catalog(args.app,record)
+  else:catalog(args.app,record);sync_icons()

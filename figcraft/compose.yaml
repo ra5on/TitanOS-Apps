@@ -33,9 +33,9 @@ services:
     image: ghcr.io/ra5on/titanos-figcraft:latest
     restart: unless-stopped
     labels:
-      titanos.webui: "http://[host]:8097"
+      titanos.webui: "http://[host]:8197"
     ports:
-      - "8097:8080"
+      - "8197:8080"
     read_only: true
     tmpfs:
       - /tmp:size=32m,mode=1777

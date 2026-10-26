@@ -36,6 +36,9 @@ jobs:
     name: Catalog tags in TitanOS WebUI
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      # Same version as storytold.yml and the local TitanOS dev setup.
+      PLAYWRIGHT_VERSION: 1.56.1
     steps:
       - uses: actions/checkout@v7
       - uses: actions/checkout@v7
@@ -50,7 +53,7 @@ jobs:
         run: |
           npm --prefix .titanos/web ci
           npm --prefix .titanos/web run build
-          npm install --prefix /tmp/catalog-browser --ignore-scripts playwright
+          npm install --prefix /tmp/catalog-browser --ignore-scripts "playwright@$PLAYWRIGHT_VERSION"
           google-chrome --version
       - name: Test all catalog images, stacks and mobile tag inputs
         env:

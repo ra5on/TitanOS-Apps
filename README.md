@@ -156,7 +156,8 @@ werden zusätzliche Programmdateien und Updates geladen.
 
 Music Assistant benötigt Host-Netzwerk für die Lautsprechersuche und Wiedergabe
 im selben lokalen Netz. Der Installationsdialog zeigt das vorhandene Recht an.
-Port 8095 muss frei sein und lässt sich dabei nicht automatisch umlegen.
+Port 8095 muss frei sein und lässt sich dabei nicht automatisch umlegen;
+die Craft-Apps des Katalogs halten 8095 und 8097 deshalb frei.
 Audiostreams verwenden 8097 oder den nächsten freien Port; zusätzliche
 Protokolle können weitere Ports benötigen. Zuerst das Administratorkonto
 anlegen, danach Musikquellen und Lautsprecher einrichten. Für lokale Dateien
@@ -493,7 +494,8 @@ Neue Apps erhalten einen eigenen Ordner mit `compose.yaml`. Die Erweiterung
 Variablen, Pfade und Ports. Vorhandene Vorlagen dienen als Beispiele.
 
 - `x-titanos.icon`: HTTPS-Adresse des App-Symbols. [icons.json](icons.json)
-  dokumentiert die Zuordnung. TitanOS zeigt bei nicht erreichbaren Bildern
+  dokumentiert die Zuordnung; für die Craft-Apps erzeugt `scripts/storytold.py
+  icons` sie aus den Vorlagen, und ein Test prüft, dass beide übereinstimmen. TitanOS zeigt bei nicht erreichbaren Bildern
   Namenskürzel an. Bereits installierte Container ohne Icon-Label übernehmen
   neue Symbole nicht automatisch.
 - `services.<main>.labels.titanos.webui`: Webadresse mit `[host]`, Host-Port
