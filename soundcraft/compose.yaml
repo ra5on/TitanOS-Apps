@@ -3,7 +3,7 @@ x-titanos:
   name: SoundCraft
   main: soundcraft
   category: media
-  icon: "https://raw.githubusercontent.com/storytold/soundcraft/v0.13.1/assets/app-icon/hicolor/128x128/apps/ai.storyteller.soundcraft.png"
+  icon: "https://raw.githubusercontent.com/storytold/soundcraft/v0.14.0/assets/app-icon/hicolor/128x128/apps/ai.storyteller.soundcraft.png"
   description:
     de: "Audio aufnehmen und bearbeiten im Browser. Verarbeitung auf deinem Endgerät."
     en: "Record and edit audio in your browser. Processing runs on your device."

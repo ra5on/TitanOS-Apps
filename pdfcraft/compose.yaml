@@ -3,7 +3,7 @@ x-titanos:
   name: PdfCraft
   main: pdfcraft
   category: productivity
-  icon: "https://raw.githubusercontent.com/storytold/pdfcraft/v0.14.0/assets/app-icon/hicolor/128x128/apps/ai.storyteller.pdfcraft.png"
+  icon: "https://raw.githubusercontent.com/storytold/pdfcraft/v0.15.0/assets/app-icon/hicolor/128x128/apps/ai.storyteller.pdfcraft.png"
   description:
     de: "PDFs bearbeiten im Browser. Verarbeitung auf deinem Endgerät."
     en: "Edit PDFs in your browser. Processing runs on your device."
