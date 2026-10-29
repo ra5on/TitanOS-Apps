@@ -57,7 +57,7 @@ jobs:
           APP: ${{ matrix.app }}
         run: |
           docker build --label "org.opencontainers.image.source=https://github.com/ra5on/TitanOS-Apps" -t "test-$APP" image-context
-          docker run -d --name web-test --read-only --tmpfs /tmp:rw,size=32m,mode=1777 --cap-drop ALL --security-opt no-new-privileges:true -p 127.0.0.1:8099:8080 "test-$APP"
+          docker run -d --name web-test --read-only --tmpfs /tmp:rw,size=32m,mode=1777 --cap-drop ALL --security-opt no-new-privileges=true -p 127.0.0.1:8099:8080 "test-$APP"
           npm install --prefix /tmp/browser "playwright@$PLAYWRIGHT_VERSION"
           /tmp/browser/node_modules/.bin/playwright install --with-deps chromium
           PLAYWRIGHT_PATH=/tmp/browser/node_modules/playwright/index.mjs node scripts/web-smoke.mjs http://127.0.0.1:8099 "$APP"

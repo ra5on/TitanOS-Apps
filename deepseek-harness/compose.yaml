@@ -136,7 +136,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     security_opt:
-      - no-new-privileges:true
+      - no-new-privileges=true
     stop_grace_period: 30s
     logging:
       driver: json-file

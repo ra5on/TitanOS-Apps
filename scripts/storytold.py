@@ -115,6 +115,11 @@ def unpack(data, destination):
  if not list(destination.rglob('*.wasm')): raise ValueError('Missing WebAssembly')
 
 def supplement_web_assets(app, record, site):
+ # Upstream 0.17.0 loads its app bundle from app/, which imports ./snippets/
+ # relative to itself, but ships snippets/ only at the top. Same verified ZIP.
+ if app == 'photocraft' and record['tag'] == 'v0.17.0':
+  shutil.copytree(site/'snippets', site/'app'/'snippets')
+  return
  # Upstream 0.9.1 requests this external font but omits it from its web ZIP.
  # The commit is craft-fonts-ref in lightcraft/v0.9.1/.github/workflows/release.yml.
  if app != 'lightcraft' or record['tag'] != 'v0.9.1': return
@@ -198,7 +203,7 @@ services:
     tmpfs:
       - /tmp:size=32m,mode=1777
     cap_drop: [ALL]
-    security_opt: [no-new-privileges:true]
+    security_opt: [no-new-privileges=true]
     logging:
       driver: json-file
       options: {{max-size: "10m", max-file: "3"}}

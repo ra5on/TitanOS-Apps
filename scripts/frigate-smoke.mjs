@@ -16,7 +16,7 @@ const config=JSON.parse(docker('compose','-f','frigate/compose.yaml','config','-
 const service=config.services.frigate;
 assert.deepEqual(service.cap_drop,['ALL']);
 assert.ok(!service.privileged&&!service.devices&&!service.network_mode&&!service.user);
-assert.ok(service.security_opt.includes('no-new-privileges:true'));
+assert.ok(service.security_opt.includes('no-new-privileges=true'));
 service.ports=[{target:8971,published:'0',host_ip:'127.0.0.1',protocol:'tcp'}];
 for(const mount of service.volumes){
  if(mount.type!=='bind')continue;
