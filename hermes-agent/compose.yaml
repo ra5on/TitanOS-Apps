@@ -282,7 +282,7 @@ services:
     # dem persistenten Hermes-Datenverzeichnis.
 
     security_opt:
-      - no-new-privileges:true
+      - no-new-privileges=true
 
     # ==========================================
     # RESSOURCEN

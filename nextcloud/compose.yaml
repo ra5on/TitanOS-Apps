@@ -219,7 +219,7 @@ services:
     # ==========================================
 
     security_opt:
-      - no-new-privileges:true
+      - no-new-privileges=true
 
     # Kein öffentlicher Datenbankport.
 
@@ -349,7 +349,7 @@ services:
     # ==========================================
 
     security_opt:
-      - no-new-privileges:true
+      - no-new-privileges=true
 
     # ==========================================
     # BEENDEN
@@ -410,7 +410,7 @@ services:
     # ==========================================
 
     security_opt:
-      - no-new-privileges:true
+      - no-new-privileges=true
 
     # ==========================================
     # BEENDEN
