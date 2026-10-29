@@ -93,4 +93,12 @@ class UpstreamRegressions(unittest.TestCase):
   with patch.object(module,'download') as download:
    module.supplement_web_assets('lightcraft',{'tag':'v0.10.0'},Path('/unused'))
    download.assert_not_called()
+ def test_photocraft_snippets_reach_app_bundle(self):
+  with tempfile.TemporaryDirectory() as d, patch.object(module,'download') as download:
+   site=Path(d);(site/'snippets'/'eframe-x').mkdir(parents=True);(site/'app').mkdir()
+   (site/'snippets'/'eframe-x'/'inline0.js').write_text('export {}')
+   module.supplement_web_assets('photocraft',{'tag':'v0.17.0'},site)
+   self.assertEqual((site/'app'/'snippets'/'eframe-x'/'inline0.js').read_text(),'export {}')
+   self.assertTrue((site/'snippets'/'eframe-x'/'inline0.js').exists())
+   download.assert_not_called()
 if __name__=='__main__':unittest.main()
