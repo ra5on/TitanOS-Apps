@@ -173,11 +173,38 @@ x-titanos:
 
 services:
 
+  # ==========================================
+  # DATENORDNER VORBEREITEN
+  # ==========================================
+
+  # Docker legt ./data als root an, Node-RED
+  # läuft aber als Benutzer node-red (1000).
+  # Dieser Dienst übergibt den Ordner einmalig
+  # vor dem Start und beendet sich danach.
+
+  init:
+    image: "nodered/node-red:latest"
+    user: "0:0"
+    restart: "no"
+    entrypoint:
+      - /bin/sh
+      - -ec
+    command:
+      - chown 1000:1000 /data && chmod 750 /data
+    volumes:
+      - ./data:/data
+    security_opt:
+      - no-new-privileges=true
+
   node-red:
     labels:
       titanos.webui: "http://[host]:1880"
     image: "nodered/node-red:latest"
     restart: unless-stopped
+
+    depends_on:
+      init:
+        condition: service_completed_successfully
 
     # ==========================================
     # UMGEBUNGSVARIABLEN

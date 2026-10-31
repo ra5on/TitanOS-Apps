@@ -48,7 +48,7 @@ services:
 
 Den Tag eines Dienstes ändern; die übrigen Dienste behalten ihre Auswahl.
 Formular und Compose-Ansicht verwenden dieselben Werte. Die
-[vollständige Tabelle](docs/IMAGE-TAGS.md) listet alle 69 Dienste und Vorgaben.
+[vollständige Tabelle](docs/IMAGE-TAGS.md) listet alle 70 Dienste und Vorgaben.
 Zusammengehörige Dienste wie Immich Server/ML, Nextcloud/Cron oder
 Synapse/Einrichtungsdienste müssen auf kompatiblen Versionen bleiben.
 
