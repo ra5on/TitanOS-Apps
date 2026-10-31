@@ -95,7 +95,7 @@ for (const app of readdirSync(root, { withFileTypes: true }).filter(entry => ent
 }
 test('the complete catalog and multi-service stacks were covered', () => {
   assert.equal(apps, 53);
-  assert.equal(services, 69);
+  assert.equal(services, 70);
   assert.ok(stacks >= 7);
   console.log(`Checked ${apps} apps, ${services} services and ${stacks} stacks using released TitanOS helpers and real Compose.`);
 });

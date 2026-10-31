@@ -70,6 +70,7 @@ vollständige Funktionsabnahme jeder Anwendung.
 | nextcloud | nextcloud | `nextcloud:latest` |
 | nextcloud | nextcloud-cron | `nextcloud:latest` |
 | node-red | node-red | `nodered/node-red:latest` |
+| node-red | init | `nodered/node-red:latest` |
 | ollama | ollama | `ollama/ollama:latest` |
 | pairdrop | pairdrop | `lscr.io/linuxserver/pairdrop:latest` |
 | palworld | palworld | `thijsvanloef/palworld-server-docker:latest` |
