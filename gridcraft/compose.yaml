@@ -3,7 +3,7 @@ x-titanos:
   name: GridCraft
   main: gridcraft
   category: productivity
-  icon: "https://raw.githubusercontent.com/storytold/gridcraft/v0.13.0/assets/app-icon/hicolor/128x128/apps/ai.storyteller.gridcraft.png"
+  icon: "https://raw.githubusercontent.com/storytold/gridcraft/v0.14.2/assets/app-icon/hicolor/128x128/apps/ai.storyteller.gridcraft.png"
   description:
     de: "Tabellen bearbeiten im Browser. Verarbeitung auf deinem Endgerät."
     en: "Edit spreadsheets in your browser. Processing runs on your device."

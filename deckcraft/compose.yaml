@@ -3,7 +3,7 @@ x-titanos:
   name: DeckCraft
   main: deckcraft
   category: productivity
-  icon: "https://raw.githubusercontent.com/storytold/deckcraft/v0.12.0/assets/app-icon/hicolor/128x128/apps/ai.storyteller.deckcraft.png"
+  icon: "https://raw.githubusercontent.com/storytold/deckcraft/v0.13.1/assets/app-icon/hicolor/128x128/apps/ai.storyteller.deckcraft.png"
   description:
     de: "Präsentationen gestalten im Browser. Verarbeitung auf deinem Endgerät."
     en: "Create presentations in your browser. Processing runs on your device."
