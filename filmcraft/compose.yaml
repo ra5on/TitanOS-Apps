@@ -3,7 +3,7 @@ x-titanos:
   name: FilmCraft
   main: filmcraft
   category: media
-  icon: "https://raw.githubusercontent.com/storytold/filmcraft/v0.15.0/assets/app-icon/hicolor/128x128/apps/ai.storyteller.filmcraft.png"
+  icon: "https://raw.githubusercontent.com/storytold/filmcraft/v0.16.0/assets/app-icon/hicolor/128x128/apps/ai.storyteller.filmcraft.png"
   description:
     de: "Videos bearbeiten im Browser. Verarbeitung auf deinem Endgerät."
     en: "Edit videos in your browser. Processing runs on your device."
