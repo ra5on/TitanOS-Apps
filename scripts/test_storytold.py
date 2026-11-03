@@ -101,4 +101,25 @@ class UpstreamRegressions(unittest.TestCase):
    self.assertEqual((site/'app'/'snippets'/'eframe-x'/'inline0.js').read_text(),'export {}')
    self.assertTrue((site/'snippets'/'eframe-x'/'inline0.js').exists())
    download.assert_not_called()
+ def test_later_photocraft_keeps_snippets_next_to_app_bundle(self):
+  # 0.18.0 has the same app/ layout; the fix follows the layout, not the tag.
+  for tag in ('v0.18.0','v0.19.0'):
+   with tempfile.TemporaryDirectory() as d:
+    site=Path(d);(site/'snippets'/'eframe-x').mkdir(parents=True);(site/'app').mkdir()
+    (site/'snippets'/'eframe-x'/'inline0.js').write_text('export {}')
+    module.supplement_web_assets('photocraft',{'tag':tag},site)
+    self.assertTrue((site/'app'/'snippets'/'eframe-x'/'inline0.js').exists())
+ def test_photocraft_without_app_folder_is_untouched(self):
+  with tempfile.TemporaryDirectory() as d:
+   site=Path(d);(site/'snippets').mkdir()
+   module.supplement_web_assets('photocraft',{'tag':'v0.16.0'},site)
+   self.assertEqual(sorted(p.name for p in site.iterdir()),['snippets'])
+ def test_effectcraft_gets_default_startup_config(self):
+  with tempfile.TemporaryDirectory() as d:
+   site=Path(d)
+   module.supplement_web_assets('effectcraft',{'tag':'v0.19.0'},site)
+   self.assertEqual(__import__('json').loads((site/'effectcraft-config.json').read_text()),{'startup':'last'})
+   (site/'effectcraft-config.json').write_text('{"startup":"demo"}')
+   module.supplement_web_assets('effectcraft',{'tag':'v0.19.0'},site)
+   self.assertEqual((site/'effectcraft-config.json').read_text(),'{"startup":"demo"}')
 if __name__=='__main__':unittest.main()
