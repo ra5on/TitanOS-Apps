@@ -35,7 +35,7 @@
   "pairdrop": "https://raw.githubusercontent.com/schlagmichdoch/PairDrop/master/public/images/android-chrome-512x512.png",
   "palworld": "https://raw.githubusercontent.com/thijsvanloef/palworld-server-docker/main/docusaurus/static/img/palworld.png",
   "paperless-ngx": "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docs/assets/logo_leaf.svg",
-  "pdfcraft": "https://raw.githubusercontent.com/storytold/pdfcraft/v0.18.0/assets/app-icon/hicolor/128x128/apps/ai.storyteller.pdfcraft.png",
+  "pdfcraft": "https://raw.githubusercontent.com/storytold/pdfcraft/v0.18.1/assets/app-icon/hicolor/128x128/apps/ai.storyteller.pdfcraft.png",
   "photocraft": "https://raw.githubusercontent.com/storytold/photocraft/v0.20.1/assets/app-icon/hicolor/128x128/apps/ai.storyteller.photocraft.png",
   "pihole": "https://raw.githubusercontent.com/pi-hole/web/master/img/favicons/android-chrome-192x192.png",
   "satisfactory": "https://raw.githubusercontent.com/robtme/satisfactory-server/main/.github/logo.png",
@@ -50,6 +50,6 @@
   "valheim": "https://raw.githubusercontent.com/community-valheim-tools/valheim-server-docker/main/misc/Logo_valheim.png",
   "vaultwarden": "https://raw.githubusercontent.com/dani-garcia/vaultwarden/main/resources/vaultwarden-icon.svg",
   "vectorcraft": "https://raw.githubusercontent.com/storytold/vectorcraft/v0.21.0/assets/app-icon/hicolor/128x128/apps/ai.storyteller.vectorcraft.png",
-  "wordcraft": "https://raw.githubusercontent.com/storytold/wordcraft/v0.15.0/assets/app-icon/hicolor/128x128/apps/ai.storyteller.wordcraft.png",
+  "wordcraft": "https://raw.githubusercontent.com/storytold/wordcraft/v0.15.1/assets/app-icon/hicolor/128x128/apps/ai.storyteller.wordcraft.png",
   "zigbee2mqtt": "https://raw.githubusercontent.com/Koenkk/zigbee2mqtt/master/images/logo.png"
 }
