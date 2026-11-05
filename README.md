@@ -125,6 +125,7 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [Valheim](valheim/compose.yaml) | Valheim-Server mit geschützter Spielwelt und automatischen Welt-Backups |
 | [Vaultwarden](vaultwarden/compose.yaml) | Passwortmanager für Bitwarden-Clients |
 | [VectorCraft](vectorcraft/compose.yaml) | Vektorgrafiken bearbeiten |
+| [Whisper (Speaches)](whisper/compose.yaml) | Spracherkennung mit Grafikkarte, z. B. für die Spracheingabe des TitanOS-KI-Agenten |
 | [WordCraft](wordcraft/compose.yaml) | Textdokumente erstellen und bearbeiten |
 | [Zigbee2MQTT](zigbee2mqtt/compose.yaml) | Zigbee-Geräte mit einem privaten MQTT-Broker verbinden |
 

@@ -1,0 +1,77 @@
+x-titanos:
+  icon: "https://cdn.jsdelivr.net/gh/selfhst/icons/svg/speaches.svg"
+  name: Whisper (Speaches)
+  main: whisper
+  category: productivity
+
+  description:
+    de: >-
+      Spracherkennung mit Whisper auf dem eigenen NAS.
+      OpenAI-kompatible Schnittstelle für die Spracheingabe
+      des KI-Agenten von TitanOS und andere Apps.
+    en: >-
+      Speech recognition with Whisper on your own NAS.
+      OpenAI-compatible API for the voice input of the
+      TitanOS KI-Agent and other apps.
+
+  tips:
+    de: >-
+      Die Vorlage nutzt das CUDA-Image und reserviert eine
+      NVIDIA-Grafikkarte; dafür muss das NVIDIA-Treiber-Plugin
+      laufen. Ohne Grafikkarte das Image auf
+      ghcr.io/speaches-ai/speaches:latest-cpu ändern und den
+      deploy-Abschnitt entfernen. Das unter PRELOAD_MODELS
+      genannte Modell wird beim ersten Start geladen (large-v3
+      etwa 3 GB). Danach unter Einstellungen › KI-Agent ›
+      Verbindung und Modelle „Whisper-App übernehmen“ wählen.
+      Die API hat keine Anmeldung; nicht öffentlich freigeben.
+    en: >-
+      The template uses the CUDA image and reserves an NVIDIA
+      graphics card; the NVIDIA driver plugin must run. Without
+      a graphics card change the image to
+      ghcr.io/speaches-ai/speaches:latest-cpu and remove the
+      deploy section. The model named in PRELOAD_MODELS is
+      downloaded on the first start (large-v3 about 3 GB).
+      Then choose “Use the Whisper app” under Settings ›
+      KI-Agent › Connection and models. The API has no login;
+      do not expose it publicly.
+
+  variables:
+    PRELOAD_MODELS:
+      label: { de: Modelle beim Start laden (JSON-Liste), en: Models loaded at start (JSON list) }
+
+  paths:
+    /home/ubuntu/.cache/huggingface/hub:
+      label:
+        de: Heruntergeladene Modelle
+        en: Downloaded models
+
+  ports:
+    "8000":
+      label: Whisper API
+      webui: false
+
+services:
+  whisper:
+    image: ghcr.io/speaches-ai/speaches:latest-cuda
+    restart: unless-stopped
+    environment:
+      TZ: "Europe/Berlin"
+      PRELOAD_MODELS: '["Systran/faster-whisper-large-v3"]'
+    ports:
+      - "8010:8000"
+    volumes:
+      - ./models:/home/ubuntu/.cache/huggingface/hub
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://127.0.0.1:8000/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 120s
+      retries: 3
