@@ -17,7 +17,8 @@ const exceptions = {
   'ghcr.io/blakeblackshear/frigate': 'stable',
   'ghcr.io/immich-app/immich-server': 'release',
   'ghcr.io/immich-app/immich-machine-learning': 'release',
-  'ghcr.io/tensorchord/vchord-suite': 'pg18-latest'
+  'ghcr.io/tensorchord/vchord-suite': 'pg18-latest',
+  'ghcr.io/speaches-ai/speaches': 'latest-cuda'
 };
 let apps = 0, services = 0, stacks = 0;
 for (const app of readdirSync(root, { withFileTypes: true }).filter(entry => entry.isDirectory() && !entry.name.startsWith('.'))) {
@@ -94,8 +95,8 @@ for (const app of readdirSync(root, { withFileTypes: true }).filter(entry => ent
   });
 }
 test('the complete catalog and multi-service stacks were covered', () => {
-  assert.equal(apps, 53);
-  assert.equal(services, 70);
+  assert.equal(apps, 54);
+  assert.equal(services, 71);
   assert.ok(stacks >= 7);
   console.log(`Checked ${apps} apps, ${services} services and ${stacks} stacks using released TitanOS helpers and real Compose.`);
 });

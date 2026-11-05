@@ -124,6 +124,7 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [Uptime Kuma](uptime-kuma/compose.yaml) | Erreichbarkeit von Diensten überwachen |
 | [Valheim](valheim/compose.yaml) | Valheim-Server mit geschützter Spielwelt und automatischen Welt-Backups |
 | [Vaultwarden](vaultwarden/compose.yaml) | Passwortmanager für Bitwarden-Clients |
+| [Whisper (Speaches)](whisper/compose.yaml) | Spracherkennung mit Grafikkarte, z. B. für die Spracheingabe des TitanOS-KI-Agenten |
 | [VectorCraft](vectorcraft/compose.yaml) | Vektorgrafiken bearbeiten |
 | [WordCraft](wordcraft/compose.yaml) | Textdokumente erstellen und bearbeiten |
 | [Zigbee2MQTT](zigbee2mqtt/compose.yaml) | Zigbee-Geräte mit einem privaten MQTT-Broker verbinden |
