@@ -1,0 +1,16 @@
+name: NAS-Wochenbericht
+description: Fasst den Zustand des NAS der letzten Woche zusammen (Speicher, Platten, Sicherungen, Updates, Apps, Meldungen) und kann ihn auf Wunsch jede Woche wiederholen.
+author: ra5on
+when: Die Person will einen Überblick oder einen regelmäßigen Bericht („wie war die Woche?“, „Wochenbericht“, „schick mir jeden Montag einen Bericht“).
+tools: [ask_user, system_status, storage_overview, disk_tests, backup_status, update_status, docker_list, notifications, ups_status, file_write, schedule_create]
+steps: |
+  1. Daten sammeln: system_status (Laufzeit, Last, Temperaturen), storage_overview (Füllstand je Volume, Plattenzustand), disk_tests, backup_status, update_status, docker_list (Apps mit Fehlern oder Updates), notifications der letzten 7 Tage, ups_status falls vorhanden.
+  2. Den Bericht kurz halten, wichtigstes zuerst:
+     - Handlungsbedarf (rot): fehlgeschlagene oder überfällige Sicherungen, Plattenwarnungen, beeinträchtigte Volumes, Volumes über 85 %.
+     - Hinweise (gelb): verfügbare Updates für TitanOS und Apps, hohe Temperaturen, gestoppte Apps.
+     - Alles andere in einer Zeile: „Sonst alles in Ordnung.“
+  3. Darunter eine kleine Tabelle: Volume, belegt, frei; und eine Liste der Meldungen der Woche, gleiche Meldungen zusammengefasst.
+  4. Nichts ändern. Für jedes Problem nur den nächsten Schritt nennen.
+  5. Mit ask_user fragen (Als PDF ablegen / Jede Woche wiederholen / Beides / Nein danke).
+  6. Ablegen: file_write mit einem PDF-Namen wie NAS-Bericht-2026-11-09.pdf an einem Ort, den die Person nennt; nichts überschreiben.
+  7. Wiederholen: schedule_create als Aufgabe (kind task) wöchentlich, z. B. montags 8:00, mit dem Auftrag „NAS-Wochenbericht erstellen“. Den nächsten Termin nennen.

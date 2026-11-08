@@ -1,0 +1,14 @@
+name: Netzlaufwerk nicht erreichbar
+description: Hilft, wenn ein Computer die Freigaben des NAS nicht mehr findet, und prüft Freigabe, Netzwerk und Firewall; geändert wird nur nach Rückfrage.
+author: ra5on
+when: Ein Netzlaufwerk ist weg oder lässt sich nicht öffnen („mein Laptop findet das NAS nicht“, „Laufwerk Z ist getrennt“, „Freigabe Fotos geht nicht“).
+tools: [ask_user, shares_list, storage_overview, network_status, network_diagnostics, firewall_status, logs_search, firewall_unblock]
+steps: |
+  1. Klären, welche Freigabe und welches Gerät betroffen sind; bei Unklarheit mit ask_user fragen (eine Freigabe / alle Freigaben / weiß nicht).
+  2. shares_list: Gibt es die Freigabe, ist sie verfügbar? Ist sie nicht verfügbar, mit storage_overview prüfen, ob ihr Volume läuft.
+  3. network_status: Adresse des NAS, Gateway, Namensserver, eine wartende Netzwerkänderung. Dann network_diagnostics für das Netz, in dem der Computer hängt.
+  4. firewall_status: Ist die Firewall an, blockiert eine Regel SMB, steht die Adresse des Computers auf der Sperrliste (zu viele falsche Anmeldungen)?
+  5. logs_search nach SMB- oder Anmeldefehlern der letzten Stunden.
+  6. Den Befund erklären und die Lösung Schritt für Schritt nennen. Typische Fälle: NAS hat eine neue Adresse bekommen (Laufwerk mit dem Namen statt der Adresse verbinden), falsche Anmeldedaten am Computer gespeichert (dort neu eingeben), Volume gestoppt, Firewall sperrt.
+  7. Bis hierher wird nichts geändert. Ist die Adresse des Computers gesperrt, mit ask_user fragen (Adresse freigeben / Nicht freigeben) und erst dann firewall_unblock verwenden. Neue Firewall-Regeln nur auf ausdrücklichen Wunsch und nie, um das NAS zum Internet zu öffnen.
+  8. Zum Schluss den Verbindungsweg nennen: Windows \\NAS-Name\Freigabe, Mac smb://NAS-Name/Freigabe.

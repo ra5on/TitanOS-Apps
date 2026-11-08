@@ -1,0 +1,17 @@
+name: Docker-App startet nicht
+description: Findet heraus, warum eine Docker-App nicht läuft oder ständig neu startet, erklärt die Ursache und startet sie nur nach Rückfrage neu.
+author: ra5on
+when: Eine App ist nicht erreichbar, gestoppt oder startet ständig neu („Jellyfin geht nicht mehr“, „Nextcloud zeigt einen Fehler“, „die App hängt“).
+tools: [ask_user, docker_list, container_logs, logs_search, storage_overview, network_status, docker_container_start, docker_container_restart]
+steps: |
+  1. docker_list lesen und die App finden; bei mehreren Treffern mit ask_user fragen. Festhalten: Zustand (läuft, gestoppt, startet neu), Gesundheit, Image, Ports.
+  2. container_logs der betroffenen Container lesen. Gleiche Zeilen zusammenfassen und die erste Fehlermeldung suchen, nicht nur die letzte.
+  3. Häufige Ursachen prüfen:
+     - Volume voll oder nicht eingehängt: storage_overview.
+     - Port belegt oder Netzwerkproblem: network_status und die Ports aus docker_list.
+     - Abhängiger Container (z. B. Datenbank) gestoppt: andere Container derselben App in docker_list.
+     - Fehler beim Start des Docker-Dienstes: logs_search mit dem Namen der App oder mit docker.
+  4. Der Person erklären, was vermutlich los ist, in einfachen Worten, mit der wichtigsten Logzeile als Beleg (Adressen und Namen sind darin schon unkenntlich).
+  5. Ist ein Neustart sinnvoll, mit ask_user fragen (Starten bzw. neu starten / Erst selbst nachsehen / Abbrechen). Sagen, dass der Dienst dabei kurz nicht erreichbar ist.
+  6. Gestoppte App mit docker_container_start starten, hängende mit docker_container_restart neu starten. Liegt die Ursache woanders (voller Speicher, falsche Einstellung), nicht blind neu starten, sondern erst die Ursache nennen.
+  7. Danach docker_list und container_logs erneut prüfen und berichten, ob die App jetzt läuft.

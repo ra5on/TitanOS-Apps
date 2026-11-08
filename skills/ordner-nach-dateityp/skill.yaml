@@ -1,0 +1,13 @@
+name: Ordner nach Dateityp aufräumen
+description: Sortiert einen unordentlichen Ordner (z. B. Downloads) nach Rückfrage in Unterordner wie Dokumente, Bilder, Videos, Musik und Archive.
+author: ra5on
+when: Die Person will einen Ordner aufräumen oder sortieren („räum meinen Download-Ordner auf“, „sortier das nach Dateityp“).
+tools: [ask_user, locations_list, files_list, files_mkdir, files_move]
+steps: |
+  1. Den Ordner bestimmen: genannten Namen mit locations_list und files_list auflösen. Passt er auf mehrere Orte, mit ask_user fragen.
+  2. Mit files_list den Inhalt der obersten Ebene lesen (bei vielen Einträgen seitenweise). Unterordner bleiben, wie sie sind; sortiert werden nur lose Dateien.
+  3. Dateien nach Endung einteilen: Dokumente (pdf, doc, docx, odt, txt, xls, xlsx), Bilder (jpg, jpeg, png, heic, gif, webp), Videos (mp4, mkv, mov, avi), Musik (mp3, flac, m4a, wav), Archive (zip, rar, 7z, tar, gz), Programme und Abbilder (exe, msi, dmg, iso, img), alles andere bleibt liegen.
+  4. Der Person den Plan zeigen: je Zielordner die Anzahl und drei Beispielnamen. Gibt es einen Zielordner schon, kommen die Dateien dazu.
+  5. Mit ask_user fragen (So sortieren / Andere Ordnernamen / Abbrechen). Bei anderen Namen die Wünsche aufnehmen und den Plan erneut zeigen.
+  6. Fehlende Zielordner mit files_mkdir anlegen, dann alles in einem Schritt mit files_move verschieben. files_move bleibt in derselben Wurzel und ersetzt nie eine vorhandene Datei; Namenskonflikte melden statt sie zu lösen.
+  7. Zum Schluss mit files_list nachsehen und berichten, wie viele Dateien in welchem Ordner gelandet sind und was liegen geblieben ist.

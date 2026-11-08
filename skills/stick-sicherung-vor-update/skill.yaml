@@ -1,0 +1,14 @@
+name: Vor dem Update den Stick sichern
+description: Macht vor einem TitanOS-Update eine frische Sicherung der Einstellungen auf dem Stick, prüft Sicherungen und Updates und installiert erst nach Rückfrage.
+author: ra5on
+when: Die Person will TitanOS aktualisieren oder fragt, ob ein Update sicher ist („installier das Update“, „kann ich updaten?“).
+tools: [ask_user, update_status, backup_status, storage_overview, docker_list, notifications, stick_backup, update_action]
+steps: |
+  1. update_status lesen: laufende Version, neue Version, das System im anderen Slot zum Zurückgehen. Gibt es kein Update, das sagen und aufhören.
+  2. Vorher prüfen, ob der Zeitpunkt gut ist: storage_overview (kein Rebuild oder Scrub läuft, alle Volumes gesund), backup_status (keine Sicherung läuft gerade), docker_list (welche Apps kurz ausfallen).
+  3. Der Person zusammenfassen: von welcher auf welche Version, ob ein Neustart nötig ist, was gerade läuft und was dagegen spricht.
+  4. Mit ask_user fragen (Erst Stick sichern, dann updaten / Nur Stick sichern / Abbrechen).
+  5. stick_backup ausführen. Eine bestehende Stick-Sicherung kann der Agent nicht einsehen, darum immer eine frische machen. Das Ergebnis abwarten, das TitanOS zurückmeldet, und zusätzlich in notifications nachsehen; nicht Erfolg melden, bevor es bestätigt ist. Schlägt sie fehl: nicht updaten, sondern den Fehler erklären.
+  6. Erst jetzt, und nur wenn die Person „updaten“ gewählt hat: noch einmal mit ask_user bestätigen lassen, dass das NAS neu startet (Jetzt installieren / Später).
+  7. update_action zum Installieren des gefundenen Updates. Erklären, dass bei Problemen mit update_action (rollback) zur vorigen Version im anderen Slot zurückgegangen werden kann, auch das nur nach Rückfrage.
+  8. Nach dem Neustart in einem neuen Gespräch: update_status und notifications prüfen und berichten, ob die neue Version läuft.

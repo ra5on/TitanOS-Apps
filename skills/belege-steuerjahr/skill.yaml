@@ -1,0 +1,15 @@
+name: Belege nach Steuerjahr sammeln
+description: Sucht Rechnungen und Belege eines Jahres zusammen, kopiert sie nach Rückfrage in einen Steuer-Ordner und legt eine Übersicht als Excel-Tabelle an.
+author: ra5on
+when: Die Person will Rechnungen, Quittungen oder Belege eines Steuerjahres beisammen haben („Belege für die Steuer 2025“, „alle Rechnungen vom letzten Jahr“).
+tools: [ask_user, locations_list, files_list, files_search, document_read, file_read, image_view, files_mkdir, file_copy, file_write]
+steps: |
+  1. Klären: welches Jahr? Wenn die Person kein Jahr nennt, frage mit ask_user (letztes Jahr / dieses Jahr / anderes Jahr).
+  2. Mit locations_list und files_list die Orte finden, an denen Belege liegen (Dokumente, Scans, Downloads). Sind es mehrere oder ist es unklar, frage mit ask_user, welche Orte durchsucht werden sollen.
+  3. In jedem Ort mit files_search suchen: einmal mit extension pdf, einmal mit extension images (Fotos von Kassenzetteln) und zusätzlich mit Namensteilen wie Rechnung, Quittung, Beleg, Invoice und der Jahreszahl.
+  4. Jeden Treffer prüfen: PDFs mit document_read oder file_read, Fotos mit image_view. Notiere Datum, Absender, Betrag und Art (z. B. Handwerker, Arzt, Spende, Arbeitsmittel). Belege aus einem anderen Jahr fallen heraus; bei Zweifeln (kein Datum lesbar) kommen sie auf eine eigene Liste „unklar“.
+  5. Der Person eine Tabelle zeigen: Datum, Absender, Betrag, Art, Fundort. Dazu die Summe je Art.
+  6. Mit ask_user fragen, was passieren soll (In Steuer-Ordner kopieren / Nur die Übersicht anlegen / Abbrechen). Nenne den geplanten Zielordner, z. B. Dokumente › Steuer › 2025.
+  7. Beim Kopieren: Zielordner mit files_mkdir anlegen, wenn er fehlt, dann die Belege mit file_copy kopieren (nicht verschieben, die Originale bleiben, wo sie sind). Gleiche Namen bekommen von TitanOS eine Nummer, nichts wird überschrieben.
+  8. Die Übersicht mit file_write als Excel-Datei (.xlsx) in den Zielordner schreiben, z. B. Belege-2025.xlsx. Gibt es die Datei schon, nicht ersetzen, sondern einen neuen Namen wählen oder mit ask_user fragen.
+  9. Zum Schluss sagen, wie viele Belege wo liegen, wie hoch die Summen sind und welche Belege unklar blieben. Keine Steuerberatung, nur die Sammlung.

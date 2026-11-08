@@ -1,0 +1,20 @@
+name: Plattengesundheit verstehen
+description: Liest SMART-Werte, Temperaturen und Testergebnisse aller Platten und erklärt in einfachen Worten, ob Handlungsbedarf besteht.
+author: ra5on
+when: Die Person fragt nach dem Zustand ihrer Festplatten oder SSDs („sind meine Platten gesund?“, „was heißt die SMART-Warnung?“), oder eine Plattenmeldung kam.
+tools: [ask_user, storage_overview, disk_tests, notifications, backup_status, disk_test, volume_action]
+steps: |
+  1. storage_overview lesen: je Platte Modell, Größe, Rolle (in welchem Volume), SMART-Zustand, Temperatur, Fehler, Abnutzung; je Volume den Zustand.
+  2. disk_tests für laufende und letzte Tests, notifications für Plattenmeldungen der letzten Zeit.
+  3. Jede Platte einordnen und erklären, ohne Fachchinesisch:
+     - neu zugewiesene oder schwebende Sektoren: die Platte ersetzt kaputte Stellen; steigt die Zahl, bald tauschen.
+     - CRC-Fehler: meist Kabel oder Anschluss, nicht die Platte.
+     - Temperatur: bis etwa 45 °C gut, über 55 °C zu warm.
+     - Abnutzung bei SSDs: unter 80 % verbraucht unkritisch.
+     - Betriebsstunden: über 40 000 Stunden ist eine Platte alt, aber nicht automatisch schlecht.
+  4. Der Person eine Tabelle zeigen: Platte, Volume, Zustand (gut / beobachten / tauschen), wichtigster Wert, Erklärung in einem Satz.
+  5. Steht eine Platte auf „tauschen“ oder ist ein Volume beeinträchtigt: backup_status prüfen und zuerst eine frische Sicherung empfehlen, bevor irgendetwas anderes passiert.
+  6. Nächste Schritte nur nach Rückfrage mit ask_user anbieten:
+     - eine Platte, die in keinem Volume steckt: disk_test nur als Lesetest; der Überschreibtest löscht alles und kommt nur auf ausdrücklichen Wunsch.
+     - ein Volume: mit volume_action nur die Prüfung (Scrub) starten. volume_action kann auch löschen; das nie vorschlagen.
+  7. Abschluss: ein Satz Gesamturteil und wann es sich lohnt, wieder nachzusehen.

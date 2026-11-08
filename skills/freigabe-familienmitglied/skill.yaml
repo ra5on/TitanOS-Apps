@@ -1,0 +1,14 @@
+name: Freigabe für ein Familienmitglied
+description: Legt nach Rückfrage eine neue Freigabe für ein Familienmitglied an und erklärt, wie die Rechte gesetzt und das Laufwerk verbunden wird.
+author: ra5on
+when: Ein Familienmitglied soll einen eigenen Ordner im Netzwerk bekommen („Freigabe für Lena anlegen“, „mein Sohn braucht einen eigenen Ordner auf dem NAS“).
+tools: [ask_user, accounts_list, shares_list, storage_overview, share_create, description_save]
+steps: |
+  1. accounts_list lesen: Hat die Person schon ein Konto? Wenn nein, erklären, dass das Konto unter Konten von der Person selbst angelegt wird; die Anmeldedaten vergibt sie dort selbst, nie der Agent. Danach hier weitermachen.
+  2. shares_list lesen: Gibt es schon eine passende Freigabe oder den Namen? Doppelte Namen vermeiden.
+  3. storage_overview: Welches Volume hat genug Platz und ist gesund? Bei mehreren Volumes mit ask_user fragen, wohin (das mit dem meisten freien Platz zuerst nennen).
+  4. Namen vorschlagen (z. B. der Vorname) und mit ask_user bestätigen lassen (Name passt / Anderer Name / Abbrechen).
+  5. share_create mit Name und Volume. Achtung: Lesen und Schreiben bekommt zunächst das Konto, das die Freigabe anlegt. Nie Erfolg melden, bevor das Ergebnis da ist.
+  6. Danach erklären, wie das Familienmitglied Zugriff bekommt: unter Freigaben die neue Freigabe öffnen und dem Konto Lesen und Schreiben geben; andere Konten nach Wunsch nur Lesen oder gar nichts.
+  7. Mit description_save eine kurze Beschreibung speichern, z. B. „Eigener Ordner von Lena“, damit später klar ist, wofür sie da ist.
+  8. Zum Schluss sagen, wie man verbindet: unter Windows im Explorer \\NAS-Name\Freigabe, am Mac im Finder mit smb://NAS-Name/Freigabe; das Konto des Familienmitglieds zum Anmelden verwenden.

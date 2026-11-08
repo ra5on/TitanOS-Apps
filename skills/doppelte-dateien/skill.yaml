@@ -1,0 +1,15 @@
+name: Doppelte Dateien aussortieren
+description: Findet doppelte Dateien, zeigt sie gruppiert und legt nach Rückfrage die überflüssigen Kopien in einen Aussortiert-Ordner oder in den Papierkorb.
+author: ra5on
+when: Die Person sucht Duplikate oder doppelte Fotos, Musik oder Dokumente („doppelte Dateien finden“, „habe ich Fotos mehrfach?“).
+tools: [ask_user, files_list, files_search, file_read, image_view, files_mkdir, files_move, files_delete]
+steps: |
+  1. Klären, wo gesucht wird: mit files_list die Wurzeln zeigen und mit ask_user fragen, welche Freigaben oder Ordner gemeint sind. Nie ungefragt alles durchsuchen.
+  2. Mit files_search die gewählten Orte durchsuchen (für Fotos extension images, sonst nach Dateityp). Treffer gruppieren: gleicher Name und gleiche Größe, oder gleiche Größe und sehr ähnlicher Name (z. B. „Bild (1).jpg“, „Kopie von …“).
+  3. Unsichere Gruppen stichprobenartig prüfen: Bilder mit image_view vergleichen, Textdateien mit file_read. Nur sichere Duplikate kommen auf die Vorschlagsliste.
+  4. Je Gruppe festlegen, welche Kopie bleibt: die im sinnvollsten Ordner (sortierter Ordner vor Downloads oder Handy-Upload), bei Gleichstand die älteste.
+  5. Der Person eine Tabelle zeigen: Gruppe, bleibt, kommt weg, Größe. Dazu den Platz, der frei würde.
+  6. Mit ask_user fragen (In Ordner Aussortiert verschieben / In den Papierkorb / Nur die Liste / Abbrechen). Aussortiert ist die Empfehlung, weil es sich leicht rückgängig machen lässt.
+  7. Aussortiert: in jeder Wurzel den Ordner Aussortiert mit files_mkdir anlegen, wenn er fehlt, dann die überflüssigen Kopien mit files_move dorthin verschieben. files_move ersetzt nie etwas.
+  8. Papierkorb: files_delete nie mit permanent. Hat eine Freigabe keinen Papierkorb, wäre das Löschen endgültig: dann vorher noch einmal mit ask_user fragen und das ausdrücklich sagen (Trotzdem endgültig löschen / Lieber nach Aussortiert / Abbrechen).
+  9. Zum Schluss melden, was wohin ging und wie viel Platz frei wurde, und dass Aussortiert nach einer Prüfung von Hand geleert werden kann.

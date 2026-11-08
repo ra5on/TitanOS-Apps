@@ -1,0 +1,14 @@
+name: Sicherungen prüfen
+description: Prüft alle Sicherungsaufträge, erklärt Probleme in einfachen Worten und schlägt nach Rückfrage eine Prüfung oder einen Nachlauf vor.
+author: ra5on
+when: Die Person will wissen, ob ihre Sicherungen laufen („laufen meine Backups?“, „ist alles gesichert?“), oder eine Meldung zu einer Sicherung kam.
+tools: [ask_user, backup_status, backup_snapshots, notifications, logs_search, backup_check, backup_action, file_write]
+steps: |
+  1. backup_status lesen: je Auftrag Ziel, letzter Lauf und Ergebnis, letzte erfolgreiche Sicherung, nächster Lauf, überfällig ja/nein, letzte Prüfung.
+  2. Für jeden Auftrag mit Fehler oder Verzug: backup_snapshots für die letzten Stände (wann, wie groß), notifications und logs_search mit dem Namen des Auftrags für die Fehlermeldung.
+  3. Bewerten: grün = letzter Lauf erfolgreich und nicht älter als der Zeitplan erwarten lässt; gelb = überfällig oder seit über 30 Tagen nicht geprüft; rot = fehlgeschlagen oder Ziel nicht erreichbar.
+  4. Der Person eine Tabelle zeigen: Auftrag, Ziel, letzte erfolgreiche Sicherung, Status (grün/gelb/rot), Grund. Danach in ein bis zwei Sätzen die wahrscheinliche Ursache je Problem (z. B. Ziel-Platte nicht angesteckt, Ziel voll, Netzwerkziel nicht erreichbar).
+  5. Gibt es Probleme, mit ask_user fragen, was als Nächstes passieren soll (Jetzt nachsichern / Sicherung prüfen lassen / Nur Bericht / Nichts tun).
+  6. Nachsichern mit backup_action, Prüfen mit backup_check (ein kleiner Anteil readData reicht für den Anfang). Beides läuft im Hintergrund; nie Erfolg melden, bevor backup_status das Ergebnis zeigt.
+  7. Will die Person einen Bericht, ihn mit file_write als PDF an einen Ort schreiben, den sie nennt; eine vorhandene Datei nicht ersetzen.
+  8. Abschluss: ein Satz Gesamturteil („Alle 3 Sicherungen sind aktuell“ oder „Die Sicherung Fotos läuft seit 9 Tagen nicht“).
