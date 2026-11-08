@@ -1,0 +1,14 @@
+name: Home-Assistant-Gerät prüfen
+description: Prüft ein Gerät in Home Assistant (Zustand, Verlauf, Verbindung) und erklärt, warum es nicht reagiert; schaltet nur nach Rückfrage.
+author: ra5on
+when: Ein Gerät in Home Assistant reagiert nicht, zeigt seltsame Werte oder die Person fragt nach seinem Zustand („der Bewegungsmelder im Flur geht nicht“, „warum ist das Licht im Bad an?“).
+tools: [ask_user, ha_entities, ha_state, ha_history, ha_diagnostics, ha_capabilities, ha_call, ha_undo]
+steps: |
+  1. Mit ha_entities das Gerät finden (Name und Raum). Passen mehrere Entitäten, mit ask_user fragen, welche gemeint ist. Taucht es nicht auf, erklären, dass nur in TitanOS freigegebene Entitäten sichtbar sind.
+  2. ha_state lesen: aktueller Zustand, letzte Änderung, Attribute wie Batterie, Signalstärke, Helligkeit. Der Zustand „unavailable“ oder „unknown“ heißt meist: keine Verbindung zum Gerät.
+  3. ha_history der letzten 24 Stunden lesen: Wann hat es zuletzt gemeldet, wechselt es ständig, fiel es zu einer bestimmten Zeit aus? Lücken im Verlauf sind kein Beweis, dass nichts passiert ist.
+  4. ha_diagnostics lesen, um zu sehen, ob die Verbindung zwischen TitanOS und Home Assistant selbst unterbrochen war. Aus zeitlicher Nähe allein keine Ursache ableiten.
+  5. Der Person den Befund erklären: Gerät ohne Verbindung (Batterie, Reichweite, Funknetz), Gerät meldet, aber falsche Werte, oder alles in Ordnung. Dazu den einen nächsten Schritt (z. B. Batterie wechseln, näher an den Funkstick, Gerät neu koppeln).
+  6. Soll etwas geschaltet werden: zuerst ha_capabilities lesen, welche Dienste und Werte das Gerät wirklich kann. Dann mit ask_user bestätigen lassen, was genau passiert (Ja, schalten / Abbrechen).
+  7. ha_call ausführen und mit ha_state prüfen, ob der neue Zustand angekommen ist. Nie Erfolg melden, bevor das bestätigt ist.
+  8. Will die Person das sofort zurücknehmen, ha_undo mit dem Beleg aus ha_call verwenden (nur für einfache Schaltvorgänge, innerhalb von 30 Minuten). Türen, Schlösser und Szenen nicht so zurücknehmen.

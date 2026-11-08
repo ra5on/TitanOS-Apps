@@ -1,0 +1,14 @@
+name: Urlaubsfotos zusammenführen
+description: Sammelt die Fotos eines Urlaubs aus mehreren Ordnern (Handy-Uploads, Kamera, Familie) nach Rückfrage in einem gemeinsamen Ordner.
+author: ra5on
+when: Die Person will die Fotos einer Reise oder eines Ereignisses an einem Ort haben („Fotos vom Italienurlaub zusammenlegen“, „alle Bilder von der Hochzeit in einen Ordner“).
+tools: [ask_user, locations_list, files_list, files_search, image_view, files_mkdir, file_copy]
+steps: |
+  1. Klären: welcher Zeitraum (von–bis) und wie soll der Zielordner heißen? Fehlt etwas, frage mit ask_user; schlage einen Namen wie „2026-08 Italien“ vor.
+  2. Mit locations_list und files_list die Foto-Orte finden (Fotos, Handy-Uploads, Kamera, Ordner der Familie, soweit dieses Konto sie öffnen darf). Bei mehreren möglichen Orten mit ask_user fragen, welche dazugehören.
+  3. In jedem Ort files_search mit extension images, ohne query. Auch Videos können dazugehören: zusätzlich files_search mit extension mp4,mov.
+  4. Nach dem Änderungsdatum der Treffer auf den Zeitraum eingrenzen. Bei wenigen Grenzfällen (erster oder letzter Tag) einzelne Bilder mit image_view ansehen, um zu prüfen, ob sie zum Urlaub gehören.
+  5. Der Person zeigen: Anzahl Fotos und Videos je Ort, Gesamtgröße, Zielordner. Doppelte Namen gleicher Größe als vermutliche Duplikate kennzeichnen und nicht doppelt übernehmen.
+  6. Mit ask_user fragen (Kopieren, Originale bleiben / Verschieben / Nur die Liste / Abbrechen). Kopieren ist die Empfehlung, weil dabei nichts verloren geht.
+  7. Zielordner mit files_mkdir anlegen, wenn er fehlt. Dann file_copy je Quellort; bei „Verschieben“ mit move. TitanOS überschreibt nichts, gleiche Namen bekommen eine Nummer.
+  8. Am Ende melden: wie viele Dateien im Zielordner liegen, wie viele als Duplikat übersprungen wurden und wo der Ordner ist.

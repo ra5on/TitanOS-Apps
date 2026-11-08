@@ -1,0 +1,15 @@
+name: Speicherplatz frei machen
+description: Findet das vollste Volume, schlägt große und lange unbenutzte Dateien vor und räumt erst nach Rückfrage auf.
+author: ra5on
+when: Ein Volume oder eine Freigabe wird voll, oder die Person will Platz schaffen („die Platte ist fast voll“, „was frisst so viel Speicher?“).
+tools: [ask_user, storage_overview, notifications, shares_list, files_list, files_search, files_mkdir, files_move, files_delete]
+steps: |
+  1. Mit storage_overview und notifications feststellen, welches Volume wie voll ist. Über 85 % ist dringend, über 95 % kritisch: das zuerst sagen.
+  2. Mit shares_list die Freigaben auf diesem Volume finden. Mit files_list in die oberen Ordner schauen, um die großen Bereiche zu erkennen.
+  3. Große Dateien suchen: files_search mit extension iso,img,zip,rar,7z,tar,gz (Abbilder und Archive), mit extension mkv,mp4,avi,mov (Videos) und in Downloads ohne Einschränkung. Ergebnisse nach Größe sortieren.
+  4. Lange nicht geänderte Dateien hervorheben: Änderungsdatum älter als zwei Jahre. Alt heißt nicht wertlos (Fotos, Dokumente), darum nur vorschlagen, nicht bewerten.
+  5. Eine Vorschlagsliste zeigen, die größten zuerst: Datei, Ort, Größe, zuletzt geändert, Grund (z. B. „Installationsabbild, liegt seit 2023 in Downloads“). Dazu die Summe, die frei würde. Fotos, Dokumente und Sicherungen nie von selbst vorschlagen, nur wenn die Person danach fragt.
+  6. Mit ask_user fragen, was passieren soll (Ausgewählte in den Papierkorb / Nach Aussortiert verschieben / Nur die Liste / Abbrechen). Will die Person nur einen Teil, die Auswahl in Worten bestätigen lassen.
+  7. Verschieben: Ordner Aussortiert mit files_mkdir anlegen, wenn er fehlt, dann files_move. Achtung: das macht auf demselben Volume keinen Platz frei; das der Person sagen.
+  8. Papierkorb: files_delete nie mit permanent. Der Papierkorb belegt weiter Platz, bis er geleert wird; das erklären. Hat die Freigabe keinen Papierkorb, ist das Löschen endgültig: dann erneut mit ask_user fragen und das klar sagen.
+  9. Am Ende storage_overview erneut lesen und berichten, wie viel jetzt frei ist.

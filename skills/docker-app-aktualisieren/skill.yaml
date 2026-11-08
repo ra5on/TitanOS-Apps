@@ -1,0 +1,15 @@
+name: Docker-App sicher aktualisieren
+description: Aktualisiert eine Docker-App nach Rückfrage, prüft danach, ob sie wieder läuft, und hilft bei Problemen weiter.
+author: ra5on
+when: Die Person will eine bestimmte App aktualisieren („update Jellyfin“, „bring Nextcloud auf den neuesten Stand“), oder eine App zeigt ein Update an.
+tools: [ask_user, docker_list, docker_check_updates, backup_status, app_action, container_logs, docker_container_restart]
+steps: |
+  1. docker_list lesen und die App finden. Passt der Name auf mehrere Apps, mit ask_user fragen, welche. Das jetzige Image mit Tag notieren, damit die alte Version bekannt ist.
+  2. Ist kein Update angezeigt, mit docker_check_updates nachfragen lassen und docker_list erneut lesen. Gibt es weiterhin keins, das sagen und aufhören.
+  3. Vorher sichern: backup_status ansehen, ob die Daten der App (Appdata) in einer aktuellen Sicherung stecken. Wenn nicht, darauf hinweisen.
+  4. Mit ask_user fragen (Jetzt aktualisieren / Später / Abbrechen). Sagen, dass die App dabei kurz nicht erreichbar ist und der Container neu erstellt wird; die Daten bleiben.
+  5. app_action mit update. Nie die Variante zum Entfernen verwenden. Nicht Erfolg melden, bevor das Ergebnis da ist.
+  6. Danach prüfen: docker_list (läuft der Container, ist er gesund, welches Image), dann container_logs auf Fehler in den ersten Minuten (Datenbank-Migration, fehlende Einstellung, Absturzschleife).
+  7. Läuft alles: kurz melden, von welcher auf welche Version es ging.
+  8. Läuft die App nicht: die wichtigste Fehlerzeile zeigen und erklären, was sie vermutlich bedeutet. Dann mit ask_user fragen (Container neu starten / Ich setze die alte Version selbst / Weiter beobachten).
+  9. Neu starten mit docker_container_restart, danach erneut docker_list und container_logs prüfen. Zur alten Version zurück geht es unter Docker › App bearbeiten: dort das Image-Tag auf das notierte alte Tag setzen. Das macht die Person selbst; der Agent nennt ihr nur das Tag.

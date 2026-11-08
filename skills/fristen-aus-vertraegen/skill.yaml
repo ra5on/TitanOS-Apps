@@ -1,0 +1,14 @@
+name: Fristen aus Verträgen notieren
+description: Sucht in den eigenen Dokumenten nach Kündigungs-, Garantie- und Zahlungsfristen, zeigt sie mit Quelle und legt nach Rückfrage Erinnerungen und eine Notiz an.
+author: ra5on
+when: Die Person will wissen, welche Fristen anstehen, oder an eine Kündigung erinnert werden („wann kann ich den Handyvertrag kündigen?“, „trag mir die Fristen aus meinen Verträgen ein“).
+tools: [ask_user, documents_search, document_read, schedule_list, schedule_create, notes_list, note_write]
+steps: |
+  1. Klären, worum es geht: ein bestimmter Vertrag oder alle. Bei „alle“ mit ask_user die Art eingrenzen (Versicherungen / Handy und Internet / Strom und Gas / Abos / Alles).
+  2. Mit documents_search gezielt fragen, je Vertrag oder Art einzeln, z. B. „Kündigungsfrist Handyvertrag“, „Laufzeit Kfz-Versicherung“, „Garantie bis“. documents_search durchsucht nur die Ordner, die die Person für das Dokumenten-Gedächtnis gewählt hat.
+  3. Jeden Treffer an der genannten Seite mit document_read nachlesen. Notieren: Vertrag, Anbieter, Laufzeitende, Kündigungsfrist, daraus der letzte Kündigungstag, Quelle (Datei und Seite). Nur übernehmen, was wirklich im Dokument steht; Rechnen (z. B. „3 Monate vor Ablauf“) offen zeigen.
+  4. Der Person eine Tabelle zeigen: Vertrag, letzter Kündigungstag, Laufzeitende, Quelle. Unklare Fälle getrennt aufführen. Keine Rechtsberatung.
+  5. schedule_list lesen, damit keine Erinnerung doppelt angelegt wird.
+  6. Mit ask_user fragen (Erinnerungen anlegen / In meine Notizen schreiben / Beides / Nichts). Als Vorlauf zwei Wochen vor dem letzten Kündigungstag vorschlagen.
+  7. Erinnerungen: schedule_create je Frist als Erinnerung (kind reminder), einmalig am Datum des Vorlaufs um 9:00, Text mit Vertrag, Frist und Quelle. Danach Datum und Uhrzeit jeder Erinnerung nennen.
+  8. Notiz: mit notes_list nachsehen, ob es schon eine Notiz „Verträge/Fristen.md“ gibt. Dann note_write mit append an diese Notiz, sonst eine neue anlegen. Nie mit replace überschreiben, ohne zu fragen.

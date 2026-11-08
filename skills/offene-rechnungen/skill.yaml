@@ -1,0 +1,14 @@
+name: Offene Rechnungen und Ausgaben des Monats
+description: Zeigt aus dem Papierkram die Ausgaben eines Monats und die noch offenen Rechnungen mit Fälligkeit und legt nach Rückfrage Zahlungserinnerungen an.
+author: ra5on
+when: Die Person fragt nach offenen Rechnungen oder ihren Ausgaben („welche Rechnungen sind noch offen?“, „was habe ich im Oktober ausgegeben?“).
+tools: [ask_user, paperwork_summary, documents_search, document_read, schedule_list, schedule_create]
+steps: |
+  1. Den Monat bestimmen: genannten Monat übernehmen, sonst den laufenden. paperwork_summary mit diesem Monat aufrufen.
+  2. Offene Zahlungen zuerst zeigen, nach Fälligkeit sortiert: Absender, Betrag, fällig am, Dokument. Überfällige ausdrücklich markieren.
+  3. Danach die Ausgaben des Monats nach Art und Absender, mit Summe. Auf Wunsch den Vormonat mit paperwork_summary dazu holen und vergleichen.
+  4. Fragt die Person nach einer einzelnen Rechnung, mit documents_search danach suchen und mit document_read die Stelle nachlesen; immer Datei und Seite nennen.
+  5. Ob eine Rechnung schon bezahlt ist, kann der Agent nicht wissen. Nichts als bezahlt behandeln, sondern die Person fragen.
+  6. Für offene Rechnungen mit ask_user fragen (Erinnerungen anlegen / Nur die Liste / Nichts). Vorher schedule_list lesen, um doppelte Erinnerungen zu vermeiden.
+  7. schedule_create je Rechnung als Erinnerung (kind reminder), einmalig drei Tage vor der Fälligkeit um 9:00, mit Absender, Betrag und Fälligkeit im Text. Danach die Termine nennen.
+  8. Keine Kontodaten, Zugangsdaten oder IBAN in Erinnerungen oder Antworten wiederholen.

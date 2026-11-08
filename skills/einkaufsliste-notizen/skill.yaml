@@ -1,0 +1,13 @@
+name: Einkaufsliste in den Notizen
+description: Führt eine Einkaufs- oder Erledigungsliste in den Notizen als Checkliste, ergänzt und hakt ab, ohne die Liste zu überschreiben.
+author: ra5on
+when: Die Person will etwas auf eine Liste setzen, abhaken oder die Liste sehen („setz Milch auf die Einkaufsliste“, „was steht auf der Liste?“, „Brot ist gekauft“).
+tools: [ask_user, notes_list, note_read, note_write, schedule_create]
+steps: |
+  1. Mit notes_list die passende Notiz finden (z. B. Haushalt/Einkauf.md). Gibt es mehrere Listen, mit ask_user fragen, welche. Gibt es keine, vorschlagen, Haushalt/Einkauf.md neu anzulegen.
+  2. note_read lesen, bevor etwas geändert wird.
+  3. Hinzufügen: nur neue Punkte, die noch nicht offen auf der Liste stehen, als „- [ ] Punkt“ mit note_write und append anhängen. Mengen übernehmen, wie die Person sie sagt.
+  4. Abhaken: den Punkt in der gelesenen Liste von „- [ ]“ auf „- [x]“ ändern und die ganze Notiz mit note_write und replace schreiben. Dabei nichts anderes an der Notiz verändern.
+  5. Erledigte Punkte entfernen nur, wenn die Person es will: mit ask_user fragen (Erledigte entfernen / Stehen lassen). Die Notiz selbst nie löschen.
+  6. Anzeigen: die offenen Punkte als kurze Liste, die erledigten nur als Anzahl.
+  7. Will die Person an den Einkauf erinnert werden, schedule_create als Erinnerung (kind reminder) mit Uhrzeit; den Termin nennen.
