@@ -3,6 +3,15 @@ x-titanos:
   icon: "https://raw.githubusercontent.com/bambulab/BambuStudio/master/resources/images/BambuStudio_128px.png"
   name: Bambu Studio
   main: bambustudio
+
+  # „Öffnen mit“ im Dateimanager von TitanOS (ab 0.69): Dateien dieser
+  # Typen öffnet TitanOS mit dem Programm im Container. Pfad im Container
+  # unter /shares/<Freigabe>; TitanOS fragt beim ersten Öffnen nach dem
+  # Einhängen der Freigabe.
+  opens:
+    types: [3mf, stl, step, stp, obj, amf]
+    command: [/opt/bambustudio/AppRun, "{file}"]
+    user: abc
   category: productivity
 
   description:
