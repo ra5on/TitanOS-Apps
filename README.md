@@ -76,27 +76,19 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | --- | --- |
 | [AdGuard Home](adguard/compose.yaml) | DNS-Server mit Werbe- und Trackingfilter |
 | [Bambu Studio](bambu-lab/compose.yaml) | 3D-Modelle im Browser vorbereiten und slicen |
-| [CADCraft](cadcraft/compose.yaml) | Technische Zeichnungen und CAD-Entwürfe erstellen |
 | [Cloudflare Tunnel](cloudflare-tunnel/compose.yaml) | Dienste über eigene Domains erreichbar machen |
 | [ConvertX](convertx/compose.yaml) | Dateien im Browser zwischen vielen Formaten umwandeln |
-| [DeckCraft](deckcraft/compose.yaml) | Präsentationen erstellen und bearbeiten |
 | [DeepSeek Harness](deepseek-harness/compose.yaml) | KI-Agent für Dateien und Befehle in einem Arbeitsordner |
-| [DesignCraft](designcraft/compose.yaml) | Seiten und Layouts gestalten |
 | [Eclipse Mosquitto](mosquitto/compose.yaml) | Passwortgeschützter MQTT-Broker für Geräte und Automationen |
-| [EffectCraft](effectcraft/compose.yaml) | Animationen und Effekte gestalten |
 | [ESPHome](esphome/compose.yaml) | Gerätekonfiguration und Firmware mit ESPHome Device Builder erstellen |
-| [FigCraft](figcraft/compose.yaml) | Oberflächen und Prototypen entwerfen |
-| [FilmCraft](filmcraft/compose.yaml) | Videos bearbeiten |
 | [Firefox](firefox/compose.yaml) | Firefox auf dem NAS mit geschütztem Browserzugang und dauerhaftem Profil |
 | [Frigate NVR](frigate/compose.yaml) | Videoüberwachung mit Objekterkennung |
-| [GridCraft](gridcraft/compose.yaml) | Tabellen und Berechnungen bearbeiten |
 | [Grocy](grocy/compose.yaml) | Vorräte, Einkäufe und Haushaltsaufgaben verwalten |
 | [Hermes Agent](hermes-agent/compose.yaml) | KI-Agent mit Web-Dashboard |
 | [Immich](immich/compose.yaml) | Fotos und Videos verwalten und sichern |
 | [JDownloader 2](jdownloader-2/compose.yaml) | Downloads mit geschützter Browseroberfläche verwalten |
 | [Jellyfin](jellyfin/compose.yaml) | Filme, Serien und Musik an Browser, Fernseher und Mobilgeräte streamen |
 | [Joplin Server](joplin-server/compose.yaml) | Notizen zwischen Joplin-Apps synchronisieren |
-| [LightCraft](lightcraft/compose.yaml) | Fotos entwickeln |
 | [Matrix + Element](matrix-element/compose.yaml) | Privater Matrix-Messenger mit Element-Weboberfläche, persönlichen Konten und PostgreSQL |
 | [Mattermost](mattermost/compose.yaml) | Eigener Teamchat mit Kanälen, persönlichen Konten und Dateiaustausch |
 | [Mealie](mealie/compose.yaml) | Rezepte, Essenspläne und Einkaufslisten verwalten |
@@ -110,12 +102,10 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [PairDrop](pairdrop/compose.yaml) | Dateien und Text zwischen Browsern übertragen |
 | [Palworld](palworld/compose.yaml) | Palworld-Server mit eigener Welt, Spielerpasswort und automatischen Backups |
 | [Paperless-ngx](paperless-ngx/compose.yaml) | Dokumente mit OCR archivieren und durchsuchen |
-| [PdfCraft](pdfcraft/compose.yaml) | PDFs bearbeiten |
 | [PhotoCraft](photocraft/compose.yaml) | Bilder bearbeiten |
 | [Pi-hole](pihole/compose.yaml) | DNS-Werbeblocker mit Dashboard |
 | [Satisfactory](satisfactory/compose.yaml) | Dedizierter Satisfactory-Server für eine gemeinsame Fabrik und dauerhafte Spielstände |
 | [SolidCraft](solidcraft/compose.yaml) | 3D-CAD-Modelle im Browser erstellen und bearbeiten |
-| [SoundCraft](soundcraft/compose.yaml) | Audio aufnehmen und bearbeiten |
 | [Syncthing](syncthing/compose.yaml) | Ordner zwischen Geräten synchronisieren |
 | [Terraria / tModLoader](terraria/compose.yaml) | Terraria-Server mit tModLoader, dauerhafter Welt und optionalen Workshop-Mods |
 | [Thunderbird](thunderbird/compose.yaml) | Vorhandene E-Mail-Konten, Kontakte und Kalender im Browser nutzen |
@@ -124,9 +114,7 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [Uptime Kuma](uptime-kuma/compose.yaml) | Erreichbarkeit von Diensten überwachen |
 | [Valheim](valheim/compose.yaml) | Valheim-Server mit geschützter Spielwelt und automatischen Welt-Backups |
 | [Vaultwarden](vaultwarden/compose.yaml) | Passwortmanager für Bitwarden-Clients |
-| [VectorCraft](vectorcraft/compose.yaml) | Vektorgrafiken bearbeiten |
 | [Whisper (Speaches)](whisper/compose.yaml) | Spracherkennung mit Grafikkarte, z. B. für die Spracheingabe des TitanOS-KI-Agenten |
-| [WordCraft](wordcraft/compose.yaml) | Textdokumente erstellen und bearbeiten |
 | [Zigbee2MQTT](zigbee2mqtt/compose.yaml) | Zigbee-Geräte mit einem privaten MQTT-Broker verbinden |
 
 ## Dateikonvertierung, Downloads und Musikwiedergabe
@@ -455,7 +443,7 @@ MQTT-Ports sind nach Installation direkt im Netzwerk erreichbar.
 ## Storytold / Craft-Apps
 
 Der Workflow [Storytold web images](.github/workflows/storytold.yml) prüft alle sechs Stunden sowie manuell neue
-stabile Releases der 14 konfigurierten Craft-Apps (13 von Storytold, dazu SolidCraft). Er lädt die offiziellen
+stabile Releases der zwei verbliebenen Craft-Apps (PhotoCraft von Storytold, dazu SolidCraft). Die übrigen Craft-Apps gibt es als eigene Fassungen von TitanOS (T-Word, T-PDF, T-Exel …, Repo [TitanOS-Office](https://github.com/ra5on/TitanOS-Office)); TitanOS ersetzt installierte Docker-Fassungen beim Update selbst. Ihre Ports bleiben reserviert. Er lädt die offiziellen
 Web-ZIPs, prüft Größe und SHA-256 aus GitHubs Release-Metadaten und übernimmt die
 Original-Lizenztexte und Quellverweise der exakten Version. Anschließend baut
 er ein schlankes, nicht privilegiertes NGINX-Image und prüft HTTP, fehlende
@@ -464,12 +452,6 @@ versionierte Images und `latest` nach GHCR übertragen und Katalogeinträge
 aktualisiert. Scheitern Prüfungen, wird die betroffene neue Version nicht
 veröffentlicht. Alte versionierte Images bleiben für Rückwechsel verfügbar.
 Die Vorlagen beziehen ihre Images aus der GitHub Container Registry (GHCR).
-
-DeckCraft verwendet vorerst die geprüfte Version 0.7.0, weil das offizielle
-Web-Paket 0.8.0 beim Start abstürzt. Spätere Versionen werden wieder automatisch
-geprüft. Bei LightCraft 0.9.1 ergänzt die Paketierung eine im offiziellen ZIP
-fehlende Schrift mit Original-Lizenz und festen Prüfsummen. Einzelheiten stehen
-in [den dokumentierten Upstream-Ausnahmen](docs/CRAFT-UPSTREAM.md).
 
 AniCraft hat derzeit kein veröffentlichtes Release. Die eigentliche ArtCraft-App
 bietet in ihrem aktuellen Release Windows- und macOS-Pakete, aber kein Web-Paket.

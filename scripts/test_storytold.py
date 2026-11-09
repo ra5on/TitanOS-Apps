@@ -20,20 +20,21 @@ class Archives(unittest.TestCase):
    with self.assertRaises(ValueError):module.unpack(self.archive({'index.html':'test'}),Path(d))
 class Catalog(unittest.TestCase):
  def test_existing_ports_remain_stable(self):
-  self.assertEqual(list(module.APPS)[:8], ['photocraft','pdfcraft','filmcraft','vectorcraft','lightcraft','designcraft','effectcraft','figcraft'])
+  self.assertEqual(module.PORT_ORDER[:8], ['photocraft','pdfcraft','filmcraft','vectorcraft','lightcraft','designcraft','effectcraft','figcraft'])
+  self.assertTrue(set(module.APPS) <= set(module.PORT_ORDER))
  def test_all_released_craft_web_apps_are_discovered(self):
-  self.assertEqual(set(module.APPS), {'photocraft','pdfcraft','filmcraft','vectorcraft','lightcraft','designcraft','effectcraft','figcraft','wordcraft','gridcraft','deckcraft','cadcraft','soundcraft','solidcraft'})
+  # The others have their own TitanOS build (T-Word …) and left the catalog.
+  self.assertEqual(set(module.APPS), {'photocraft','solidcraft'})
  def test_solidcraft_keeps_its_port_and_comes_from_tangency_labs(self):
-  self.assertEqual(8090+list(module.APPS).index('solidcraft'), 8103)
+  self.assertEqual(module.host_port('solidcraft'), 8103)
   self.assertEqual(module.owner('solidcraft'), 'tangency-labs')
-  self.assertEqual(module.owner('cadcraft'), 'storytold')
+  self.assertEqual(module.owner('photocraft'), 'storytold')
  def test_ports_avoid_host_network_apps_and_stay_stable(self):
   ports={app:module.host_port(app) for app in module.APPS}
   self.assertEqual(len(set(ports.values())),len(ports))
   self.assertFalse(set(ports.values())&module.taken_ports())
-  self.assertEqual((ports['designcraft'],ports['figcraft']),(8195,8197))
   for app,port in ports.items():
-   if app not in ('designcraft','figcraft','effectcraft'):self.assertEqual(port,8090+list(module.APPS).index(app))
+   self.assertEqual(port,8090+module.PORT_ORDER.index(app))
   # Every catalog app on the host network has its fixed ports reserved.
   repo=Path(__file__).resolve().parents[1]
   for compose in repo.glob('*/compose.yaml'):
@@ -52,7 +53,7 @@ class Catalog(unittest.TestCase):
   self.assertEqual(clashes,{})
  def test_relocated_catalogs_match_the_generator(self):
   repo=Path(__file__).resolve().parents[1]
-  for app in ('designcraft','figcraft'):
+  for app in ('photocraft','solidcraft'):
    record=__import__('json').loads((repo/app/'release.json').read_text())
    with tempfile.TemporaryDirectory() as d, patch.object(module,'ROOT',Path(d)):
     module.catalog(app,record)
@@ -67,14 +68,14 @@ class Catalog(unittest.TestCase):
    self.assertEqual(len(__import__('json').loads((repo/'icons.json').read_text())),len(list(repo.glob('*/compose.yaml'))))
  def test_storytold_catalog_is_unchanged(self):
   repo=Path(__file__).resolve().parents[1]
-  record=__import__('json').loads((repo/'cadcraft'/'release.json').read_text())
+  record=__import__('json').loads((repo/'photocraft'/'release.json').read_text())
   with tempfile.TemporaryDirectory() as d, patch.object(module,'ROOT',Path(d)):
-   module.catalog('cadcraft',record)
-   expected=(repo/'cadcraft'/'compose.yaml').read_text()
-   self.assertEqual((Path(d)/'cadcraft'/'compose.yaml').read_text(),expected)
+   module.catalog('photocraft',record)
+   expected=(repo/'photocraft'/'compose.yaml').read_text()
+   self.assertEqual((Path(d)/'photocraft'/'compose.yaml').read_text(),expected)
    self.assertNotIn('${',expected)
-   self.assertIn('image: ghcr.io/ra5on/titanos-cadcraft:latest',expected)
-   self.assertFalse((Path(d)/'cadcraft'/'.env.example').exists())
+   self.assertIn('image: ghcr.io/ra5on/titanos-photocraft:latest',expected)
+   self.assertFalse((Path(d)/'photocraft'/'.env.example').exists())
 class UpstreamRegressions(unittest.TestCase):
  def release(self,tag):
   return {'tag_name':tag,'draft':False,'prerelease':False,'assets':[{'name':'deckcraft-web-'+tag[1:]+'.zip','digest':'sha256:'+'a'*64,'size':10,'browser_download_url':'https://github.com/storytold/deckcraft/releases/download/'+tag+'/web.zip'}]}

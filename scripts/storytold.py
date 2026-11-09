@@ -6,18 +6,6 @@ from pathlib import Path, PurePosixPath
 ROOT = Path(__file__).resolve().parents[1]
 APPS = {
  'photocraft': ('PhotoCraft', 'photos', 'Bilder bearbeiten', 'Edit images'),
- 'pdfcraft': ('PdfCraft', 'productivity', 'PDFs bearbeiten', 'Edit PDFs'),
- 'filmcraft': ('FilmCraft', 'media', 'Videos bearbeiten', 'Edit videos'),
- 'vectorcraft': ('VectorCraft', 'productivity', 'Vektorgrafiken bearbeiten', 'Edit vector graphics'),
- 'lightcraft': ('LightCraft', 'photos', 'Fotos entwickeln', 'Develop photos'),
- 'designcraft': ('DesignCraft', 'productivity', 'Seiten und Layouts gestalten', 'Design pages and layouts'),
- 'effectcraft': ('EffectCraft', 'media', 'Animationen und Effekte gestalten', 'Create motion graphics and effects'),
- 'figcraft': ('FigCraft', 'productivity', 'Oberflächen und Prototypen gestalten', 'Design interfaces and prototypes'),
- 'wordcraft': ('WordCraft', 'productivity', 'Textdokumente bearbeiten', 'Edit text documents'),
- 'gridcraft': ('GridCraft', 'productivity', 'Tabellen bearbeiten', 'Edit spreadsheets'),
- 'deckcraft': ('DeckCraft', 'productivity', 'Präsentationen gestalten', 'Create presentations'),
- 'cadcraft': ('CADCraft', 'productivity', 'Technische Zeichnungen erstellen', 'Create technical drawings'),
- 'soundcraft': ('SoundCraft', 'media', 'Audio aufnehmen und bearbeiten', 'Record and edit audio'),
  'solidcraft': ('SolidCraft', 'productivity', '3D-CAD-Modelle erstellen und bearbeiten', 'Create and edit 3D CAD models'),
 }
 # Apps that are not published by storytold. Their GHCR images are not public,
@@ -58,10 +46,15 @@ def taken_ports():
    ports.update(int(port) for port in re.findall(r'^\s+- "?(\d+):', compose.read_text(), re.M))
  return ports
 
+# The order the apps came into the catalog: their ports follow it. The
+# Craft apps with a TitanOS build of their own (T-Word …) left the catalog
+# (TitanOS PLAN 75-20) but keep their places, so no port moves.
+PORT_ORDER = ['photocraft','pdfcraft','filmcraft','vectorcraft','lightcraft','designcraft','effectcraft','figcraft','wordcraft','gridcraft','deckcraft','cadcraft','soundcraft','solidcraft']
+
 def host_port(app):
  # 8090+position keeps every existing app on its port; only a clash moves
  # to the same position in the next free hundred.
- port, taken=8090+list(APPS).index(app), taken_ports()
+ port, taken=8090+PORT_ORDER.index(app), taken_ports()
  while port in taken:
   port+=100
  return port
