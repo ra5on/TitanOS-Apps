@@ -1,6 +1,6 @@
 # Image-Tags je Container
 
-Alle 53 Apps und 69 Dienste verwenden wörtliche Image-Referenzen. In TitanOS
+Alle Apps und Dienste verwenden wörtliche Image-Referenzen. In TitanOS
 0.21.0 ist das **Image-Tag**-Feld für jeden Dienst direkt bearbeitbar, beim
 Installieren und im bestehenden Diensteditor. Formular und Compose-Ansicht
 halten dieselbe Auswahl; nach erneutem Öffnen bleiben die Tags erhalten.
@@ -8,7 +8,7 @@ Zusätzliche Compose-Variablen oder Beispieldateien sind nicht nötig.
 
 `latest` ist der Standard, wo der Herausgeber ihn anbietet. Frigate nennt den
 aktuellen Kanal `stable`, Immich Server/ML `release` und das VectorChord-Image
-`pg18-latest`. Die aktuellen Registry-Abfragen für `latest` dieser vier Images
+`pg18-latest`. Whisper (speaches) nennt ihn `latest-cuda`. Die aktuellen Registry-Abfragen für `latest` der ersten vier Images
 liefern HTTP 404. Zusammengehörige Dienste auf kompatiblen Versionen halten.
 PostgreSQL-Hauptversionswechsel benötigen eine Datenmigration.
 
@@ -83,6 +83,7 @@ vollständige Funktionsabnahme jeder Anwendung.
 | satisfactory | satisfactory | `robtme/satisfactory-server:latest` |
 | solidcraft | solidcraft | `ghcr.io/ra5on/titanos-solidcraft:latest` |
 | soundcraft | soundcraft | `ghcr.io/ra5on/titanos-soundcraft:latest` |
+| syncthing | init | `syncthing/syncthing:latest` |
 | syncthing | syncthing | `syncthing/syncthing:latest` |
 | terraria | terraria | `ghcr.io/crosis47/tmodloader:latest` |
 | thunderbird | thunderbird | `jlesage/thunderbird:latest` |
@@ -95,3 +96,5 @@ vollständige Funktionsabnahme jeder Anwendung.
 | wordcraft | wordcraft | `ghcr.io/ra5on/titanos-wordcraft:latest` |
 | zigbee2mqtt | broker | `eclipse-mosquitto:latest` |
 | zigbee2mqtt | zigbee2mqtt | `ghcr.io/koenkk/zigbee2mqtt:latest` |
+| whisper | init | `ghcr.io/speaches-ai/speaches:latest-cuda` |
+| whisper | whisper | `ghcr.io/speaches-ai/speaches:latest-cuda` |

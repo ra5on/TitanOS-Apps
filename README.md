@@ -48,7 +48,7 @@ services:
 
 Den Tag eines Dienstes ändern; die übrigen Dienste behalten ihre Auswahl.
 Formular und Compose-Ansicht verwenden dieselben Werte. Die
-[vollständige Tabelle](docs/IMAGE-TAGS.md) listet alle 70 Dienste und Vorgaben.
+[vollständige Tabelle](docs/IMAGE-TAGS.md) listet alle Dienste und Vorgaben.
 Zusammengehörige Dienste wie Immich Server/ML, Nextcloud/Cron oder
 Synapse/Einrichtungsdienste müssen auf kompatiblen Versionen bleiben.
 
@@ -513,7 +513,7 @@ Installation und Diensteditor, unterschiedliche Versionen im selben Stack sowie
 Ansichtswechsel und erneutes Öffnen. `scripts/check-registry-images.py` prüft
 zusätzlich die echten Registry-Manifeste und Linux-amd64-Unterstützung ohne
 Image-Layer herunterzuladen. HTTP-Fehler bleiben als Fehler sichtbar. Der isolierte [Katalog-Browsertest](scripts/catalog-ui-smoke.mjs)
-öffnet alle 50 Vorlagen und prüft sämtliche 66 Tag-Felder einschließlich Stacks
+öffnet alle 42 Vorlagen und prüft sämtliche 61 Tag-Felder einschließlich Stacks
 und mobiler Darstellung. Der [Prüfbericht](docs/validation/catalog-direct-tags-2026-10-25.json)
 trennt Registry-Metadaten, Formularprüfungen und Laufzeittests.
 

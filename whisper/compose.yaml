@@ -2,7 +2,7 @@ x-titanos:
   icon: "https://cdn.jsdelivr.net/gh/selfhst/icons/svg/speaches.svg"
   name: Whisper (Speaches)
   main: whisper
-  category: productivity
+  category: ai
 
   description:
     de: >-
@@ -52,7 +52,28 @@ x-titanos:
       webui: false
 
 services:
+  # The image runs as "ubuntu" (1000); Docker creates ./models as root, so
+  # the models could not be downloaded. A fresh empty folder gets its owner.
+  init:
+    image: ghcr.io/speaches-ai/speaches:latest-cuda
+    user: "0:0"
+    restart: "no"
+    entrypoint:
+      - /bin/sh
+      - -ec
+    command:
+      - >-
+        if [ "$$(stat -c %u /models)" = 0 ] && [ -z "$$(ls -A /models)" ];
+        then chown 1000:1000 /models; fi
+    volumes:
+      - ./models:/models
+    security_opt:
+      - no-new-privileges=true
+
   whisper:
+    depends_on:
+      init:
+        condition: service_completed_successfully
     image: ghcr.io/speaches-ai/speaches:latest-cuda
     restart: unless-stopped
     environment:

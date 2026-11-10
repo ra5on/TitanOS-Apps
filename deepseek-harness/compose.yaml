@@ -2,7 +2,7 @@ x-titanos:
   icon: "https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/master/apps/desktop/resources/icon.png"
   name: DeepSeek Harness
   main: dsh
-  category: productivity
+  category: ai
 
   description:
     de: >-
@@ -118,11 +118,17 @@ services:
     # DeepSeek Harness only binds one concrete address, never 0.0.0.0, and
     # only accepts browsers that name the listener or a trusted host.
     # The process drops to the installing account before anything runs.
+    # Docker creates ./data and ./workspace as root: while still root, a
+    # fresh empty folder gets that account as its owner, or npx could not
+    # write its cache (HOME=/data) and the app would never start.
     command:
       - sh
       - -c
       - >-
         umask 0002;
+        for d in /data /workspace; do
+        if [ "$$(stat -c %u "$$d")" = 0 ] && [ -z "$$(ls -A "$$d")" ];
+        then chown "$${PUID:?}:$${PGID:?}" "$$d"; fi; done;
         exec setpriv --reuid="$${PUID:?}" --regid="$${PGID:?}" --clear-groups
         npx --yes "@deepseek-ai/dsh@$${DSH_VERSION:?}" --profile web --no-open
         --host "$$(hostname -i | awk '{print $$1}')" --port 3080
