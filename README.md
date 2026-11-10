@@ -507,12 +507,12 @@ Migrationen alter Datenbanken, Video-Transcoding, Qualität der Gesichtserkennun
 GPU-Beschleunigung und reale NAS-Daten sind damit nicht abgenommen.
 
 Die [Katalogprüfung](.github/workflows/catalog.yml) prüft außerdem die Image-Tags
-aller Dienste mit dem unveränderten Installations-/Editorcode von TitanOS 0.21.0
+aller Dienste mit dem aktuellen Installations-/Editorcode von TitanOS (`main`)
 und echtem Docker Compose: direkt editierbare Tags, unabhängige Änderungen in
 Installation und Diensteditor, unterschiedliche Versionen im selben Stack sowie
 Ansichtswechsel und erneutes Öffnen. `scripts/check-registry-images.py` prüft
 zusätzlich die echten Registry-Manifeste und Linux-amd64-Unterstützung ohne
-Image-Layer herunterzuladen. HTTP-Fehler bleiben als Fehler sichtbar. Der isolierte [Katalog-Browsertest](scripts/catalog-ui-smoke.mjs)
+Image-Layer herunterzuladen; in der Katalogprüfung läuft es einmal in der Woche. HTTP-Fehler bleiben als Fehler sichtbar (eine überlastete Registry nur als Warnung). `scripts/catalog-metadata.test.mjs` prüft die Angaben jeder Vorlage (Name, Kategorie, Hauptdienst, Texte in beiden Sprachen, Symbol, beschriebene Ports) und jeden Skill gegen die Regeln von TitanOS. Der isolierte [Katalog-Browsertest](scripts/catalog-ui-smoke.mjs)
 öffnet alle 42 Vorlagen und prüft sämtliche 61 Tag-Felder einschließlich Stacks
 und mobiler Darstellung. Der [Prüfbericht](docs/validation/catalog-direct-tags-2026-10-25.json)
 trennt Registry-Metadaten, Formularprüfungen und Laufzeittests.

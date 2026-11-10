@@ -1,4 +1,4 @@
-// Exercise the actual TitanOS 0.21 install and service editors, not a second renderer.
+// Exercise the actual TitanOS install and service editors, not a second renderer.
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
@@ -7,7 +7,7 @@ import { resolve } from 'node:path';
 import { test } from 'node:test';
 
 const titanos = process.env.TITANOS_DIR;
-assert.ok(titanos, 'TITANOS_DIR must point at an unchanged TitanOS 0.21+ checkout');
+assert.ok(titanos, 'TITANOS_DIR must point at a TitanOS checkout');
 const { parse, parseDocument } = await import(`${titanos}/web/node_modules/yaml/dist/index.js`);
 const { readTemplate, build } = await import(`${titanos}/web/src/lib/compose/template.ts`);
 const { readService, writeService } = await import(`${titanos}/web/src/lib/compose/service.ts`);

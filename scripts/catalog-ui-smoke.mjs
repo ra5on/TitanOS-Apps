@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 const titanos = process.env.TITANOS_DIR;
-assert.ok(titanos, 'Set TITANOS_DIR to the released TitanOS checkout');
+assert.ok(titanos, 'Set TITANOS_DIR to a TitanOS checkout');
 const { fixtureFactory } = await import(`${titanos}/scripts/test-ui-fixtures.mjs`);
 const { parse } = await import(`${titanos}/web/node_modules/yaml/dist/index.js`);
 const { chromium } = await import(process.env.PLAYWRIGHT_PATH || 'playwright');
@@ -34,29 +34,32 @@ try {
   });
   let count = 0;
   for (const app of apps) {
-    await page.goto(base + '/apps');
-    const search = page.getByRole('searchbox');
-    if (await search.count()) await search.fill(app.name);
-    await page.getByRole('button', { name: new RegExp(app.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) }).first().click();
-    const panel = page.getByRole('complementary');
+    // The install page of the app; "Erweitert" shows the image of every service.
+    await page.goto(`${base}/apps/install/fixture/${app.id}`);
+    const panel = page.getByRole('main');
+    // The page remembers the view: switch it on only where it is off.
+    const advanced = panel.getByRole('switch', { name: 'Erweitert' });
+    if ((await advanced.getAttribute('aria-checked')) !== 'true') await advanced.click();
     const original = parse(app.compose);
     const selected = {};
+    // One service: plain "Repository:"; several: the service in brackets.
+    const single = Object.keys(original.services).length === 1;
+    const label = (service) => (single ? 'Repository:' : `Repository (${service}):`);
     let index = 0;
     for (const [service, spec] of Object.entries(original.services)) {
-      const group = panel.getByRole('group', { name: service, exact: true });
-      const tag = group.getByLabel('Image-Tag', { exact: true });
-      assert.equal(await tag.isDisabled(), false, `${app.id}/${service}: tag is directly editable`);
-      assert.equal(await tag.inputValue(), spec.image.slice(spec.image.lastIndexOf(':') + 1));
-      selected[service] = spec.image.slice(0, spec.image.lastIndexOf(':') + 1) + `catalog-test-${index}`;
-      await tag.fill(`catalog-test-${index++}`);
+      const field = panel.getByRole('textbox', { name: label(service), exact: true });
+      assert.equal(await field.isDisabled(), false, `${app.id}/${service}: the image is directly editable`);
+      assert.equal(await field.inputValue(), spec.image);
+      selected[service] = spec.image.slice(0, spec.image.lastIndexOf(':') + 1) + `catalog-test-${index++}`;
+      await field.fill(selected[service]);
       count++;
     }
-    await panel.getByRole('button', { name: 'Als Compose bearbeiten', exact: true }).click();
+    await panel.getByRole('button', { name: 'Als Compose-Datei bearbeiten', exact: true }).click();
     const yaml = panel.getByRole('textbox', { name: 'Als Compose bearbeiten', exact: true });
     const edited = parse(await yaml.inputValue());
     for (const [service, image] of Object.entries(selected)) assert.equal(edited.services[service].image, image);
     await panel.getByRole('button', { name: 'Zurück zum Formular', exact: true }).click();
-    for (const [service, image] of Object.entries(selected)) assert.equal(await panel.getByRole('group', { name: service, exact: true }).getByLabel('Image-Tag', { exact: true }).inputValue(), image.slice(image.lastIndexOf(':') + 1));
+    for (const [service, image] of Object.entries(selected)) assert.equal(await panel.getByRole('textbox', { name: label(service), exact: true }).inputValue(), image);
     if (app.id === 'nextcloud') {
       await page.screenshot({ path: `${output}/nextcloud-tags-desktop.png`, fullPage: true });
       await page.setViewportSize({ width: 390, height: 844 });
@@ -64,7 +67,7 @@ try {
       await page.screenshot({ path: `${output}/nextcloud-tags-mobile.png`, fullPage: true });
       await page.setViewportSize({ width: 1440, height: 1000 });
     }
-    console.log(`PASS ${app.id}: ${index} independent editable tags and YAML round trip`);
+    console.log(`PASS ${app.id}: ${index} independent editable images and YAML round trip`);
   }
   assert.equal(apps.length, 42);
   assert.equal(count, 61);
