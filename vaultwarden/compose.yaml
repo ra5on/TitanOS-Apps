@@ -5,6 +5,19 @@ x-titanos:
   description:
     de: Passwortmanager, kompatibel mit den Bitwarden-Apps.
     en: Password manager that works with the Bitwarden apps.
+  tips:
+    de: >-
+      Die Registrierung ist nach der Installation offen, damit du dein
+      Konto anlegen kannst. Stelle „Registrierung offen“ danach auf false
+      (App bearbeiten), sonst kann sich jeder ein Konto anlegen, der die
+      Adresse erreicht. Weitere Konten lädst du über die Verwaltungsseite
+      /admin mit dem Admin-Token ein.
+    en: >-
+      Sign-ups are open after the installation so that you can create
+      your account. Set "Sign-ups allowed" to false afterwards (edit the
+      app), or anyone who reaches the address can create an account.
+      Invite further accounts on the admin page /admin with the admin
+      token.
   variables:
     DOMAIN:
       label: { de: Öffentliche Adresse, en: Public address }

@@ -23,7 +23,32 @@ x-titanos:
       label: { de: Geräte im Netz finden, en: Local discovery }
 
 services:
+  # Docker legt ./data als root an; Syncthing läuft als PUID und könnte dort
+  # keinen Ordner anlegen. Nur ein frischer, leerer Ordner von root bekommt
+  # den Besitzer – eine gewählte Freigabe bleibt, wie sie ist.
+  init:
+    image: syncthing/syncthing:latest
+    user: "0:0"
+    restart: "no"
+    environment:
+      PUID: ""
+      PGID: ""
+    entrypoint:
+      - /bin/sh
+      - -ec
+    command:
+      - >-
+        if [ "$$(stat -c %u /data)" = 0 ] && [ -z "$$(ls -A /data)" ];
+        then chown "$${PUID:?}:$${PGID:?}" /data; fi
+    volumes:
+      - "./data:/data"
+    security_opt:
+      - no-new-privileges=true
+
   syncthing:
+    depends_on:
+      init:
+        condition: service_completed_successfully
     labels:
       titanos.webui: "http://[host]:8384"
     image: syncthing/syncthing:latest
