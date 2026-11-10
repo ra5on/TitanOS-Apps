@@ -104,7 +104,8 @@ try{
    assert.match(await (await req(`/etapi/notes/${note.noteId}/content`,{headers})).text(),/Synthetic persistent note/);
    const again=await jsonPost('/etapi/auth/login',{password});assert.equal(again.status,201);
    await page.context().close();page=await browser.newPage({locale:'en-US'});
-   await page.goto(base);await page.locator('input[type="password"]').fill(password);
+   // After the restart the login page can take longer than the usual half minute.
+   await page.goto(base);await page.locator('input[type="password"]').fill(password,{timeout:120000}).catch(async error=>{console.error('Trilium after the restart, no login field:',page.url(),(await page.locator('body').innerText().catch(()=>'')).slice(0,600));throw error});
    await page.locator('form button[type="submit"], form button.btn-primary').first().click();
    await page.waitForURL(url=>!url.searchParams.has('login')&&!url.pathname.includes('login'));
    // Account, API data and browser login assertions above remain mandatory.

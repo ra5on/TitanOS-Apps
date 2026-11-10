@@ -1,6 +1,7 @@
 x-titanos:
   icon: "https://raw.githubusercontent.com/syncthing/syncthing/main/assets/logo-128.png"
   name: Syncthing
+  main: syncthing
   category: backup
   description:
     de: Ordner zwischen Geräten synchronisieren, ohne Cloud.

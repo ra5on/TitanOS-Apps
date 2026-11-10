@@ -79,8 +79,15 @@ def main():
         args.output.write_text(json.dumps(report, indent=2) + '\n')
     for check in checks:
         print(json.dumps(check), flush=True)
-    failed = [check for check in checks if check.get('status') != 200 or not check.get('linuxAmd64')]
-    print(f'Checked {len(entries)} services / {len(checks)} distinct images; {len(failed)} unavailable or unverified.')
+    # A registry that only says "too many requests" or is down has told
+    # nothing about the image: reported, but not a failure of the catalog.
+    unverified = [check for check in checks if check.get('status') in (429, 500, 502, 503, 504)]
+    failed = [check for check in checks if check not in unverified and (check.get('status') != 200 or not check.get('linuxAmd64'))]
+    for check in failed:
+        print(f"::error::{check['image']}: {check.get('error') or 'no linux/amd64 image'} ({check.get('status')})")
+    for check in unverified:
+        print(f"::warning::{check['image']}: registry answered {check.get('status')}, not verified")
+    print(f'Checked {len(entries)} services / {len(checks)} distinct images; {len(failed)} unavailable, {len(unverified)} unverified.')
     return bool(failed)
 
 if __name__ == '__main__':

@@ -1,21 +1,27 @@
 name: Catalog checks
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  # Once a week: does every image of the catalog still exist in its registry?
+  schedule:
+    - cron: '23 5 * * 1'
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
   check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: python3 -m unittest discover -s scripts -p 'test_*.py' -v
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
-      - name: Read unchanged released TitanOS form code
-        uses: actions/checkout@v7
+      - name: Read the current TitanOS form code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ra5on/TitanOS
-          ref: v0.21.0
+          ref: main
           path: .titanos
           sparse-checkout: web/src/lib
       - name: Verify current channels and direct per-service tag editing
@@ -25,6 +31,10 @@ jobs:
           npm install --prefix /tmp/catalog-yaml --ignore-scripts yaml@2.9.1
           ln -s /tmp/catalog-yaml/node_modules .titanos/web/node_modules
           node scripts/catalog-images.test.mjs
+      - name: Check metadata of templates and skills
+        env:
+          TITANOS_DIR: ${{ github.workspace }}/.titanos
+        run: node --test scripts/catalog-metadata.test.mjs
       - name: Validate Compose templates
         run: |
           for file in */compose.yaml; do
@@ -32,24 +42,32 @@ jobs:
           done
       - name: Check Frigate image availability
         run: docker manifest inspect ghcr.io/blakeblackshear/frigate:stable > /dev/null
+  registry:
+    name: Images exist in their registries
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: python3 scripts/check-registry-images.py
   ui:
     name: Catalog tags in TitanOS WebUI
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
       # Same version as storytold.yml and the local TitanOS dev setup.
       PLAYWRIGHT_VERSION: 1.56.1
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ra5on/TitanOS
-          ref: v0.21.0
+          ref: main
           path: .titanos
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
-      - name: Build unchanged released TitanOS UI and load browser client
+      - name: Build the current TitanOS UI and load browser client
         run: |
           npm --prefix .titanos/web ci
           npm --prefix .titanos/web run build
@@ -70,7 +88,7 @@ jobs:
             sleep 1
           done
           node scripts/catalog-ui-smoke.mjs
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: catalog-tags-ui
