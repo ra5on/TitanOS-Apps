@@ -38,9 +38,11 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.discover.outputs.matrix) }}
     runs-on: ubuntu-latest
+    # Builds and tests code that a pull request may have changed: this job
+    # can read only. Publishing is a job of its own (publish) that never
+    # runs for a pull request.
     permissions:
       contents: read
-      packages: write
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -66,8 +68,39 @@ jobs:
         with:
           name: browser-${{ matrix.app }}
           path: '*-smoke.png'
-      - name: Publish checked images
+      - name: Keep the tested image for publishing
         if: github.event_name != 'pull_request'
+        env:
+          APP: ${{ matrix.app }}
+        run: docker save "test-$APP" | zstd -q -T0 -o "image-$APP.tar.zst"
+      - uses: actions/upload-artifact@v7
+        if: github.event_name != 'pull_request'
+        with:
+          name: image-${{ matrix.app }}
+          path: image-${{ matrix.app }}.tar.zst
+          retention-days: 1
+          compression-level: 0
+  publish:
+    # Pushes exactly the image the build job tested. One failed app must not
+    # hold back the others: a leg without a tested image ends quietly.
+    if: ${{ !cancelled() && github.event_name != 'pull_request' && needs.discover.outputs.changed == 'true' }}
+    needs: [discover, build]
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.discover.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        id: image
+        continue-on-error: true
+        with:
+          name: image-${{ matrix.app }}
+      - name: Publish checked images
+        if: steps.image.outcome == 'success'
         env:
           APP: ${{ matrix.app }}
           RECORD: ${{ matrix.record }}
@@ -75,6 +108,7 @@ jobs:
           ACTOR: ${{ github.actor }}
         run: |
           version=$(echo "$RECORD" | jq -r .tag)
+          zstd -dc "image-$APP.tar.zst" | docker load
           echo "$GH_TOKEN" | docker login ghcr.io -u "$ACTOR" --password-stdin
           image="ghcr.io/ra5on/titanos-$APP"
           docker tag "test-$APP" "$image:$version"
@@ -83,7 +117,7 @@ jobs:
           docker push "$image:latest"
           python3 scripts/storytold.py catalog --app "$APP" --record "$RECORD"
       - uses: actions/upload-artifact@v7
-        if: github.event_name != 'pull_request'
+        if: steps.image.outcome == 'success'
         with:
           name: catalog-${{ matrix.app }}
           include-hidden-files: true
@@ -93,8 +127,8 @@ jobs:
   catalog:
     # One failed app must not hold back the others (and make them rebuild
     # forever): only legs that passed their checks uploaded a catalog artifact.
-    if: ${{ !cancelled() && github.event_name != 'pull_request' && needs.build.result != 'skipped' }}
-    needs: build
+    if: ${{ !cancelled() && github.event_name != 'pull_request' && needs.publish.result != 'skipped' }}
+    needs: publish
     runs-on: ubuntu-latest
     permissions:
       contents: write
