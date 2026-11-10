@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   discover:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       matrix: ${{ steps.discover.outputs.matrix }}
       changed: ${{ steps.discover.outputs.changed }}
@@ -37,7 +37,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.discover.outputs.matrix) }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # Builds and tests code that a pull request may have changed: this job
     # can read only. Publishing is a job of its own (publish) that never
     # runs for a pull request.
@@ -88,7 +88,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.discover.outputs.matrix) }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: write
@@ -129,7 +129,7 @@ jobs:
     # forever): only legs that passed their checks uploaded a catalog artifact.
     if: ${{ !cancelled() && github.event_name != 'pull_request' && needs.publish.result != 'skipped' }}
     needs: publish
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
