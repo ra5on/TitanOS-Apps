@@ -42,9 +42,9 @@ try {
     if ((await advanced.getAttribute('aria-checked')) !== 'true') await advanced.click();
     const original = parse(app.compose);
     const selected = {};
-    // One service: plain "Repository:"; several: the service in brackets.
+    // One service: plain "Repository"; several: the service in brackets.
     const single = Object.keys(original.services).length === 1;
-    const label = (service) => (single ? 'Repository:' : `Repository (${service}):`);
+    const label = (service) => (single ? 'Repository' : `Repository (${service})`);
     let index = 0;
     for (const [service, spec] of Object.entries(original.services)) {
       const field = panel.getByRole('textbox', { name: label(service), exact: true });
@@ -69,8 +69,8 @@ try {
     }
     console.log(`PASS ${app.id}: ${index} independent editable images and YAML round trip`);
   }
-  assert.equal(apps.length, 42);
-  assert.equal(count, 61);
+  assert.equal(apps.length, 43);
+  assert.equal(count, 62);
   assert.deepEqual(errors, []);
   console.log(`PASS: actual catalog UI for ${apps.length} apps and ${count} services; desktop/mobile, no NAS mutations.`);
 } finally { await browser.close(); }

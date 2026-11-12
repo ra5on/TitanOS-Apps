@@ -29,7 +29,8 @@ Alle Dienste verwenden standardmäßig `latest`, soweit der Herausgeber diesen
 Tag anbietet. Die vier überprüften Ausnahmen sind Frigate (`stable`), Immich
 Server und ML (`release`) sowie PostgreSQL/VectorChord (`pg18-latest`). Das sind
 laufend aktualisierte Kanäle ihrer jeweiligen Herausgeber; nicht vorhandene
-`latest`-Tags werden nicht eingetragen.
+`latest`-Tags werden nicht eingetragen. Whisper (`latest-cuda`) und ComfyUI
+(`cu130-megapak-pt211`) nennen im Tag zusätzlich die Grafikkarten-Variante.
 
 Seit TitanOS **0.21.0** zeigt das Installationspanel für jeden Dienst dessen
 Dienstname, vollständiges Image und ein direkt editierbares **Image-Tag**-Feld.
@@ -77,6 +78,7 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [AdGuard Home](adguard/compose.yaml) | DNS-Server mit Werbe- und Trackingfilter |
 | [Bambu Studio](bambu-lab/compose.yaml) | 3D-Modelle im Browser vorbereiten und slicen |
 | [Cloudflare Tunnel](cloudflare-tunnel/compose.yaml) | Dienste über eigene Domains erreichbar machen |
+| [ComfyUI](comfyui/compose.yaml) | Bilder und Videos mit KI-Modellen erzeugen, Abläufe aus Knoten, mit NVIDIA-Grafikkarte |
 | [ConvertX](convertx/compose.yaml) | Dateien im Browser zwischen vielen Formaten umwandeln |
 | [DeepSeek Harness](deepseek-harness/compose.yaml) | KI-Agent für Dateien und Befehle in einem Arbeitsordner |
 | [Eclipse Mosquitto](mosquitto/compose.yaml) | Passwortgeschützter MQTT-Broker für Geräte und Automationen |
@@ -513,7 +515,7 @@ Installation und Diensteditor, unterschiedliche Versionen im selben Stack sowie
 Ansichtswechsel und erneutes Öffnen. `scripts/check-registry-images.py` prüft
 zusätzlich die echten Registry-Manifeste und Linux-amd64-Unterstützung ohne
 Image-Layer herunterzuladen; in der Katalogprüfung läuft es einmal in der Woche. HTTP-Fehler bleiben als Fehler sichtbar (eine überlastete Registry nur als Warnung). `scripts/catalog-metadata.test.mjs` prüft die Angaben jeder Vorlage (Name, Kategorie, Hauptdienst, Texte in beiden Sprachen, Symbol, beschriebene Ports) und jeden Skill gegen die Regeln von TitanOS. Der isolierte [Katalog-Browsertest](scripts/catalog-ui-smoke.mjs)
-öffnet alle 42 Vorlagen und prüft sämtliche 61 Tag-Felder einschließlich Stacks
+öffnet alle 43 Vorlagen und prüft sämtliche 62 Tag-Felder einschließlich Stacks
 und mobiler Darstellung. Der [Prüfbericht](docs/validation/catalog-direct-tags-2026-10-25.json)
 trennt Registry-Metadaten, Formularprüfungen und Laufzeittests.
 

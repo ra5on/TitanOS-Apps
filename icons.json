@@ -2,6 +2,7 @@
   "adguard": "https://raw.githubusercontent.com/AdguardTeam/AdGuardHome/master/client/public/assets/apple-touch-icon-180x180.png",
   "bambu-lab": "https://raw.githubusercontent.com/bambulab/BambuStudio/master/resources/images/BambuStudio_128px.png",
   "cloudflare-tunnel": "https://raw.githubusercontent.com/cloudflare/cloudflare-docs/production/public/favicon.png",
+  "comfyui": "https://cdn.jsdelivr.net/gh/selfhst/icons/svg/comfyui.svg",
   "convertx": "https://raw.githubusercontent.com/C4illin/ConvertX/main/public/favicon.svg",
   "deepseek-harness": "https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/master/apps/desktop/resources/icon.png",
   "esphome": "https://raw.githubusercontent.com/home-assistant/brands/master/core_integrations/esphome/icon.png",
