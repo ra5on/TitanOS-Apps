@@ -8,7 +8,11 @@ Zusätzliche Compose-Variablen oder Beispieldateien sind nicht nötig.
 
 `latest` ist der Standard, wo der Herausgeber ihn anbietet. Frigate nennt den
 aktuellen Kanal `stable`, Immich Server/ML `release` und das VectorChord-Image
-`pg18-latest`. Whisper (speaches) nennt ihn `latest-cuda`. Die aktuellen Registry-Abfragen für `latest` der ersten vier Images
+`pg18-latest`. Whisper (speaches) nennt ihn `latest-cuda`. ComfyUI
+(`yanwk/comfyui-boot`) hat kein offizielles Image und keinen `latest`-Tag; der
+Tag nennt die Variante, voreingestellt ist `cu130-megapak-pt211` (NVIDIA, CUDA 13.0,
+mit Zusatzknoten), daneben gibt es `cu126-megapak`, `cu130-slim-v2`, `cu126-slim`,
+`cpu`, `xpu` und `rocm`. Die aktuellen Registry-Abfragen für `latest` der ersten vier Images
 liefern HTTP 404. Zusammengehörige Dienste auf kompatiblen Versionen halten.
 PostgreSQL-Hauptversionswechsel benötigen eine Datenmigration.
 
@@ -29,6 +33,7 @@ vollständige Funktionsabnahme jeder Anwendung.
 | bambu-lab | bambustudio | `lscr.io/linuxserver/bambustudio:latest` |
 | cadcraft | cadcraft | `ghcr.io/ra5on/titanos-cadcraft:latest` |
 | cloudflare-tunnel | cloudflared | `cloudflare/cloudflared:latest` |
+| comfyui | comfyui | `yanwk/comfyui-boot:cu130-megapak-pt211` |
 | convertx | convertx | `ghcr.io/c4illin/convertx:latest` |
 | deckcraft | deckcraft | `ghcr.io/ra5on/titanos-deckcraft:latest` |
 | deepseek-harness | dsh | `node:latest` |

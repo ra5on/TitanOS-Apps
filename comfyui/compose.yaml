@@ -1,0 +1,121 @@
+x-titanos:
+  icon: "https://cdn.jsdelivr.net/gh/selfhst/icons/svg/comfyui.svg"
+  name: ComfyUI
+  main: comfyui
+  category: ai
+
+  description:
+    de: >-
+      Bilder und Videos mit KI-Modellen auf dem eigenen NAS
+      erzeugen. Abläufe werden im Browser aus Knoten
+      zusammengesteckt. Mit ComfyUI-Manager und über 40
+      vorinstallierten Zusatzknoten.
+    en: >-
+      Generate images and videos with AI models on your own
+      NAS. Workflows are built from nodes in the browser.
+      Includes ComfyUI-Manager and more than 40 preinstalled
+      custom nodes.
+
+  tips:
+    de: >-
+      Die Vorlage nutzt das Image cu130-megapak-pt211 (etwa
+      13 GB Download) und reserviert eine NVIDIA-Grafikkarte
+      ab der RTX-20-Reihe bzw. GTX 16; dafür muss das
+      NVIDIA-Treiber-Plugin laufen. Für ältere NVIDIA-Karten
+      den Tag cu126-megapak wählen, für ein kleineres Image
+      ohne Zusatzknoten cu130-slim-v2. Ohne NVIDIA-Karte den
+      Tag auf cpu (sehr langsam), xpu (Intel Arc) oder rocm
+      (AMD) ändern und den deploy-Abschnitt entfernen; bei
+      cpu zusätzlich --cpu als Startparameter eintragen.
+      Modelle sind nicht enthalten: über den Manager in der
+      Oberfläche laden oder in den Modellordner legen; je
+      Modell oft 2 bis 20 GB. Der erste Start kopiert
+      ComfyUI und die Zusatzknoten auf das Daten-Volume und
+      dauert einige Minuten. Zusatzknoten werden danach über
+      den Manager aktualisiert, nicht über ein neues Image.
+      Die Oberfläche hat keine Anmeldung und Zusatzknoten
+      führen beliebigen Code aus; nicht öffentlich freigeben.
+    en: >-
+      The template uses the image cu130-megapak-pt211 (about
+      13 GB to download) and reserves an NVIDIA graphics card
+      from the RTX 20 series or GTX 16 on; the NVIDIA driver
+      plugin must run. For older NVIDIA cards choose the tag
+      cu126-megapak, for a smaller image without custom nodes
+      cu130-slim-v2. Without an NVIDIA card change the tag to
+      cpu (very slow), xpu (Intel Arc) or rocm (AMD) and
+      remove the deploy section; with cpu also enter --cpu as
+      start argument. Models are not included: download them
+      with the Manager in the interface or put them into the
+      model folder; a model is often 2 to 20 GB. The first
+      start copies ComfyUI and the custom nodes to the data
+      volume and takes a few minutes. After that, custom
+      nodes are updated with the Manager, not by a new image.
+      The interface has no login and custom nodes run
+      arbitrary code; do not expose it publicly.
+
+  variables:
+    CLI_ARGS:
+      label: { de: Startparameter von ComfyUI, en: ComfyUI start arguments }
+
+  paths:
+    /root/ComfyUI/models:
+      label: { de: Modelle, en: Models }
+    /root/ComfyUI/output:
+      label: { de: Erzeugte Bilder und Videos, en: Generated images and videos }
+    /root/ComfyUI/input:
+      label: { de: Eingabedateien, en: Input files }
+    /root/ComfyUI/user:
+      label: { de: Abläufe und Einstellungen, en: Workflows and settings }
+    /root/ComfyUI/custom_nodes:
+      label: { de: Zusatzknoten, en: Custom nodes }
+    /root/.local:
+      label: { de: Nachinstallierte Python-Pakete, en: Additionally installed Python packages }
+    /root/.cache:
+      label: { de: Cache und automatisch geladene Modelle, en: Cache and automatically downloaded models }
+    /root/.config:
+      label: { de: Programmeinstellungen, en: Program settings }
+    /root/user-scripts:
+      label: { de: Eigenes Skript vor dem Start, en: Own script before the start }
+
+  ports:
+    "8188":
+      label: WebUI
+      webui: true
+
+services:
+  comfyui:
+    image: yanwk/comfyui-boot:cu130-megapak-pt211
+    restart: unless-stopped
+    init: true
+    labels:
+      titanos.webui: "http://[host]:8188"
+    environment:
+      TZ: "Europe/Berlin"
+      # Extra arguments for ComfyUI's main.py, e.g. --fast, --lowvram, --cpu.
+      CLI_ARGS: ""
+    ports:
+      - "8188:8188"
+    volumes:
+      - ./models:/root/ComfyUI/models
+      - ./output:/root/ComfyUI/output
+      - ./input:/root/ComfyUI/input
+      - ./user:/root/ComfyUI/user
+      - ./custom_nodes:/root/ComfyUI/custom_nodes
+      - ./python:/root/.local
+      - ./cache:/root/.cache
+      - ./config:/root/.config
+      - ./user-scripts:/root/user-scripts
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    stop_grace_period: 30s
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--output", "/dev/null", "http://127.0.0.1:8188/system_stats"]
+      interval: 30s
+      timeout: 10s
+      start_period: 600s
+      retries: 3

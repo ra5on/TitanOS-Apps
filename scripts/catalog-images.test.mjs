@@ -18,7 +18,9 @@ const exceptions = {
   'ghcr.io/immich-app/immich-server': 'release',
   'ghcr.io/immich-app/immich-machine-learning': 'release',
   'ghcr.io/tensorchord/vchord-suite': 'pg18-latest',
-  'ghcr.io/speaches-ai/speaches': 'latest-cuda'
+  'ghcr.io/speaches-ai/speaches': 'latest-cuda',
+  // No latest: the tag names the graphics card variant.
+  'yanwk/comfyui-boot': 'cu130-megapak-pt211'
 };
 let apps = 0, services = 0, stacks = 0;
 for (const app of readdirSync(root, { withFileTypes: true }).filter(entry => entry.isDirectory() && !entry.name.startsWith('.'))) {
@@ -95,8 +97,8 @@ for (const app of readdirSync(root, { withFileTypes: true }).filter(entry => ent
   });
 }
 test('the complete catalog and multi-service stacks were covered', () => {
-  assert.equal(apps, 42);
-  assert.equal(services, 61);
+  assert.equal(apps, 43);
+  assert.equal(services, 62);
   assert.ok(stacks >= 7);
   console.log(`Checked ${apps} apps, ${services} services and ${stacks} stacks using released TitanOS helpers and real Compose.`);
 });
