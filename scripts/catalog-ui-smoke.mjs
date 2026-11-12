@@ -42,9 +42,9 @@ try {
     if ((await advanced.getAttribute('aria-checked')) !== 'true') await advanced.click();
     const original = parse(app.compose);
     const selected = {};
-    // One service: plain "Repository:"; several: the service in brackets.
+    // One service: plain "Repository"; several: the service in brackets.
     const single = Object.keys(original.services).length === 1;
-    const label = (service) => (single ? 'Repository:' : `Repository (${service}):`);
+    const label = (service) => (single ? 'Repository' : `Repository (${service})`);
     let index = 0;
     for (const [service, spec] of Object.entries(original.services)) {
       const field = panel.getByRole('textbox', { name: label(service), exact: true });
