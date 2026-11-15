@@ -6,14 +6,14 @@ x-titanos:
     de: Eigene Metasuchmaschine – fragt viele Suchdienste ab, ohne Konto und ohne Verlauf. Der KI-Agent von TitanOS kann sie als Websuche nutzen.
     en: A metasearch engine of your own – asks many search services, without an account or history. The TitanOS AI agent can use it as its web search.
   tips:
-    de: Nach der Installation die Adresse (http://<NAS>:8888) unter Einstellungen › KI-Agent ›
+    de: Nach der Installation die Adresse (http://<NAS>:8580) unter Einstellungen › KI-Agent ›
       Verbindung und Modelle › „Eigene Websuche (SearXNG)“ eintragen; der Agent sucht dann hier statt
       über die Seite von DuckDuckGo. Die Vorlage schaltet dafür beim ersten Start die JSON-Ausgabe ein
       und legt einen eigenen geheimen Schlüssel an (config/settings.yml auf dem Daten-Volume); eine
       vorhandene settings.yml wird nicht angefasst. Suchdienste, Sprache und Aussehen stellst du in
       dieser Datei oder in der Weboberfläche ein. SearXNG hat keine Anmeldung, deshalb nur im
       Heimnetz oder über Tailscale erreichbar lassen und keine Router-Portfreigabe einrichten.
-    en: After installing, enter the address (http://<NAS>:8888) under Settings › AI agent › Connection
+    en: After installing, enter the address (http://<NAS>:8580) under Settings › AI agent › Connection
       and models › "Own web search (SearXNG)"; the agent then searches here instead of through
       DuckDuckGo's page. For that the template switches the JSON output on at the first start and
       creates a secret key of its own (config/settings.yml on the data volume); an existing
@@ -39,9 +39,9 @@ services:
     image: searxng/searxng:latest
     restart: unless-stopped
     labels:
-      titanos.webui: http://[host]:8888
+      titanos.webui: http://[host]:8580
     ports:
-      - 8888:8080
+      - 8580:8080
     logging:
       driver: json-file
       options:

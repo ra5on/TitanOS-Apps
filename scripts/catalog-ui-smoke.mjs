@@ -69,8 +69,8 @@ try {
     }
     console.log(`PASS ${app.id}: ${index} independent editable images and YAML round trip`);
   }
-  assert.equal(apps.length, 43);
-  assert.equal(count, 62);
+  assert.equal(apps.length, 44);
+  assert.equal(count, 63);
   assert.deepEqual(errors, []);
   console.log(`PASS: actual catalog UI for ${apps.length} apps and ${count} services; desktop/mobile, no NAS mutations.`);
 } finally { await browser.close(); }
