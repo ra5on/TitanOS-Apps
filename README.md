@@ -107,6 +107,7 @@ Die Links führen zur jeweiligen Compose-Vorlage mit ihren Einstellungen.
 | [PhotoCraft](photocraft/compose.yaml) | Bilder bearbeiten |
 | [Pi-hole](pihole/compose.yaml) | DNS-Werbeblocker mit Dashboard |
 | [Satisfactory](satisfactory/compose.yaml) | Dedizierter Satisfactory-Server für eine gemeinsame Fabrik und dauerhafte Spielstände |
+| [SearXNG](searxng/compose.yaml) | Eigene Metasuchmaschine, auch als Websuche für den KI-Agenten von TitanOS |
 | [SolidCraft](solidcraft/compose.yaml) | 3D-CAD-Modelle im Browser erstellen und bearbeiten |
 | [Syncthing](syncthing/compose.yaml) | Ordner zwischen Geräten synchronisieren |
 | [Terraria / tModLoader](terraria/compose.yaml) | Terraria-Server mit tModLoader, dauerhafter Welt und optionalen Workshop-Mods |
@@ -515,7 +516,7 @@ Installation und Diensteditor, unterschiedliche Versionen im selben Stack sowie
 Ansichtswechsel und erneutes Öffnen. `scripts/check-registry-images.py` prüft
 zusätzlich die echten Registry-Manifeste und Linux-amd64-Unterstützung ohne
 Image-Layer herunterzuladen; in der Katalogprüfung läuft es einmal in der Woche. HTTP-Fehler bleiben als Fehler sichtbar (eine überlastete Registry nur als Warnung). `scripts/catalog-metadata.test.mjs` prüft die Angaben jeder Vorlage (Name, Kategorie, Hauptdienst, Texte in beiden Sprachen, Symbol, beschriebene Ports) und jeden Skill gegen die Regeln von TitanOS. Der isolierte [Katalog-Browsertest](scripts/catalog-ui-smoke.mjs)
-öffnet alle 43 Vorlagen und prüft sämtliche 62 Tag-Felder einschließlich Stacks
+öffnet alle 44 Vorlagen und prüft sämtliche 63 Tag-Felder einschließlich Stacks
 und mobiler Darstellung. Der [Prüfbericht](docs/validation/catalog-direct-tags-2026-10-25.json)
 trennt Registry-Metadaten, Formularprüfungen und Laufzeittests.
 
