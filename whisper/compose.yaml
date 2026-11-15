@@ -6,13 +6,17 @@ x-titanos:
 
   description:
     de: >-
-      Spracherkennung mit Whisper auf dem eigenen NAS.
-      OpenAI-kompatible Schnittstelle für die Spracheingabe
-      des KI-Agenten von TitanOS und andere Apps.
+      Spracherkennung mit Whisper und OpenAI-kompatibler
+      Schnittstelle für andere Apps und Programme. Für den
+      KI-Agenten von TitanOS und für Home Assistant sind die
+      Sprachdienste von TitanOS (Einstellungen › Sprachdienste)
+      der einfachere Weg; diese App wird dafür nicht gebraucht.
     en: >-
-      Speech recognition with Whisper on your own NAS.
-      OpenAI-compatible API for the voice input of the
-      TitanOS KI-Agent and other apps.
+      Speech recognition with Whisper and an OpenAI-compatible
+      API for other apps and programs. For the TitanOS KI-Agent
+      and for Home Assistant the speech services of TitanOS
+      (Settings › Speech services) are the easier way; this app
+      is not needed for them.
 
   tips:
     de: >-
@@ -22,8 +26,10 @@ x-titanos:
       ghcr.io/speaches-ai/speaches:latest-cpu ändern und den
       deploy-Abschnitt entfernen. Das unter PRELOAD_MODELS
       genannte Modell wird beim ersten Start geladen (large-v3
-      etwa 3 GB). Danach unter Einstellungen › KI-Agent ›
-      Verbindung und Modelle „Whisper-App übernehmen“ wählen.
+      etwa 3 GB). Home Assistant kann diese App nicht nutzen
+      (es erwartet das Wyoming-Protokoll der Sprachdienste).
+      Wer sie trotzdem für den KI-Agenten nehmen will: unter
+      Einstellungen › KI-Agent › Verbindung übernehmen.
       Die API hat keine Anmeldung; nicht öffentlich freigeben.
     en: >-
       The template uses the CUDA image and reserves an NVIDIA
@@ -32,9 +38,11 @@ x-titanos:
       ghcr.io/speaches-ai/speaches:latest-cpu and remove the
       deploy section. The model named in PRELOAD_MODELS is
       downloaded on the first start (large-v3 about 3 GB).
-      Then choose “Use the Whisper app” under Settings ›
-      KI-Agent › Connection and models. The API has no login;
-      do not expose it publicly.
+      Home Assistant cannot use this app (it expects the
+      Wyoming protocol of the speech services). To use it for
+      the KI-Agent all the same: take it over under Settings ›
+      KI-Agent › Connection. The API has no login; do not
+      expose it publicly.
 
   variables:
     PRELOAD_MODELS:
