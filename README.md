@@ -591,6 +591,12 @@ Trilium-Desktop-Synchronisation, Mehrinstanzbetrieb, MQTT-Geräte/ACLs/TLS,
 PairDrop-Transfers zwischen unterschiedlichen Netzen, TURN, mobile Browser,
 dauerhafte Kopplung sowie Reverse-Proxy-Betrieb.
 
+## Haftungsausschluss
+
+Der App-Katalog gehört zu TitanOS, einem privaten, nicht kommerziellen Projekt; die Apps selbst stammen von ihren Herstellern. Es wird kostenlos und ohne Gewähr bereitgestellt, die Nutzung geschieht auf eigenes Risiko. RAID und Snapshots ersetzen keine Datensicherung. Den vollständigen Hinweis auf Deutsch und Englisch enthält [DISCLAIMER.md](DISCLAIMER.md).
+
+*Part of TitanOS, a private, non-commercial project, provided free of charge and without warranty; use it at your own risk. See [DISCLAIMER.md](DISCLAIMER.md).*
+
 ## Lizenzen und Herkunft
 
 Die Anwendungen, Container-Images und Logos unterliegen den Lizenzen und
